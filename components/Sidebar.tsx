@@ -7,7 +7,7 @@ import {
   LayoutDashboard, FileText, BarChart3, Wallet, ShoppingCart,
   Banknote, Users, LogOut, Box, Shield, UsersRound, Building2,
   ChevronRight, Circle, Truck, Receipt, Scale, TrendingUp,
-  ArrowDownLeft, Landmark,
+  ArrowDownLeft, Landmark, X,
 } from "lucide-react";
 
 interface MenuItem {
@@ -192,7 +192,12 @@ const menus: Record<string, { section: string; items: MenuItem[] }[]> = {
   ],
 };
 
-export default function Sidebar() {
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
+export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const { role } = useRole();
   const menu = menus[role] || menus["staff"];
@@ -204,7 +209,26 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col h-screen shrink-0">
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/40 z-40 lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col h-screen shrink-0 transform transition-transform duration-300 ease-in-out ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        } lg:translate-x-0`}
+      >
+        {/* Mobile close button */}
+        <button
+          onClick={onMobileClose}
+          className="lg:hidden absolute top-3.5 right-3.5 p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition z-10"
+        >
+          <X className="w-5 h-5" />
+        </button>
       <div className="h-16 flex items-center px-6 border-b border-slate-100">
         <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white mr-3">
           <Box className="w-5 h-5" />
@@ -232,6 +256,7 @@ export default function Sidebar() {
                 <div key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={onMobileClose}
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
                       isItemActive || isParentActive
                         ? "bg-blue-50 text-blue-700 font-semibold"
@@ -252,6 +277,7 @@ export default function Sidebar() {
                           <Link
                             key={child.href}
                             href={child.href}
+                            onClick={onMobileClose}
                             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
                               childActive
                                 ? "bg-blue-50 text-blue-700 font-semibold"
@@ -284,6 +310,7 @@ export default function Sidebar() {
           </Link>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
