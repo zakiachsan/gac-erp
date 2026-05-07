@@ -16,11 +16,7 @@ export default function LoginPage() {
 
   const handleLogin = (r: UserRole) => {
     setRole(r);
-    if (r === "super_admin") {
-      router.push("/super-admin");
-    } else {
-      router.push("/dashboard");
-    }
+    router.push("/dashboard");
   };
 
   return (
