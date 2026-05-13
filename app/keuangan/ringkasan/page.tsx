@@ -11,6 +11,8 @@ import {
   TrendingUp, TrendingDown, Scale, Wallet, Landmark, Receipt,
   AlertTriangle, ArrowUpRight, ArrowDownRight, BarChart3,
 } from "lucide-react";
+import ExportButtons from "@/components/ExportButtons";
+import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
 
 export default function RingkasanKeuanganPage() {
   const maxVal = useMemo(() => Math.max(...trendData.map((t) => Math.max(t.pendapatan, t.cogs, t.beban))), []);
@@ -31,6 +33,20 @@ export default function RingkasanKeuanganPage() {
 
   return (
     <SidebarLayout title="Ringkasan Keuangan" subtitle="Executive Summary — overview KPI & trend">
+      <div className="flex justify-end mb-4">
+        <ExportButtons
+          onExportPDF={() => {
+            const headers = ["Bulan", "Pendapatan", "COGS", "Beban", "Laba Bersih"];
+            const rows = trendData.map((t) => [t.bulan, t.pendapatan, t.cogs, t.beban, t.labaBersih]);
+            exportToPDF("Ringkasan Keuangan", headers, rows, `ringkasan-keuangan.pdf`);
+          }}
+          onExportExcel={() => {
+            const headers = ["Bulan", "Pendapatan", "COGS", "Beban", "Laba Bersih"];
+            const rows = trendData.map((t) => [t.bulan, t.pendapatan, t.cogs, t.beban, t.labaBersih]);
+            exportToExcel("Ringkasan Keuangan", headers, rows, `ringkasan-keuangan.xlsx`);
+          }}
+        />
+      </div>
       {/* KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <KpiCard label="Total Aset" value={totalAset} icon={Scale} color="blue" />

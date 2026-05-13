@@ -5,6 +5,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import FinanceFilterBar, { formatPeriodLabel } from "@/components/FinanceFilterBar";
 import { fmt, ppnList, type PpnItem } from "@/lib/keuanganData";
 import { Search } from "lucide-react";
+import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
 
 export default function PpnReportPage() {
   const [period, setPeriod] = useState({ from: "2026-05-01", to: "2026-05-31", quick: "thisMonth" });
@@ -32,7 +33,20 @@ export default function PpnReportPage() {
     <SidebarLayout title="PPN Report" subtitle={subtitle}>
       <FinanceFilterBar
         onChange={setPeriod}
-        onExport={() => alert("Export PPN Report")}
+        onExportPDF={() => {
+          const headers = ["No Faktur", "Tanggal", "Pihak", "NPWP", "Jenis", "DPP", "PPN", "Status"];
+          const rows = filtered.map((p) => [
+            p.noFaktur, p.tanggal, p.pihak, p.npwp, p.jenis, p.dpp, p.ppn, p.status,
+          ]);
+          exportToPDF("Laporan PPN", headers, rows, `ppn-report_${period.from}_${period.to}.pdf`);
+        }}
+        onExportExcel={() => {
+          const headers = ["No Faktur", "Tanggal", "Pihak", "NPWP", "Jenis", "DPP", "PPN", "Status"];
+          const rows = filtered.map((p) => [
+            p.noFaktur, p.tanggal, p.pihak, p.npwp, p.jenis, p.dpp, p.ppn, p.status,
+          ]);
+          exportToExcel("Laporan PPN", headers, rows, `ppn-report_${period.from}_${period.to}.xlsx`);
+        }}
         extraFilters={
           <div className="flex flex-wrap gap-4 items-end">
             <div>

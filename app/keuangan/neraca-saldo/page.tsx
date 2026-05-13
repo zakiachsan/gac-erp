@@ -3,7 +3,9 @@
 import { useState, useMemo } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { fmt, coaList, bukuBesarList, type CoaItem } from "@/lib/keuanganData";
-import { Scale, Search, Filter } from "lucide-react";
+import { Scale, Search } from "lucide-react";
+import ExportButtons from "@/components/ExportButtons";
+import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
 
 export default function NeracaSaldoPage() {
   const [periodFrom, setPeriodFrom] = useState("2026-05-01");
@@ -81,9 +83,38 @@ export default function NeracaSaldoPage() {
               <input type="text" placeholder="Kode atau nama akun..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
           </div>
-          <button onClick={() => alert("Export Neraca Saldo")} className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition">
-            Export
-          </button>
+          <ExportButtons
+            onExportPDF={() => {
+              const headers = ["Kode", "Nama Akun", "Kategori", "Saldo Awal D", "Saldo Awal K", "Debit", "Kredit", "Saldo Akhir D", "Saldo Akhir K"];
+              const rows = filtered.map((a) => [
+                a.kode,
+                a.nama,
+                a.kategori,
+                a.saldoAwal >= 0 ? a.saldoAwal : "",
+                a.saldoAwal < 0 ? Math.abs(a.saldoAwal) : "",
+                a.debit || "",
+                a.kredit || "",
+                a.saldoAkhir >= 0 ? a.saldoAkhir : "",
+                a.saldoAkhir < 0 ? Math.abs(a.saldoAkhir) : "",
+              ]);
+              exportToPDF("Neraca Saldo", headers, rows, `neraca-saldo_${periodFrom}_${periodTo}.pdf`);
+            }}
+            onExportExcel={() => {
+              const headers = ["Kode", "Nama Akun", "Kategori", "Saldo Awal D", "Saldo Awal K", "Debit", "Kredit", "Saldo Akhir D", "Saldo Akhir K"];
+              const rows = filtered.map((a) => [
+                a.kode,
+                a.nama,
+                a.kategori,
+                a.saldoAwal >= 0 ? a.saldoAwal : "",
+                a.saldoAwal < 0 ? Math.abs(a.saldoAwal) : "",
+                a.debit || "",
+                a.kredit || "",
+                a.saldoAkhir >= 0 ? a.saldoAkhir : "",
+                a.saldoAkhir < 0 ? Math.abs(a.saldoAkhir) : "",
+              ]);
+              exportToExcel("Neraca Saldo", headers, rows, `neraca-saldo_${periodFrom}_${periodTo}.xlsx`);
+            }}
+          />
         </div>
       </div>
 

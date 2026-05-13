@@ -3,7 +3,9 @@
 import { useState, useMemo } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { fmt, bukuBesarList, coaList, type BukuBesarItem } from "@/lib/keuanganData";
-import { BookOpen, Search, Filter } from "lucide-react";
+import { BookOpen, Search } from "lucide-react";
+import ExportButtons from "@/components/ExportButtons";
+import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
 
 export default function BukuBesarPage() {
   const [kodeAkun, setKodeAkun] = useState("Semua");
@@ -64,9 +66,34 @@ export default function BukuBesarPage() {
               <input type="text" placeholder="No bukti / keterangan..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
           </div>
-          <button onClick={() => alert("Export Buku Besar")} className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-medium rounded-lg transition">
-            Export
-          </button>
+          <ExportButtons
+            onExportPDF={() => {
+              const headers = ["Tanggal", "No Bukti", "Keterangan", "Akun", "Debit", "Kredit", "Saldo"];
+              const rows = filtered.map((e) => [
+                e.tanggal,
+                e.noBukti,
+                e.keterangan,
+                `${e.kodeAkun} — ${e.namaAkun}`,
+                e.debit || "",
+                e.kredit || "",
+                e.saldo,
+              ]);
+              exportToPDF("Buku Besar", headers, rows, `buku-besar_${periodFrom}_${periodTo}.pdf`);
+            }}
+            onExportExcel={() => {
+              const headers = ["Tanggal", "No Bukti", "Keterangan", "Akun", "Debit", "Kredit", "Saldo"];
+              const rows = filtered.map((e) => [
+                e.tanggal,
+                e.noBukti,
+                e.keterangan,
+                `${e.kodeAkun} — ${e.namaAkun}`,
+                e.debit || "",
+                e.kredit || "",
+                e.saldo,
+              ]);
+              exportToExcel("Buku Besar", headers, rows, `buku-besar_${periodFrom}_${periodTo}.xlsx`);
+            }}
+          />
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import FinanceFilterBar, { formatPeriodLabel } from "@/components/FinanceFilterBar";
 import { fmt, pphList, type PphItem } from "@/lib/keuanganData";
 import { Receipt, Search } from "lucide-react";
+import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
 
 export default function PphReportPage() {
   const [period, setPeriod] = useState({ from: "2026-05-01", to: "2026-05-31", quick: "thisMonth" });
@@ -31,7 +32,20 @@ export default function PphReportPage() {
     <SidebarLayout title="PPh Report" subtitle={subtitle}>
       <FinanceFilterBar
         onChange={setPeriod}
-        onExport={() => alert("Export PPh Report")}
+        onExportPDF={() => {
+          const headers = ["No Bukti", "Tanggal", "Pihak", "NPWP", "Jenis PPh", "Tarif %", "DPP", "PPh", "Status"];
+          const rows = filtered.map((p) => [
+            p.noBukti, p.tanggal, p.pihak, p.npwp, p.jenisPph, p.tarif, p.dpp, p.pph, p.status,
+          ]);
+          exportToPDF("Laporan PPh", headers, rows, `pph-report_${period.from}_${period.to}.pdf`);
+        }}
+        onExportExcel={() => {
+          const headers = ["No Bukti", "Tanggal", "Pihak", "NPWP", "Jenis PPh", "Tarif %", "DPP", "PPh", "Status"];
+          const rows = filtered.map((p) => [
+            p.noBukti, p.tanggal, p.pihak, p.npwp, p.jenisPph, p.tarif, p.dpp, p.pph, p.status,
+          ]);
+          exportToExcel("Laporan PPh", headers, rows, `pph-report_${period.from}_${period.to}.xlsx`);
+        }}
         extraFilters={
           <div className="flex flex-wrap gap-4 items-end">
             <div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Calendar, Download, ChevronDown, SlidersHorizontal, X } from "lucide-react";
+import { Calendar, ChevronDown, SlidersHorizontal, X } from "lucide-react";
+import ExportButtons from "./ExportButtons";
 
 const quickOptions = [
   { value: "today", label: "Hari Ini" },
@@ -26,6 +27,8 @@ function getQuickDates(value: string) {
 interface FinanceFilterBarProps {
   onChange?: (filters: { from: string; to: string; quick: string }) => void;
   onExport?: () => void;
+  onExportPDF?: () => void;
+  onExportExcel?: () => void;
   extraFilters?: React.ReactNode;
   defaultQuick?: string;
   hideQuickFilter?: boolean;
@@ -37,6 +40,8 @@ interface FinanceFilterBarProps {
 export default function FinanceFilterBar({
   onChange,
   onExport,
+  onExportPDF,
+  onExportExcel,
   extraFilters,
   defaultQuick = "thisMonth",
   hideQuickFilter = false,
@@ -173,14 +178,19 @@ export default function FinanceFilterBar({
         )}
 
         {/* Export */}
-        {onExport && (
-          <button
-            onClick={onExport}
-            className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 hover:border-slate-300 transition ml-auto"
-          >
-            <Download className="w-4 h-4 text-slate-400" />
-            <span>Export</span>
-          </button>
+        {(onExport || (onExportPDF && onExportExcel)) && (
+          <div className="ml-auto">
+            {onExportPDF && onExportExcel ? (
+              <ExportButtons onExportPDF={onExportPDF} onExportExcel={onExportExcel} />
+            ) : (
+              <button
+                onClick={onExport}
+                className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 hover:border-slate-300 transition"
+              >
+                Export
+              </button>
+            )}
+          </div>
         )}
       </div>
 
