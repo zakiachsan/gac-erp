@@ -30,7 +30,7 @@ export default function DanaPage() {
   const totalKeluar = filtered.filter((d) => d.tipe === "Keluar").reduce((s, d) => s + d.jumlah, 0);
 
   return (
-    <SidebarLayout title="Dana Masuk / Keluar" subtitle={subtitle}>
+    <SidebarLayout title="Kas & Bank" subtitle={subtitle}>
       <FinanceFilterBar
         onChange={setPeriod}
         onExport={() => alert("Export Dana")}
