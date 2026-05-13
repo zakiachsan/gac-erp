@@ -205,6 +205,385 @@ export const invoiceList: InvoiceItem[] = [
 ];
 
 // ═══════════════════════════════════════════
+// CHART OF ACCOUNTS (COA)
+// ═══════════════════════════════════════════
+export type CoaCategory =
+  | "Aset Lancar"
+  | "Aset Tetap"
+  | "Akumulasi Penyusutan"
+  | "Hutang Jangka Pendek"
+  | "Hutang Jangka Panjang"
+  | "Ekuitas"
+  | "Pendapatan"
+  | "COGS"
+  | "Beban Operasional"
+  | "Pendapatan Lain"
+  | "Beban Lain"
+  | "Pajak";
+
+export interface CoaItem {
+  kode: string;
+  nama: string;
+  kategori: CoaCategory;
+  tipe: "Debit" | "Kredit";
+  saldoAwal: number;
+  saldoAkhir: number;
+  status: "Aktif" | "Arsip";
+}
+
+export const coaList: CoaItem[] = [
+  // ASET LANCAR
+  { kode: "1110", nama: "Kas", kategori: "Aset Lancar", tipe: "Debit", saldoAwal: 250000000, saldoAkhir: 500000000, status: "Aktif" },
+  { kode: "1120", nama: "Bank BCA", kategori: "Aset Lancar", tipe: "Debit", saldoAwal: 500000000, saldoAkhir: 750000000, status: "Aktif" },
+  { kode: "1130", nama: "Piutang Usaha", kategori: "Aset Lancar", tipe: "Debit", saldoAwal: 600000000, saldoAkhir: 730000000, status: "Aktif" },
+  { kode: "1140", nama: "Persediaan Bahan", kategori: "Aset Lancar", tipe: "Debit", saldoAwal: 350000000, saldoAkhir: 420000000, status: "Aktif" },
+  { kode: "1150", nama: "Uang Muka", kategori: "Aset Lancar", tipe: "Debit", saldoAwal: 100000000, saldoAkhir: 150000000, status: "Aktif" },
+  { kode: "1160", nama: "PPN Masukan", kategori: "Aset Lancar", tipe: "Debit", saldoAwal: 120000000, saldoAkhir: 161150000, status: "Aktif" },
+  // ASET TETAP
+  { kode: "1210", nama: "Tanah", kategori: "Aset Tetap", tipe: "Debit", saldoAwal: 500000000, saldoAkhir: 500000000, status: "Aktif" },
+  { kode: "1220", nama: "Bangunan", kategori: "Aset Tetap", tipe: "Debit", saldoAwal: 1500000000, saldoAkhir: 1500000000, status: "Aktif" },
+  { kode: "1230", nama: "Kendaraan", kategori: "Aset Tetap", tipe: "Debit", saldoAwal: 500000000, saldoAkhir: 500000000, status: "Aktif" },
+  { kode: "1240", nama: "Peralatan Kantor", kategori: "Aset Tetap", tipe: "Debit", saldoAwal: 250000000, saldoAkhir: 250000000, status: "Aktif" },
+  // AKUMULASI PENYUSUTAN
+  { kode: "1310", nama: "Akum. Penyusutan Bangunan", kategori: "Akumulasi Penyusutan", tipe: "Kredit", saldoAwal: 200000000, saldoAkhir: 300000000, status: "Aktif" },
+  { kode: "1320", nama: "Akum. Penyusutan Kendaraan", kategori: "Akumulasi Penyusutan", tipe: "Kredit", saldoAwal: 100000000, saldoAkhir: 150000000, status: "Aktif" },
+  { kode: "1330", nama: "Akum. Penyusutan Peralatan", kategori: "Akumulasi Penyusutan", tipe: "Kredit", saldoAwal: 50000000, saldoAkhir: 70000000, status: "Aktif" },
+  // HUTANG JANGKA PENDEK
+  { kode: "2110", nama: "Hutang Usaha", kategori: "Hutang Jangka Pendek", tipe: "Kredit", saldoAwal: 800000000, saldoAkhir: 890000000, status: "Aktif" },
+  { kode: "2120", nama: "Hutang Bank", kategori: "Hutang Jangka Pendek", tipe: "Kredit", saldoAwal: 800000000, saldoAkhir: 750000000, status: "Aktif" },
+  { kode: "2130", nama: "Hutang Pajak", kategori: "Hutang Jangka Pendek", tipe: "Kredit", saldoAwal: 180000000, saldoAkhir: 220000000, status: "Aktif" },
+  { kode: "2140", nama: "PPN Keluaran", kategori: "Hutang Jangka Pendek", tipe: "Kredit", saldoAwal: 300000000, saldoAkhir: 401500000, status: "Aktif" },
+  // HUTANG JANGKA PANJANG
+  { kode: "2210", nama: "Pinjaman Jangka Panjang", kategori: "Hutang Jangka Panjang", tipe: "Kredit", saldoAwal: 1200000000, saldoAkhir: 1125000000, status: "Aktif" },
+  // EKUITAS
+  { kode: "3110", nama: "Modal Disetor", kategori: "Ekuitas", tipe: "Kredit", saldoAwal: 2000000000, saldoAkhir: 2000000000, status: "Aktif" },
+  { kode: "3120", nama: "Laba Ditahan", kategori: "Ekuitas", tipe: "Kredit", saldoAwal: 800000000, saldoAkhir: 950000000, status: "Aktif" },
+  { kode: "3130", nama: "Laba Tahun Berjalan", kategori: "Ekuitas", tipe: "Kredit", saldoAwal: 1200000000, saldoAkhir: 1800000000, status: "Aktif" },
+  // PENDAPATAN
+  { kode: "4110", nama: "Pendapatan Jasa Konstruksi", kategori: "Pendapatan", tipe: "Kredit", saldoAwal: 0, saldoAkhir: 3200000000, status: "Aktif" },
+  { kode: "4120", nama: "Pendapatan Maintenance", kategori: "Pendapatan", tipe: "Kredit", saldoAwal: 0, saldoAkhir: 850000000, status: "Aktif" },
+  { kode: "4130", nama: "Penjualan Barang", kategori: "Pendapatan", tipe: "Kredit", saldoAwal: 0, saldoAkhir: 450000000, status: "Aktif" },
+  // COGS
+  { kode: "5110", nama: "Pembelian Material", kategori: "COGS", tipe: "Debit", saldoAwal: 0, saldoAkhir: 1200000000, status: "Aktif" },
+  { kode: "5120", nama: "Upah Langsung", kategori: "COGS", tipe: "Debit", saldoAwal: 0, saldoAkhir: 650000000, status: "Aktif" },
+  { kode: "5130", nama: "Subkontraktor", kategori: "COGS", tipe: "Debit", saldoAwal: 0, saldoAkhir: 480000000, status: "Aktif" },
+  // BEBAN OPERASIONAL
+  { kode: "6110", nama: "Gaji & Tunjangan", kategori: "Beban Operasional", tipe: "Debit", saldoAwal: 0, saldoAkhir: 420000000, status: "Aktif" },
+  { kode: "6120", nama: "Transportasi", kategori: "Beban Operasional", tipe: "Debit", saldoAwal: 0, saldoAkhir: 85000000, status: "Aktif" },
+  { kode: "6130", nama: "Listrik & Air", kategori: "Beban Operasional", tipe: "Debit", saldoAwal: 0, saldoAkhir: 45000000, status: "Aktif" },
+  { kode: "6140", nama: "Sewa Kantor", kategori: "Beban Operasional", tipe: "Debit", saldoAwal: 0, saldoAkhir: 120000000, status: "Aktif" },
+  { kode: "6150", nama: "Biaya Admin & Umum", kategori: "Beban Operasional", tipe: "Debit", saldoAwal: 0, saldoAkhir: 65000000, status: "Aktif" },
+  { kode: "6160", nama: "Marketing", kategori: "Beban Operasional", tipe: "Debit", saldoAwal: 0, saldoAkhir: 95000000, status: "Aktif" },
+  { kode: "6170", nama: "Penyusutan Aset", kategori: "Beban Operasional", tipe: "Debit", saldoAwal: 0, saldoAkhir: 180000000, status: "Aktif" },
+  // PENDAPATAN LAIN
+  { kode: "7110", nama: "Pendapatan Bunga", kategori: "Pendapatan Lain", tipe: "Kredit", saldoAwal: 0, saldoAkhir: 12500000, status: "Aktif" },
+  // BEBAN LAIN
+  { kode: "8110", nama: "Beban Bunga", kategori: "Beban Lain", tipe: "Debit", saldoAwal: 0, saldoAkhir: 45000000, status: "Aktif" },
+];
+
+export const coaCategories: CoaCategory[] = [
+  "Aset Lancar", "Aset Tetap", "Akumulasi Penyusutan",
+  "Hutang Jangka Pendek", "Hutang Jangka Panjang",
+  "Ekuitas", "Pendapatan", "COGS", "Beban Operasional",
+  "Pendapatan Lain", "Beban Lain", "Pajak",
+];
+
+// ═══════════════════════════════════════════
+// JURNAL UMUM (GENERAL JOURNAL)
+// ═══════════════════════════════════════════
+export interface JurnalUmumItem {
+  id: string;
+  tanggal: string;
+  noBukti: string;
+  keterangan: string;
+  detail: { kodeAkun: string; namaAkun: string; debit: number; kredit: number }[];
+}
+
+export const jurnalUmumList: JurnalUmumItem[] = [
+  {
+    id: "JU-001",
+    tanggal: "2026-05-01",
+    noBukti: "JU/2026/05/001",
+    keterangan: "Penerimaan pembayaran invoice PT Maju Jaya",
+    detail: [
+      { kodeAkun: "1120", namaAkun: "Bank BCA", debit: 240000000, kredit: 0 },
+      { kodeAkun: "1130", namaAkun: "Piutang Usaha", debit: 0, kredit: 240000000 },
+    ],
+  },
+  {
+    id: "JU-002",
+    tanggal: "2026-05-02",
+    noBukti: "JU/2026/05/002",
+    keterangan: "Pembayaran pembelian material PT CoolTech",
+    detail: [
+      { kodeAkun: "2110", namaAkun: "Hutang Usaha", debit: 420000000, kredit: 0 },
+      { kodeAkun: "1120", namaAkun: "Bank BCA", debit: 0, kredit: 420000000 },
+    ],
+  },
+  {
+    id: "JU-003",
+    tanggal: "2026-05-03",
+    noBukti: "JU/2026/05/003",
+    keterangan: "Pembayaran gaji karyawan Mei 2026",
+    detail: [
+      { kodeAkun: "6110", namaAkun: "Gaji & Tunjangan", debit: 180000000, kredit: 0 },
+      { kodeAkun: "1120", namaAkun: "Bank BCA", debit: 0, kredit: 180000000 },
+    ],
+  },
+  {
+    id: "JU-004",
+    tanggal: "2026-05-04",
+    noBukti: "JU/2026/05/004",
+    keterangan: "Penerimaan pelunasan invoice CV Karya Mandiri",
+    detail: [
+      { kodeAkun: "1120", namaAkun: "Bank BCA", debit: 125000000, kredit: 0 },
+      { kodeAkun: "1130", namaAkun: "Piutang Usaha", debit: 0, kredit: 125000000 },
+    ],
+  },
+  {
+    id: "JU-005",
+    tanggal: "2026-05-05",
+    noBukti: "JU/2026/05/005",
+    keterangan: "Pembayaran cicilan pinjaman bank",
+    detail: [
+      { kodeAkun: "2210", namaAkun: "Pinjaman Jangka Panjang", debit: 75000000, kredit: 0 },
+      { kodeAkun: "8110", namaAkun: "Beban Bunga", debit: 45000000, kredit: 0 },
+      { kodeAkun: "1120", namaAkun: "Bank BCA", debit: 0, kredit: 120000000 },
+    ],
+  },
+  {
+    id: "JU-006",
+    tanggal: "2026-05-10",
+    noBukti: "JU/2026/05/006",
+    keterangan: "Penyusutan aset tetap bulan Mei",
+    detail: [
+      { kodeAkun: "6170", namaAkun: "Penyusutan Aset", debit: 15000000, kredit: 0 },
+      { kodeAkun: "1310", namaAkun: "Akum. Penyusutan Bangunan", debit: 0, kredit: 8333333 },
+      { kodeAkun: "1320", namaAkun: "Akum. Penyusutan Kendaraan", debit: 0, kredit: 4166667 },
+    ],
+  },
+  {
+    id: "JU-007",
+    tanggal: "2026-05-15",
+    noBukti: "JU/2026/05/007",
+    keterangan: "Pendapatan jasa konstruksi PT Delta Konstruksi",
+    detail: [
+      { kodeAkun: "1130", namaAkun: "Piutang Usaha", debit: 175000000, kredit: 0 },
+      { kodeAkun: "4110", namaAkun: "Pendapatan Jasa Konstruksi", debit: 0, kredit: 175000000 },
+    ],
+  },
+  {
+    id: "JU-008",
+    tanggal: "2026-05-20",
+    noBukti: "JU/2026/05/008",
+    keterangan: "Pembelian material proyek dari PT Maju Bersama",
+    detail: [
+      { kodeAkun: "5110", namaAkun: "Pembelian Material", debit: 195000000, kredit: 0 },
+      { kodeAkun: "1160", namaAkun: "PPN Masukan", debit: 21450000, kredit: 0 },
+      { kodeAkun: "2110", namaAkun: "Hutang Usaha", debit: 0, kredit: 216450000 },
+    ],
+  },
+];
+
+// ═══════════════════════════════════════════
+// BUKU BESAR (GENERAL LEDGER) — aggregated entries
+// ═══════════════════════════════════════════
+export interface BukuBesarItem {
+  id: string;
+  tanggal: string;
+  noBukti: string;
+  keterangan: string;
+  kodeAkun: string;
+  namaAkun: string;
+  debit: number;
+  kredit: number;
+  saldo: number;
+}
+
+function generateBukuBesar(): BukuBesarItem[] {
+  const entries: BukuBesarItem[] = [];
+  const saldoMap: Record<string, number> = {};
+
+  // init saldo from COA saldo awal
+  coaList.forEach((a) => {
+    saldoMap[a.kode] = a.saldoAwal;
+  });
+
+  let counter = 1;
+  jurnalUmumList.forEach((ju) => {
+    ju.detail.forEach((d) => {
+      const prevSaldo = saldoMap[d.kodeAkun] ?? 0;
+      const newSaldo = prevSaldo + d.debit - d.kredit;
+      saldoMap[d.kodeAkun] = newSaldo;
+      entries.push({
+        id: `BB-${String(counter++).padStart(4, "0")}`,
+        tanggal: ju.tanggal,
+        noBukti: ju.noBukti,
+        keterangan: ju.keterangan,
+        kodeAkun: d.kodeAkun,
+        namaAkun: d.namaAkun,
+        debit: d.debit,
+        kredit: d.kredit,
+        saldo: newSaldo,
+      });
+    });
+  });
+
+  return entries.sort((a, b) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime() || a.id.localeCompare(b.id));
+}
+
+export const bukuBesarList = generateBukuBesar();
+
+// ═══════════════════════════════════════════
+// ASET TETAP (FIXED ASSETS)
+// ═══════════════════════════════════════════
+export interface AsetTetapItem {
+  id: string;
+  nama: string;
+  kategori: string;
+  tanggalBeli: string;
+  nilaiPerolehan: number;
+  umurEkonomis: number; // dalam bulan
+  metodePenyusutan: "Garis Lurus" | "Saldo Menurun";
+  penyusutanBulanan: number;
+  akumulasiPenyusutan: number;
+  nilaiBuku: number;
+  kodeAkun: string;
+  kodeAkumulasi: string;
+  kodeBeban: string;
+  status: "Aktif" | "Dijual" | "Dihapuskan";
+}
+
+export const asetTetapList: AsetTetapItem[] = [
+  {
+    id: "AST-001",
+    nama: "Tanah Kavling Jakarta",
+    kategori: "Tanah",
+    tanggalBeli: "2020-01-15",
+    nilaiPerolehan: 500000000,
+    umurEkonomis: 0,
+    metodePenyusutan: "Garis Lurus",
+    penyusutanBulanan: 0,
+    akumulasiPenyusutan: 0,
+    nilaiBuku: 500000000,
+    kodeAkun: "1210",
+    kodeAkumulasi: "",
+    kodeBeban: "",
+    status: "Aktif",
+  },
+  {
+    id: "AST-002",
+    nama: "Gudang & Kantor Medan",
+    kategori: "Bangunan",
+    tanggalBeli: "2021-06-20",
+    nilaiPerolehan: 1500000000,
+    umurEkonomis: 240,
+    metodePenyusutan: "Garis Lurus",
+    penyusutanBulanan: 6250000,
+    akumulasiPenyusutan: 300000000,
+    nilaiBuku: 1200000000,
+    kodeAkun: "1220",
+    kodeAkumulasi: "1310",
+    kodeBeban: "6170",
+    status: "Aktif",
+  },
+  {
+    id: "AST-003",
+    nama: "Pickup Toyota Hilux",
+    kategori: "Kendaraan",
+    tanggalBeli: "2023-03-10",
+    nilaiPerolehan: 350000000,
+    umurEkonomis: 96,
+    metodePenyusutan: "Garis Lurus",
+    penyusutanBulanan: 3645833,
+    akumulasiPenyusutan: 100000000,
+    nilaiBuku: 250000000,
+    kodeAkun: "1230",
+    kodeAkumulasi: "1320",
+    kodeBeban: "6170",
+    status: "Aktif",
+  },
+  {
+    id: "AST-004",
+    nama: "Pickup Isuzu D-Max",
+    kategori: "Kendaraan",
+    tanggalBeli: "2024-01-15",
+    nilaiPerolehan: 320000000,
+    umurEkonomis: 96,
+    metodePenyusutan: "Garis Lurus",
+    penyusutanBulanan: 3333333,
+    akumulasiPenyusutan: 53333328,
+    nilaiBuku: 266666672,
+    kodeAkun: "1230",
+    kodeAkumulasi: "1320",
+    kodeBeban: "6170",
+    status: "Aktif",
+  },
+  {
+    id: "AST-005",
+    nama: "Genset 100KVA",
+    kategori: "Peralatan",
+    tanggalBeli: "2023-08-10",
+    nilaiPerolehan: 180000000,
+    umurEkonomis: 120,
+    metodePenyusutan: "Garis Lurus",
+    penyusutanBulanan: 1500000,
+    akumulasiPenyusutan: 30000000,
+    nilaiBuku: 150000000,
+    kodeAkun: "1240",
+    kodeAkumulasi: "1330",
+    kodeBeban: "6170",
+    status: "Aktif",
+  },
+  {
+    id: "AST-006",
+    nama: "Mesin Las Industri",
+    kategori: "Peralatan",
+    tanggalBeli: "2024-02-20",
+    nilaiPerolehan: 85000000,
+    umurEkonomis: 120,
+    metodePenyusutan: "Garis Lurus",
+    penyusutanBulanan: 708333,
+    akumulasiPenyusutan: 9916663,
+    nilaiBuku: 75083337,
+    kodeAkun: "1240",
+    kodeAkumulasi: "1330",
+    kodeBeban: "6170",
+    status: "Aktif",
+  },
+];
+
+// ═══════════════════════════════════════════
+// BANK RECONCILIATION
+// ═══════════════════════════════════════════
+export interface BankRecItem {
+  id: string;
+  tanggal: string;
+  keterangan: string;
+  jumlah: number;
+  tipe: "Masuk" | "Keluar";
+  status: "Cleared" | "Uncleared" | "Reconciled";
+  sumber: "Jurnal" | "Bank";
+  noReferensi: string;
+}
+
+export const bankRecList: BankRecItem[] = [
+  { id: "BR-001", tanggal: "2026-05-01", keterangan: "Penerimaan PT Maju Jaya", jumlah: 240000000, tipe: "Masuk", status: "Reconciled", sumber: "Jurnal", noReferensi: "TRF-20260501-001" },
+  { id: "BR-002", tanggal: "2026-05-01", keterangan: "Penerimaan PT Maju Jaya", jumlah: 240000000, tipe: "Masuk", status: "Reconciled", sumber: "Bank", noReferensi: "TRF-20260501-001" },
+  { id: "BR-003", tanggal: "2026-05-02", keterangan: "Pembayaran PT CoolTech", jumlah: 420000000, tipe: "Keluar", status: "Reconciled", sumber: "Jurnal", noReferensi: "TRF-20260502-002" },
+  { id: "BR-004", tanggal: "2026-05-02", keterangan: "Pembayaran PT CoolTech", jumlah: 420000000, tipe: "Keluar", status: "Reconciled", sumber: "Bank", noReferensi: "TRF-20260502-002" },
+  { id: "BR-005", tanggal: "2026-05-03", keterangan: "Transfer Gaji Karyawan", jumlah: 180000000, tipe: "Keluar", status: "Reconciled", sumber: "Jurnal", noReferensi: "PAY-20260503-001" },
+  { id: "BR-006", tanggal: "2026-05-03", keterangan: "Transfer Gaji Karyawan", jumlah: 180000000, tipe: "Keluar", status: "Reconciled", sumber: "Bank", noReferensi: "PAY-20260503-001" },
+  { id: "BR-007", tanggal: "2026-05-04", keterangan: "Penerimaan CV Karya Mandiri", jumlah: 125000000, tipe: "Masuk", status: "Reconciled", sumber: "Jurnal", noReferensi: "TRF-20260504-003" },
+  { id: "BR-008", tanggal: "2026-05-04", keterangan: "Penerimaan CV Karya Mandiri", jumlah: 125000000, tipe: "Masuk", status: "Reconciled", sumber: "Bank", noReferensi: "TRF-20260504-003" },
+  { id: "BR-009", tanggal: "2026-05-05", keterangan: "Auto Debit Cicilan Bank", jumlah: 125000000, tipe: "Keluar", status: "Reconciled", sumber: "Jurnal", noReferensi: "LOAN-20260505-001" },
+  { id: "BR-010", tanggal: "2026-05-05", keterangan: "Auto Debit Cicilan Bank", jumlah: 125000000, tipe: "Keluar", status: "Reconciled", sumber: "Bank", noReferensi: "LOAN-20260505-001" },
+  { id: "BR-011", tanggal: "2026-05-08", keterangan: "Biaya Admin Bank", jumlah: 25000, tipe: "Keluar", status: "Uncleared", sumber: "Bank", noReferensi: "ADM-20260508-001" },
+  { id: "BR-012", tanggal: "2026-05-10", keterangan: "Transfer Modal dari Pemegang Saham", jumlah: 300000000, tipe: "Masuk", status: "Cleared", sumber: "Jurnal", noReferensi: "MOD-20260510-001" },
+  { id: "BR-013", tanggal: "2026-05-12", keterangan: "Penerimaan PT Sejahtera (Angsuran)", jumlah: 100000000, tipe: "Masuk", status: "Cleared", sumber: "Jurnal", noReferensi: "TRF-20260512-004" },
+];
+
+// ═══════════════════════════════════════════
 // SUMMARY HELPERS
 // ═══════════════════════════════════════════
 export const totalAset = [...neracaAktivaLancar, ...neracaAktivaTetap].reduce((s, i) => s + i.jumlah, 0);
@@ -228,3 +607,110 @@ export const totalHutang = hutangList.reduce((s, i) => s + i.sisa, 0);
 export const totalPajakKeluaran = pajakList.filter((p) => p.jenis === "Pajak Keluaran").reduce((s, p) => s + p.ppn, 0);
 export const totalPajakMasukan = pajakList.filter((p) => p.jenis === "Pajak Masukan").reduce((s, p) => s + p.ppn, 0);
 export const selisihPajak = totalPajakKeluaran - totalPajakMasukan;
+
+
+// ═══════════════════════════════════════════
+// PPh REPORT (WITHHOLDING TAX)
+// ═══════════════════════════════════════════
+export interface PphItem {
+  id: string;
+  noBukti: string;
+  tanggal: string;
+  pihak: string;
+  npwp: string;
+  jenisPph: string;
+  tarif: number;
+  dpp: number;
+  pph: number;
+  status: "Normal" | "Dibatalkan";
+}
+
+export const pphList: PphItem[] = [
+  { id: "PPH-001", noBukti: "BUPOT-001", tanggal: "2026-05-05", pihak: "PT Maju Jaya", npwp: "09.123.456.7-123.000", jenisPph: "PPh 23 (Jasa)", tarif: 2, dpp: 3200000000, pph: 64000000, status: "Normal" },
+  { id: "PPH-002", noBukti: "BUPOT-002", tanggal: "2026-05-05", pihak: "CV Karya Mandiri", npwp: "02.987.654.3-210.000", jenisPph: "PPh 23 (Jasa)", tarif: 2, dpp: 450000000, pph: 9000000, status: "Normal" },
+  { id: "PPH-003", noBukti: "BUPOT-003", tanggal: "2026-05-10", pihak: "PT Delta Konstruksi", npwp: "01.234.567.8-901.000", jenisPph: "PPh 23 (Jasa)", tarif: 2, dpp: 175000000, pph: 3500000, status: "Normal" },
+  { id: "PPH-004", noBukti: "BUPOT-004", tanggal: "2026-05-15", pihak: "PT CoolTech", npwp: "03.456.789.0-123.000", jenisPph: "PPh 23 (Jasa)", tarif: 2, dpp: 850000000, pph: 17000000, status: "Normal" },
+  { id: "PPH-005", noBukti: "BUPOT-005", tanggal: "2026-05-20", pihak: "PT Maju Bersama", npwp: "07.654.321.0-987.000", jenisPph: "PPh 22 (Pembelian)", tarif: 1.5, dpp: 420000000, pph: 6300000, status: "Normal" },
+  { id: "PPH-006", noBukti: "BUPOT-006", tanggal: "2026-05-25", pihak: "PT Sejahtera Abadi", npwp: "08.765.432.1-098.000", jenisPph: "PPh 23 (Jasa)", tarif: 2, dpp: 250000000, pph: 5000000, status: "Normal" },
+];
+
+// ═══════════════════════════════════════════
+// PPN REPORT (SALES TAX)
+// ═══════════════════════════════════════════
+export interface PpnItem {
+  id: string;
+  noFaktur: string;
+  tanggal: string;
+  pihak: string;
+  npwp: string;
+  jenis: "Keluaran" | "Masukan";
+  dpp: number;
+  ppn: number;
+  status: "Normal" | "Dibatalkan" | "Direvisi";
+}
+
+export const ppnList: PpnItem[] = [
+  { id: "PPN-001", noFaktur: "010.123-45.67890123", tanggal: "2026-04-15", pihak: "PT Maju Jaya", npwp: "09.123.456.7-123.000", jenis: "Keluaran", dpp: 3200000000, ppn: 352000000, status: "Normal" },
+  { id: "PPN-002", noFaktur: "010.123-45.67890124", tanggal: "2026-05-05", pihak: "CV Karya Mandiri", npwp: "02.987.654.3-210.000", jenis: "Keluaran", dpp: 450000000, ppn: 49500000, status: "Normal" },
+  { id: "PPN-003", noFaktur: "020.987-65.43210987", tanggal: "2026-04-20", pihak: "PT CoolTech", npwp: "03.456.789.0-123.000", jenis: "Masukan", dpp: 850000000, ppn: 93500000, status: "Normal" },
+  { id: "PPN-004", noFaktur: "020.987-65.43210988", tanggal: "2026-05-03", pihak: "PT Maju Bersama", npwp: "07.654.321.0-987.000", jenis: "Masukan", dpp: 420000000, ppn: 46200000, status: "Normal" },
+  { id: "PPN-005", noFaktur: "020.987-65.43210989", tanggal: "2026-05-06", pihak: "PT Sejahtera Abadi", npwp: "08.765.432.1-098.000", jenis: "Masukan", dpp: 195000000, ppn: 21450000, status: "Normal" },
+  { id: "PPN-006", noFaktur: "010.123-45.67890125", tanggal: "2026-05-15", pihak: "PT Delta Konstruksi", npwp: "01.234.567.8-901.000", jenis: "Keluaran", dpp: 175000000, ppn: 19250000, status: "Normal" },
+];
+
+// ═══════════════════════════════════════════
+// BUDGET VS ACTUAL
+// ═══════════════════════════════════════════
+export interface BudgetActualItem {
+  id: string;
+  kodeAkun: string;
+  namaAkun: string;
+  kategori: string;
+  anggaran: number;
+  realisasi: number;
+  selisih: number;
+  persentase: number;
+}
+
+export const budgetActualList: BudgetActualItem[] = [
+  { id: "BA-001", kodeAkun: "4110", namaAkun: "Pendapatan Jasa Konstruksi", kategori: "Pendapatan", anggaran: 3500000000, realisasi: 3200000000, selisih: 300000000, persentase: 91.4 },
+  { id: "BA-002", kodeAkun: "4120", namaAkun: "Pendapatan Maintenance", kategori: "Pendapatan", anggaran: 900000000, realisasi: 850000000, selisih: 50000000, persentase: 94.4 },
+  { id: "BA-003", kodeAkun: "4130", namaAkun: "Penjualan Barang", kategori: "Pendapatan", anggaran: 500000000, realisasi: 450000000, selisih: 50000000, persentase: 90.0 },
+  { id: "BA-004", kodeAkun: "5110", namaAkun: "Pembelian Material", kategori: "COGS", anggaran: 1100000000, realisasi: 1200000000, selisih: -100000000, persentase: 109.1 },
+  { id: "BA-005", kodeAkun: "5120", namaAkun: "Upah Langsung", kategori: "COGS", anggaran: 600000000, realisasi: 650000000, selisih: -50000000, persentase: 108.3 },
+  { id: "BA-006", kodeAkun: "5130", namaAkun: "Subkontraktor", kategori: "COGS", anggaran: 450000000, realisasi: 480000000, selisih: -30000000, persentase: 106.7 },
+  { id: "BA-007", kodeAkun: "6110", namaAkun: "Gaji & Tunjangan", kategori: "Beban Operasional", anggaran: 400000000, realisasi: 420000000, selisih: -20000000, persentase: 105.0 },
+  { id: "BA-008", kodeAkun: "6120", namaAkun: "Transportasi", kategori: "Beban Operasional", anggaran: 80000000, realisasi: 85000000, selisih: -5000000, persentase: 106.3 },
+  { id: "BA-009", kodeAkun: "6130", namaAkun: "Listrik & Air", kategori: "Beban Operasional", anggaran: 40000000, realisasi: 45000000, selisih: -5000000, persentase: 112.5 },
+  { id: "BA-010", kodeAkun: "6140", namaAkun: "Sewa Kantor", kategori: "Beban Operasional", anggaran: 120000000, realisasi: 120000000, selisih: 0, persentase: 100.0 },
+  { id: "BA-011", kodeAkun: "6150", namaAkun: "Biaya Admin & Umum", kategori: "Beban Operasional", anggaran: 60000000, realisasi: 65000000, selisih: -5000000, persentase: 108.3 },
+  { id: "BA-012", kodeAkun: "6160", namaAkun: "Marketing", kategori: "Beban Operasional", anggaran: 100000000, realisasi: 95000000, selisih: 5000000, persentase: 95.0 },
+  { id: "BA-013", kodeAkun: "6170", namaAkun: "Penyusutan Aset", kategori: "Beban Operasional", anggaran: 180000000, realisasi: 180000000, selisih: 0, persentase: 100.0 },
+];
+
+// ═══════════════════════════════════════════
+// EXECUTIVE SUMMARY — TREND DATA (6 bulan)
+// ═══════════════════════════════════════════
+export interface TrendItem {
+  bulan: string;
+  pendapatan: number;
+  cogs: number;
+  beban: number;
+  labaBersih: number;
+}
+
+export const trendData: TrendItem[] = [
+  { bulan: "Des 2025", pendapatan: 2800000000, cogs: 1800000000, beban: 650000000, labaBersih: 350000000 },
+  { bulan: "Jan 2026", pendapatan: 3100000000, cogs: 1950000000, beban: 700000000, labaBersih: 450000000 },
+  { bulan: "Feb 2026", pendapatan: 2900000000, cogs: 1850000000, beban: 680000000, labaBersih: 370000000 },
+  { bulan: "Mar 2026", pendapatan: 3300000000, cogs: 2100000000, beban: 720000000, labaBersih: 480000000 },
+  { bulan: "Apr 2026", pendapatan: 3500000000, cogs: 2200000000, beban: 750000000, labaBersih: 550000000 },
+  { bulan: "Mei 2026", pendapatan: 4500000000, cogs: 2330000000, beban: 1015000000, labaBersih: 1155000000 },
+];
+
+export const totalPphDipotong = pphList.reduce((s, p) => s + p.pph, 0);
+export const totalPpnKeluaran = ppnList.filter((p) => p.jenis === "Keluaran").reduce((s, p) => s + p.ppn, 0);
+export const totalPpnMasukan = ppnList.filter((p) => p.jenis === "Masukan").reduce((s, p) => s + p.ppn, 0);
+export const totalAnggaran = budgetActualList.reduce((s, b) => s + b.anggaran, 0);
+export const totalRealisasi = budgetActualList.reduce((s, b) => s + b.realisasi, 0);
+export const totalSelisihBudget = totalAnggaran - totalRealisasi;
