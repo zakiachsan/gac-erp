@@ -7,6 +7,7 @@ import Link from "next/link";
 
 export default function CustomerDetailPage() {
   const [editOpen, setEditOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"project" | "penawaran">("project");
   const [customer, setCustomer] = useState({
     nama: "PT Maju Jaya",
     alamat: "Jl. Sudirman No. 45, Jakarta Pusat",
@@ -83,59 +84,113 @@ export default function CustomerDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Project Berjalan */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Briefcase className="w-5 h-5 text-blue-600" />
-            <h3 className="text-sm font-bold text-slate-900">Listing Project Berjalan</h3>
-          </div>
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
-              <tr><th className="pb-3 font-medium">No Kontrak</th><th className="pb-3 font-medium">Nama Project</th><th className="pb-3 font-medium text-right">Nilai</th><th className="pb-3 font-medium">Status</th></tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              <tr className="hover:bg-slate-50 transition">
-                <td className="py-3 font-mono text-xs text-slate-600">01/GAC/IV/2026</td>
-                <td className="py-3 font-medium text-slate-800">Pengadaan & Pemasangan AC Kantor Pusat</td>
-                <td className="py-3 text-right font-semibold">Rp 1.2M</td>
-                <td className="py-3"><span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Aktif</span></td>
-              </tr>
-              <tr className="hover:bg-slate-50 transition">
-                <td className="py-3 font-mono text-xs text-slate-600">04/GAC/V/2026</td>
-                <td className="py-3 font-medium text-slate-800">Maintenance AC Bulanan</td>
-                <td className="py-3 text-right font-semibold">Rp 15jt</td>
-                <td className="py-3"><span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Aktif</span></td>
-              </tr>
-            </tbody>
-          </table>
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* Tabs */}
+        <div className="flex items-center gap-1 border-b border-slate-200 px-6">
+          <button
+            onClick={() => setActiveTab("project")}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${
+              activeTab === "project"
+                ? "border-blue-600 text-blue-700"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Project Berjalan
+          </button>
+          <button
+            onClick={() => setActiveTab("penawaran")}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${
+              activeTab === "penawaran"
+                ? "border-rose-500 text-rose-600"
+                : "border-transparent text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Penawaran Kalah
+          </button>
         </div>
 
-        {/* Penawaran Kalah */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <XCircle className="w-5 h-5 text-rose-500" />
-            <h3 className="text-sm font-bold text-slate-900">Listing Penawaran Kalah</h3>
-          </div>
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
-              <tr><th className="pb-3 font-medium">No Penawaran</th><th className="pb-3 font-medium">Nama Project</th><th className="pb-3 font-medium text-right">Nilai</th><th className="pb-3 font-medium">Tanggal</th></tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              <tr className="hover:bg-slate-50 transition">
-                <td className="py-3 font-mono text-xs text-slate-600">QT-2026-0010</td>
-                <td className="py-3 font-medium text-slate-800">Pengadaan Mesin Produksi</td>
-                <td className="py-3 text-right font-semibold">Rp 350jt</td>
-                <td className="py-3 text-slate-600">20 Mar 2026</td>
-              </tr>
-              <tr className="hover:bg-slate-50 transition">
-                <td className="py-3 font-mono text-xs text-slate-600">QT-2026-0008</td>
-                <td className="py-3 font-medium text-slate-800">Renovasi Ruang Meeting</td>
-                <td className="py-3 text-right font-semibold">Rp 45jt</td>
-                <td className="py-3 text-slate-600">15 Feb 2026</td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="overflow-x-auto">
+          {activeTab === "project" ? (
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  <th className="px-6 py-3 font-medium whitespace-nowrap">ID Project</th>
+                  <th className="px-6 py-3 font-medium">No Kontrak</th>
+                  <th className="px-6 py-3 font-medium">Nama Project</th>
+                  <th className="px-6 py-3 font-medium text-right">Nilai</th>
+                  <th className="px-6 py-3 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="px-6 py-3">
+                    <Link href="/project/PRJ-2026-0001" className="font-mono text-xs text-blue-600 hover:text-blue-700 hover:underline font-semibold whitespace-nowrap">
+                      PRJ-2026-0001
+                    </Link>
+                  </td>
+                  <td className="px-6 py-3 font-mono text-xs text-slate-600">01/GAC/IV/2026</td>
+                  <td className="px-6 py-3 font-medium text-slate-800">Pengadaan & Pemasangan AC Kantor Pusat</td>
+                  <td className="px-6 py-3 text-right font-semibold text-slate-900">Rp 1.2M</td>
+                  <td className="px-6 py-3">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Aktif</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="px-6 py-3">
+                    <Link href="/project/PRJ-2026-0004" className="font-mono text-xs text-blue-600 hover:text-blue-700 hover:underline font-semibold whitespace-nowrap">
+                      PRJ-2026-0004
+                    </Link>
+                  </td>
+                  <td className="px-6 py-3 font-mono text-xs text-slate-600">04/GAC/V/2026</td>
+                  <td className="px-6 py-3 font-medium text-slate-800">Maintenance AC Bulanan</td>
+                  <td className="px-6 py-3 text-right font-semibold text-slate-900">Rp 15jt</td>
+                  <td className="px-6 py-3">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Aktif</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 border-b border-slate-200">
+                <tr className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                  <th className="px-6 py-3 font-medium whitespace-nowrap">ID Penawaran</th>
+                  <th className="px-6 py-3 font-medium">Nama Project</th>
+                  <th className="px-6 py-3 font-medium text-right">Nilai</th>
+                  <th className="px-6 py-3 font-medium">Status</th>
+                  <th className="px-6 py-3 font-medium">Tanggal</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="px-6 py-3">
+                    <Link href="/penawaran/QT-2026-0010" className="font-mono text-xs text-blue-600 hover:text-blue-700 hover:underline font-semibold whitespace-nowrap">
+                      QT-2026-0010
+                    </Link>
+                  </td>
+                  <td className="px-6 py-3 font-medium text-slate-800">Pengadaan Mesin Produksi</td>
+                  <td className="px-6 py-3 text-right font-semibold text-slate-900">Rp 350jt</td>
+                  <td className="px-6 py-3">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100">Kalah</span>
+                  </td>
+                  <td className="px-6 py-3 text-slate-600">20 Mar 2026</td>
+                </tr>
+                <tr className="hover:bg-slate-50 transition">
+                  <td className="px-6 py-3">
+                    <Link href="/penawaran/QT-2026-0008" className="font-mono text-xs text-blue-600 hover:text-blue-700 hover:underline font-semibold whitespace-nowrap">
+                      QT-2026-0008
+                    </Link>
+                  </td>
+                  <td className="px-6 py-3 font-medium text-slate-800">Renovasi Ruang Meeting</td>
+                  <td className="px-6 py-3 text-right font-semibold text-slate-900">Rp 45jt</td>
+                  <td className="px-6 py-3">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100">Kalah</span>
+                  </td>
+                  <td className="px-6 py-3 text-slate-600">15 Feb 2026</td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 

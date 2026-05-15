@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { useRole } from "@/context/RoleContext";
-import { Plus, Search, X, Upload, CheckCircle, XCircle, RotateCcw, History, ArrowRight } from "lucide-react";
+import { Plus, Search, X, Upload, CheckCircle, XCircle, RotateCcw, ArrowRight, Eye } from "lucide-react";
 import Link from "next/link";
 
-type QuotationStatus = "Submit" | "Negosiasi" | "Menang" | "Tidak Menang";
+type QuotationStatus = "Negosiasi" | "Menang" | "Tidak Menang";
 
 interface StatusLog {
   date: string;
@@ -18,9 +18,14 @@ interface StatusLog {
 
 interface Quotation {
   no: string;
+  namaPekerjaan: string;
+  deskripsi: string;
   customer: string;
   loc: string;
   marketing: string;
+  pic: string;
+  periodeDari: string;
+  periodeSampai: string;
   total: string;
   status: QuotationStatus;
   history: StatusLog[];
@@ -29,67 +34,112 @@ interface Quotation {
 const initialData: Quotation[] = [
   { 
     no: "QT-2026-0020", 
+    namaPekerjaan: "Pemasangan Pompa Industri",
+    deskripsi: "Pemasangan dan commissioning pompa industri untuk kebutuhan pabrik PT Sejahtera Abadi.",
     customer: "PT Sejahtera Abadi", 
     loc: "Jakarta Selatan", 
-    marketing: "Budi Santoso", 
+    marketing: "Budi Santoso",
+    pic: "Dewi Kusuma",
+    periodeDari: "2026-04-15",
+    periodeSampai: "2026-06-15",
     total: "Rp 450.000.000", 
     status: "Negosiasi",
     history: [
-      { date: "05 Mei 2026", time: "10:30", from: "Submit", to: "Negosiasi", by: "Budi Santoso" },
-      { date: "03 Mei 2026", time: "09:15", from: "Submit", to: "Submit", by: "Budi Santoso" },
+      { date: "05 Mei 2026", time: "10:30", from: "Negosiasi", to: "Negosiasi", by: "Budi Santoso" },
     ]
   },
   { 
     no: "QT-2026-0019", 
+    namaPekerjaan: "Pengadaan & Pemasangan AC Kantor Pusat",
+    deskripsi: "Pengadaan dan pemasangan 10 unit AC Split 2 PK beserta instalasi pipa dan wiring untuk kantor pusat PT Maju Jaya. Termasuk pekerjaan ducting, drainase, dan commissioning.",
     customer: "PT Maju Jaya", 
     loc: "Jakarta Pusat", 
-    marketing: "Siti Aminah", 
+    marketing: "Siti Aminah",
+    pic: "Andi Wijaya",
+    periodeDari: "2026-04-10",
+    periodeSampai: "2026-06-10",
     total: "Rp 1.200.000.000", 
     status: "Menang",
     history: [
       { date: "04 Mei 2026", time: "14:20", from: "Negosiasi", to: "Menang", by: "Siti Aminah" },
-      { date: "02 Mei 2026", time: "11:00", from: "Submit", to: "Negosiasi", by: "Siti Aminah" },
-      { date: "01 Mei 2026", time: "08:45", from: "Submit", to: "Submit", by: "Siti Aminah" },
+      { date: "02 Mei 2026", time: "11:00", from: "Negosiasi", to: "Negosiasi", by: "Siti Aminah" },
     ]
   },
   { 
     no: "QT-2026-0018", 
+    namaPekerjaan: "Renovasi Furniture Kantor",
+    deskripsi: "Renovasi dan penggantian furniture kantor untuk CV Karya Mandiri.",
     customer: "CV Karya Mandiri", 
     loc: "Tangerang", 
-    marketing: "Budi Santoso", 
+    marketing: "Budi Santoso",
+    pic: "Ahmad Fauzi",
+    periodeDari: "2026-05-01",
+    periodeSampai: "2026-05-30",
     total: "Rp 85.000.000", 
     status: "Tidak Menang",
     history: [
       { date: "03 Mei 2026", time: "16:00", from: "Negosiasi", to: "Tidak Menang", by: "Budi Santoso" },
-      { date: "02 Mei 2026", time: "13:30", from: "Submit", to: "Negosiasi", by: "Budi Santoso" },
+      { date: "02 Mei 2026", time: "13:30", from: "Negosiasi", to: "Negosiasi", by: "Budi Santoso" },
     ]
   },
   { 
     no: "QT-2026-0017", 
+    namaPekerjaan: "Pengadaan Genset 500 KVA",
+    deskripsi: "Pengadaan dan instalasi genset 500 KVA untuk backup power PT Delta Prima.",
     customer: "PT Delta Prima", 
     loc: "Bandung", 
-    marketing: "Andi Wijaya", 
+    marketing: "Andi Wijaya",
+    pic: "Rizal",
+    periodeDari: "2026-05-10",
+    periodeSampai: "2026-07-10",
     total: "Rp 320.000.000", 
-    status: "Submit",
+    status: "Negosiasi",
     history: [
-      { date: "05 Mei 2026", time: "09:00", from: "Submit", to: "Submit", by: "Andi Wijaya" },
+      { date: "05 Mei 2026", time: "09:00", from: "Negosiasi", to: "Negosiasi", by: "Andi Wijaya" },
     ]
   },
 ];
 
 const statusConfig: Record<QuotationStatus, string> = {
-  Submit: "bg-blue-50 text-blue-700 border-blue-100",
   Negosiasi: "bg-amber-50 text-amber-700 border-amber-100",
   Menang: "bg-emerald-50 text-emerald-700 border-emerald-100",
   "Tidak Menang": "bg-rose-50 text-rose-700 border-rose-100",
 };
 
 const statusDot: Record<QuotationStatus, string> = {
-  Submit: "bg-blue-500",
   Negosiasi: "bg-amber-500",
   Menang: "bg-emerald-500",
   "Tidak Menang": "bg-rose-500",
 };
+
+function addToProject(q: Quotation) {
+  if (typeof window === "undefined") return;
+  const existing = JSON.parse(localStorage.getItem("gac-projects") || "[]");
+  if (existing.find((p: any) => p.noPenawaran === q.no)) return;
+  const count = existing.length + 4;
+  const nextId = `PRJ-2026-${String(count).padStart(4, "0")}`;
+  const formatDateID = (iso: string) => {
+    if (!iso) return "";
+    const d = new Date(iso + "T00:00:00");
+    return d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  };
+  const newProject = {
+    id: nextId,
+    noPenawaran: q.no,
+    nama: q.namaPekerjaan || `Project ${q.customer}`,
+    customer: q.customer,
+    nilai: q.total,
+    kontrak: "",
+    status: "Aktif",
+    statusColor: "bg-emerald-50 text-emerald-700 border-emerald-100",
+    description: q.deskripsi || "",
+    location: q.loc || "",
+    marketing: q.marketing || "",
+    pic: q.pic || "",
+    period: q.periodeDari && q.periodeSampai ? `${formatDateID(q.periodeDari)} — ${formatDateID(q.periodeSampai)}` : "",
+  };
+  localStorage.setItem("gac-projects", JSON.stringify([...existing, newProject]));
+}
 
 export default function PenawaranPage() {
   const { role } = useRole();
@@ -103,9 +153,7 @@ export default function PenawaranPage() {
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const [historyOpen, setHistoryOpen] = useState<string | null>(null);
-  const [historyPos, setHistoryPos] = useState({ x: 0, y: 0 });
-  const historyRef = useRef<HTMLDivElement>(null);
+  const [historyModal, setHistoryModal] = useState<{ open: boolean; item: Quotation | null }>({ open: false, item: null });
 
   const setStatus = (no: string, newStatus: QuotationStatus) => {
     setData((prev) =>
@@ -122,7 +170,11 @@ export default function PenawaranPage() {
           to: newStatus,
           by: q.marketing,
         };
-        return { ...q, status: newStatus, history: [log, ...q.history] };
+        const updated = { ...q, status: newStatus, history: [log, ...q.history] };
+        if (newStatus === "Menang") {
+          addToProject(updated);
+        }
+        return updated;
       })
     );
     setMenuOpen(null);
@@ -137,31 +189,17 @@ export default function PenawaranPage() {
     setMenuOpen(no);
   };
 
-  const openHistory = (e: React.MouseEvent<HTMLButtonElement>, no: string) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const panelWidth = 320;
-    const x = Math.max(8, rect.right - panelWidth);
-    const y = rect.bottom + 4;
-    setHistoryPos({ x, y });
-    setHistoryOpen(no);
-  };
-
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
         setMenuOpen(null);
       }
-      if (historyRef.current && !historyRef.current.contains(e.target as Node)) {
-        setHistoryOpen(null);
-      }
     };
-    if (menuOpen || historyOpen) {
+    if (menuOpen) {
       document.addEventListener("mousedown", handleClick);
       return () => document.removeEventListener("mousedown", handleClick);
     }
-  }, [menuOpen, historyOpen]);
-
-  const selectedHistory = data.find((q) => q.no === historyOpen)?.history ?? [];
+  }, [menuOpen]);
 
   return (
     <SidebarLayout
@@ -183,7 +221,6 @@ export default function PenawaranPage() {
         </div>
         <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option>Semua Status</option>
-          <option>Submit</option>
           <option>Negosiasi</option>
           <option>Menang</option>
           <option>Tidak Menang</option>
@@ -218,24 +255,23 @@ export default function PenawaranPage() {
                   <td className="px-6 py-3 text-slate-700">{row.marketing}</td>
                   <td className="px-6 py-3 font-semibold text-slate-900">{row.total}</td>
                   <td className="px-6 py-3">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusConfig[row.status]}`}>{row.status}</span>
+                    <button
+                      onClick={() => setHistoryModal({ open: true, item: row })}
+                      className="flex flex-col gap-0.5 items-start text-left"
+                    >
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusConfig[row.status]}`}>
+                        {row.status}
+                        <Eye className="w-3 h-3 ml-1 opacity-60" />
+                      </span>
+                    </button>
                   </td>
                   <td className="px-6 py-3 text-right">
-                    <div className="inline-flex items-center gap-1">
-                      <button
-                        onClick={(e) => openHistory(e, row.no)}
-                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                        title="Riwayat Perubahan Status"
-                      >
-                        <History className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={(e) => openMenu(e, row.no)}
-                        className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition"
-                      >
-                        Pilih
-                      </button>
-                    </div>
+                    <button
+                      onClick={(e) => openMenu(e, row.no)}
+                      className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition"
+                    >
+                      Pilih
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -270,57 +306,62 @@ export default function PenawaranPage() {
           <button onClick={() => setStatus(menuOpen, "Negosiasi")} className="w-full text-left px-3 py-2.5 text-xs font-medium text-amber-700 hover:bg-amber-50 flex items-center gap-2 transition">
             <RotateCcw className="w-3.5 h-3.5" /> Negosiasi
           </button>
-          <button onClick={() => setStatus(menuOpen, "Submit")} className="w-full text-left px-3 py-2.5 text-xs font-medium text-blue-700 hover:bg-blue-50 flex items-center gap-2 transition">
-            <RotateCcw className="w-3.5 h-3.5" /> Submit
-          </button>
         </div>
       )}
 
-      {/* Fixed Position History Panel */}
-      {historyOpen && (
-        <div
-          ref={historyRef}
-          className="fixed z-[100] w-80 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden"
-          style={{ left: historyPos.x, top: historyPos.y }}
-        >
-          <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-            <div className="flex items-center gap-2">
-              <History className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-semibold text-slate-800">Riwayat Status</span>
+      {/* History Modal */}
+      {historyModal.open && historyModal.item && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-lg w-full max-w-lg">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div>
+                <h3 className="text-base font-semibold text-slate-800">Riwayat Status</h3>
+                <p className="text-xs text-slate-500">{historyModal.item.no}</p>
+              </div>
+              <button onClick={() => setHistoryModal({ open: false, item: null })} className="text-slate-400 hover:text-slate-600 transition">
+                <XCircle className="w-5 h-5" />
+              </button>
             </div>
-            <span className="text-xs text-slate-500 font-mono">{historyOpen}</span>
-          </div>
-          <div className="max-h-64 overflow-y-auto">
-            {selectedHistory.length === 0 ? (
-              <div className="px-4 py-6 text-center text-sm text-slate-400">Belum ada riwayat perubahan</div>
-            ) : (
-              <div className="relative px-4 py-3">
-                {/* Timeline line */}
-                <div className="absolute left-[27px] top-3 bottom-3 w-px bg-slate-200" />
-                {selectedHistory.map((log, idx) => (
-                  <div key={idx} className="relative flex gap-3 mb-4 last:mb-0">
-                    <div className={`relative z-10 w-3 h-3 mt-1 rounded-full border-2 border-white shadow-sm ${statusDot[log.to]}`} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 text-xs">
-                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border ${statusConfig[log.from]}`}>
-                          {log.from}
-                        </span>
-                        <ArrowRight className="w-3 h-3 text-slate-400" />
-                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border ${statusConfig[log.to]}`}>
-                          {log.to}
-                        </span>
-                      </div>
-                      <div className="mt-1 text-xs text-slate-500">
-                        {log.date} · {log.time}
-                      </div>
-                      <div className="text-xs text-slate-400">
-                        oleh <span className="font-medium text-slate-600">{log.by}</span>
+            <div className="px-6 py-5">
+              {historyModal.item.history.length === 0 ? (
+                <div className="text-center text-sm text-slate-400">Belum ada riwayat perubahan</div>
+              ) : (
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-200" />
+                  {historyModal.item.history.map((log, idx) => (
+                    <div key={idx} className="relative flex gap-3 mb-4 last:mb-0">
+                      <div className={`relative z-10 w-3 h-3 mt-1 rounded-full border-2 border-white shadow-sm ${statusDot[log.to]}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 text-xs">
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border ${statusConfig[log.from]}`}>
+                            {log.from}
+                          </span>
+                          <ArrowRight className="w-3 h-3 text-slate-400" />
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold border ${statusConfig[log.to]}`}>
+                            {log.to}
+                          </span>
+                        </div>
+                        <div className="mt-1 text-xs text-slate-500">
+                          {log.date} · {log.time}
+                        </div>
+                        <div className="text-xs text-slate-400">
+                          oleh <span className="font-medium text-slate-600">{log.by}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-end px-6 py-4 border-t border-slate-200">
+              <button
+                onClick={() => setHistoryModal({ open: false, item: null })}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition"
+              >
+                Tutup
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -345,6 +386,14 @@ export default function PenawaranPage() {
                   <input type="date" defaultValue="2026-05-05" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nama Pekerjaan / Judul</label>
+                  <input type="text" placeholder="Contoh: Pengadaan & Pemasangan AC Kantor Pusat" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Deskripsi Pekerjaan</label>
+                  <textarea placeholder="Jelaskan scope pekerjaan secara detail..." rows={3} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+                </div>
+                <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Customer</label>
                   <select
                     className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -361,6 +410,10 @@ export default function PenawaranPage() {
                     <option>CV Karya Mandiri</option>
                     <option value="add-new" className="font-semibold text-blue-600">+ Tambah Customer Baru</option>
                   </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Lokasi</label>
+                  <input type="text" placeholder="Contoh: Jakarta Pusat" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Marketing / Sales</label>
@@ -381,6 +434,24 @@ export default function PenawaranPage() {
                       <option>Ahmad Fauzi</option>
                     </select>
                   )}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">PIC Project</label>
+                  <select className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option>Andi Wijaya</option>
+                    <option>Budi Santoso</option>
+                    <option>Dewi Kusuma</option>
+                    <option>Rizal</option>
+                    <option>Ahmad Fauzi</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Periode Dari</label>
+                  <input type="date" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Periode Sampai</label>
+                  <input type="date" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
@@ -416,7 +487,7 @@ export default function PenawaranPage() {
             <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 sticky bottom-0 bg-white rounded-b-2xl">
               <button onClick={() => setOpen(false)} className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition">Batal</button>
               <button onClick={() => setOpen(false)} className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md shadow-blue-500/20 transition">Simpan Draft</button>
-              <button onClick={() => setOpen(false)} className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md shadow-blue-500/20 transition">Submit Penawaran</button>
+              <button onClick={() => setOpen(false)} className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md shadow-blue-500/20 transition">Ajukan Penawaran</button>
             </div>
           </div>
         </div>

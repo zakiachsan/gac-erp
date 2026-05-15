@@ -5,6 +5,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import { useRole } from "@/context/RoleContext";
 import {
   Download, Calendar, Filter, ScanFace, CheckCircle, Clock, MapPin,
+  Link2, ArrowLeft, Eye, Copy, Check,
 } from "lucide-react";
 
 // ═══════════════════════════════════════════
@@ -58,6 +59,33 @@ const tabs = [
   { id: "harian", label: "Pekerja Harian" },
   { id: "rekap", label: "Rekap Absensi" },
 ];
+
+const projects = [
+  { id: "PRJ-2026-0001", nama: "Pengadaan & Pemasangan AC Kantor Pusat", customer: "PT Maju Jaya", lokasi: "Jakarta" },
+  { id: "PRJ-2026-0002", nama: "Pemasangan Pompa Industri", customer: "PT Sejahtera Abadi", lokasi: "Medan" },
+  { id: "PRJ-2026-0003", nama: "Renovasi Furniture Kantor", customer: "CV Karya Mandiri", lokasi: "Bandung" },
+];
+
+interface AbsensiHarianRecord {
+  id: string;
+  projectId: string;
+  nama: string;
+  tanggal: string;
+  jamMasuk: string;
+  status: "Hadir" | "Terlambat";
+}
+
+const HARIAN_STORAGE_KEY = "absensiHarian";
+
+function loadHarianAbsensi(): AbsensiHarianRecord[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const saved = localStorage.getItem(HARIAN_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
 
 const STORAGE_KEY = "absensiData";
 const DEMO_TODAY = "2026-05-06";
@@ -168,11 +196,6 @@ function StaffView({
       {/* Profile + Face ID Card */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-5">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-5">
-          <img
-            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(CURRENT_STAFF)}&background=0D8ABC&color=fff&size=128`}
-            className="w-16 h-16 rounded-full border-2 border-slate-100"
-            alt={CURRENT_STAFF}
-          />
           <div className="flex-1">
             <h2 className="text-lg font-bold text-slate-900">{CURRENT_STAFF}</h2>
             <p className="text-sm text-slate-500">Staff Teknik — ID: KRY-001</p>
@@ -307,12 +330,53 @@ function AdminView({ allData }: { allData: RawRecord[] }) {
   const [active, setActive] = useState("staff");
   const [dateFrom, setDateFrom] = useState("2026-05-01");
   const [dateTo, setDateTo] = useState("2026-05-05");
+  const [selectedProject, setSelectedProject] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [harianData, setHarianData] = useState<AbsensiHarianRecord[]>([]);
+  const [rekapProjectId, setRekapProjectId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setHarianData(loadHarianAbsensi());
+  }, [active]);
+
+  const handleCopyLink = (projectId: string) => {
+    const url = `${window.location.origin}/hr/absen-harian/${projectId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopiedId(projectId);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
+
+  const projectAbsensi = useMemo(() => {
+    if (!selectedProject) return [];
+    return harianData.filter((h) => h.projectId === selectedProject && h.tanggal === DEMO_TODAY);
+  }, [harianData, selectedProject]);
 
   const filteredRaw = useMemo(() => {
     return allData.filter((r) => r.tanggal >= dateFrom && r.tanggal <= dateTo);
   }, [allData, dateFrom, dateTo]);
 
-  const rekapData = useMemo(() => calcRekap(filteredRaw), [filteredRaw]);
+  const rekapStaff = useMemo(() => calcRekap(filteredRaw.filter((r) => r.tipe === "Staff")), [filteredRaw]);
+
+  const rekapHarianProject = useMemo(() => {
+    if (!rekapProjectId) return [];
+    const filtered = harianData.filter((h) => h.projectId === rekapProjectId && h.tanggal >= dateFrom && h.tanggal <= dateTo);
+    const map = new Map<string, { nama: string; hadir: number; terlambat: number }>();
+    filtered.forEach((r) => {
+      const existing = map.get(r.nama);
+      if (existing) {
+        if (r.status === "Hadir") existing.hadir++;
+        if (r.status === "Terlambat") existing.terlambat++;
+      } else {
+        map.set(r.nama, {
+          nama: r.nama,
+          hadir: r.status === "Hadir" ? 1 : 0,
+          terlambat: r.status === "Terlambat" ? 1 : 0,
+        });
+      }
+    });
+    return Array.from(map.values());
+  }, [harianData, rekapProjectId, dateFrom, dateTo]);
   const staffToday = allData.filter((r) => r.tanggal === "2026-05-05" && r.tipe === "Staff");
   const harianToday = allData.filter((r) => r.tanggal === "2026-05-05" && r.tipe === "Harian");
 
@@ -345,7 +409,6 @@ function AdminView({ allData }: { allData: RawRecord[] }) {
                   <tr key={i} className="hover:bg-slate-50 transition">
                     <td className="py-3">
                       <div className="flex items-center gap-2">
-                        <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(s.nama)}&background=${["0D8ABC","10b981","f59e0b","8b5cf6","ec4899","6366f1"][i % 6]}&color=fff`} className="w-7 h-7 rounded-full" alt="" />
                         <span className="font-medium text-slate-800">{s.nama}</span>
                       </div>
                     </td>
@@ -363,27 +426,127 @@ function AdminView({ allData }: { allData: RawRecord[] }) {
 
       {/* Tab: Harian */}
       {active === "harian" && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <h3 className="text-sm font-bold text-slate-900 mb-4">Daftar Pekerja Harian — 05 Mei 2026</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
-                <tr><th className="pb-3 font-medium">Nama</th><th className="pb-3 font-medium">Jam Masuk</th><th className="pb-3 font-medium">Jam Keluar</th><th className="pb-3 font-medium">Status</th><th className="pb-3 font-medium">Proyek</th></tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {harianToday.map((h, i) => (
-                  <tr key={i} className="hover:bg-slate-50 transition">
-                    <td className="py-3 font-medium text-slate-800">{h.nama}</td>
-                    <td className="py-3 font-mono text-xs text-slate-700">{jamMasuk(h.status)}</td>
-                    <td className="py-3 font-mono text-xs text-slate-700">{jamKeluar(h.status)}</td>
-                    <td className="py-3"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${statusBadge(h.status)}`}>{h.status}</span></td>
-                    <td className="py-3 text-slate-600 text-xs">{h.status === "Alfa" ? "—" : ["Pemasangan AC Kantor Pusat","Renovasi Gudang Medan","Pemasangan Pompa Industri","—"][i % 4]}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <>
+          {!selectedProject ? (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+              <h3 className="text-sm font-bold text-slate-900 mb-4">Daftar Project</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
+                    <tr>
+                      <th className="pb-3 font-medium">ID Project</th>
+                      <th className="pb-3 font-medium">Nama Project</th>
+                      <th className="pb-3 font-medium">Customer</th>
+                      <th className="pb-3 font-medium">Lokasi</th>
+                      <th className="pb-3 font-medium text-center">Hadir Hari Ini</th>
+                      <th className="pb-3 font-medium text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {projects.map((p) => {
+                      const hadirCount = harianData.filter((h) => h.projectId === p.id && h.tanggal === DEMO_TODAY).length;
+                      return (
+                        <tr key={p.id} className="hover:bg-slate-50 transition">
+                          <td className="py-3 font-mono text-xs text-blue-700 font-semibold">{p.id}</td>
+                          <td className="py-3 font-medium text-slate-800">{p.nama}</td>
+                          <td className="py-3 text-slate-600 text-xs">{p.customer}</td>
+                          <td className="py-3 text-slate-600 text-xs">{p.lokasi}</td>
+                          <td className="py-3 text-center">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                              {hadirCount} hadir
+                            </span>
+                          </td>
+                          <td className="py-3 text-right">
+                            <div className="inline-flex items-center gap-1.5">
+                              <button
+                                onClick={() => setSelectedProject(p.id)}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                                Detail
+                              </button>
+                              <button
+                                onClick={() => handleCopyLink(p.id)}
+                                className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border transition ${
+                                  copiedId === p.id
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                                }`}
+                                title="Copy link absen"
+                              >
+                                {copiedId === p.id ? <Check className="w-3.5 h-3.5" /> : <Link2 className="w-3.5 h-3.5" />}
+                                {copiedId === p.id ? "Copied" : "Link"}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+              {(() => {
+                const p = projects.find((pr) => pr.id === selectedProject)!;
+                return (
+                  <>
+                    <div className="flex items-center gap-3 mb-5">
+                      <button
+                        onClick={() => setSelectedProject(null)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium rounded-lg transition"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        Kembali
+                      </button>
+                      <div>
+                        <h3 className="text-sm font-bold text-slate-900">{p.nama}</h3>
+                        <p className="text-xs text-slate-500">{p.customer} · {p.lokasi}</p>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
+                          <tr>
+                            <th className="pb-3 font-medium">Nama</th>
+                            <th className="pb-3 font-medium">Jam Masuk</th>
+                            <th className="pb-3 font-medium">Status</th>
+                            <th className="pb-3 font-medium">Tanggal</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {projectAbsensi.length === 0 && (
+                            <tr>
+                              <td colSpan={4} className="py-8 text-center text-sm text-slate-400">
+                                Belum ada pekerja yang absen hari ini.
+                                <br />
+                                <span className="text-xs text-slate-300">Bagikan link absen ke pekerja harian.</span>
+                              </td>
+                            </tr>
+                          )}
+                          {projectAbsensi.map((h) => (
+                            <tr key={h.id} className="hover:bg-slate-50 transition">
+                              <td className="py-3 font-medium text-slate-800">{h.nama}</td>
+                              <td className="py-3 font-mono text-xs text-slate-700">{h.jamMasuk}</td>
+                              <td className="py-3">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${statusBadge(h.status)}`}>
+                                  {h.status}
+                                </span>
+                              </td>
+                              <td className="py-3 text-xs text-slate-500">{h.tanggal}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+        </>
       )}
 
       {/* Tab: Rekap */}
@@ -406,29 +569,127 @@ function AdminView({ allData }: { allData: RawRecord[] }) {
             <div className="text-xs text-slate-500 pb-2">{filteredRaw.length} record ditemukan</div>
           </div>
 
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-slate-900">Rekap Absensi — {dateFrom} s/d {dateTo}</h3>
-            <button className="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition"><Download className="w-3.5 h-3.5 inline mr-1" /> Export Excel</button>
+          {/* Rekap Staff */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-900">Rekap Staff — {dateFrom} s/d {dateTo}</h3>
+              <span className="text-xs text-slate-500">{rekapStaff.length} orang</span>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
+                  <tr><th className="pb-3 font-medium">Nama</th><th className="pb-3 font-medium text-center">Hadir</th><th className="pb-3 font-medium text-center">Izin</th><th className="pb-3 font-medium text-center">Sakit</th><th className="pb-3 font-medium text-center">Alfa</th><th className="pb-3 font-medium text-center">Terlambat</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {rekapStaff.length === 0 && (
+                    <tr><td colSpan={6} className="py-6 text-center text-sm text-slate-400">Tidak ada data staff.</td></tr>
+                  )}
+                  {rekapStaff.map((r, i) => (
+                    <tr key={i} className="hover:bg-slate-50 transition">
+                      <td className="py-3 font-medium text-slate-800">{r.nama}</td>
+                      <td className="py-3 text-center font-bold text-emerald-700">{r.hadir}</td>
+                      <td className="py-3 text-center text-blue-600">{r.izin || "—"}</td>
+                      <td className="py-3 text-center text-indigo-600">{r.sakit || "—"}</td>
+                      <td className={`py-3 text-center font-bold ${r.alfa ? "text-rose-600" : "text-slate-400"}`}>{r.alfa || "—"}</td>
+                      <td className={`py-3 text-center ${r.terlambat ? "text-amber-600" : "text-slate-400"}`}>{r.terlambat || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
-                <tr><th className="pb-3 font-medium">Nama</th><th className="pb-3 font-medium">Tipe</th><th className="pb-3 font-medium text-center">Hadir</th><th className="pb-3 font-medium text-center">Izin</th><th className="pb-3 font-medium text-center">Sakit</th><th className="pb-3 font-medium text-center">Alfa</th><th className="pb-3 font-medium text-center">Terlambat</th></tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {rekapData.map((r, i) => (
-                  <tr key={i} className="hover:bg-slate-50 transition">
-                    <td className="py-3 font-medium text-slate-800">{r.nama}</td>
-                    <td className="py-3"><span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${r.tipe === "Staff" ? "bg-blue-50 text-blue-700" : "bg-amber-50 text-amber-700"}`}>{r.tipe}</span></td>
-                    <td className="py-3 text-center font-bold text-emerald-700">{r.hadir}</td>
-                    <td className="py-3 text-center text-blue-600">{r.izin || "—"}</td>
-                    <td className="py-3 text-center text-indigo-600">{r.sakit || "—"}</td>
-                    <td className={`py-3 text-center font-bold ${r.alfa ? "text-rose-600" : "text-slate-400"}`}>{r.alfa || "—"}</td>
-                    <td className={`py-3 text-center ${r.terlambat ? "text-amber-600" : "text-slate-400"}`}>{r.terlambat || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          {/* Rekap Pekerja Harian */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-slate-900">Rekap Pekerja Harian — {dateFrom} s/d {dateTo}</h3>
+            </div>
+
+            {!rekapProjectId ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
+                    <tr>
+                      <th className="pb-3 font-medium">ID Project</th>
+                      <th className="pb-3 font-medium">Nama Project</th>
+                      <th className="pb-3 font-medium">Customer</th>
+                      <th className="pb-3 font-medium">Lokasi</th>
+                      <th className="pb-3 font-medium text-center">Hadir Periode Ini</th>
+                      <th className="pb-3 font-medium text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {projects.map((p) => {
+                      const count = harianData.filter((h) => h.projectId === p.id && h.tanggal >= dateFrom && h.tanggal <= dateTo).length;
+                      return (
+                        <tr key={p.id} className="hover:bg-slate-50 transition">
+                          <td className="py-3 font-mono text-xs text-blue-700 font-semibold">{p.id}</td>
+                          <td className="py-3 font-medium text-slate-800">{p.nama}</td>
+                          <td className="py-3 text-slate-600 text-xs">{p.customer}</td>
+                          <td className="py-3 text-slate-600 text-xs">{p.lokasi}</td>
+                          <td className="py-3 text-center">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                              {count} hadir
+                            </span>
+                          </td>
+                          <td className="py-3 text-right">
+                            <button
+                              onClick={() => setRekapProjectId(p.id)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                              Lihat Rekap
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <>
+                {(() => {
+                  const p = projects.find((pr) => pr.id === rekapProjectId)!;
+                  return (
+                    <>
+                      <div className="flex items-center gap-3 mb-4">
+                        <button
+                          onClick={() => setRekapProjectId(null)}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium rounded-lg transition"
+                        >
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                          Kembali
+                        </button>
+                        <div>
+                          <h4 className="text-sm font-bold text-slate-900">{p.nama}</h4>
+                          <p className="text-xs text-slate-500">{p.customer} · {p.lokasi}</p>
+                        </div>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
+                            <tr><th className="pb-3 font-medium">Nama</th><th className="pb-3 font-medium text-center">Hadir</th><th className="pb-3 font-medium text-center">Terlambat</th></tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {rekapHarianProject.length === 0 && (
+                              <tr><td colSpan={3} className="py-6 text-center text-sm text-slate-400">Tidak ada data pekerja harian untuk project ini di periode yang dipilih.</td></tr>
+                            )}
+                            {rekapHarianProject.map((r, i) => (
+                              <tr key={i} className="hover:bg-slate-50 transition">
+                                <td className="py-3 font-medium text-slate-800">{r.nama}</td>
+                                <td className="py-3 text-center font-bold text-emerald-700">{r.hadir}</td>
+                                <td className={`py-3 text-center ${r.terlambat ? "text-amber-600" : "text-slate-400"}`}>{r.terlambat || "—"}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  );
+                })()}
+              </>
+            )}
           </div>
         </div>
       )}

@@ -363,297 +363,304 @@ export default function BAPPage() {
         ))}
       </div>
 
-      {/* BAP List */}
-      <div className="space-y-3">
-        {baps.map((bap, index) => {
-          const isExpanded = expandedId === bap.id;
-          const sisaKontrak = bap.nilaiKontrak - bap.pembayaranBapSekarang;
-
-          return (
-            <div key={bap.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-              {/* Header Row */}
-              <button onClick={() => toggleExpand(bap.id)} className="w-full flex items-center justify-between px-6 py-4 hover:bg-slate-50 transition text-left">
-                <div className="flex items-center gap-4">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${isExpanded ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-600"}`}>
-                    {index + 1}
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-slate-900">{bap.vendor.nama}</div>
-                    <div className="text-xs text-slate-500 mt-0.5">
-                      <span className="font-mono text-slate-400">{bap.noBap}</span>
-                      <span className="mx-1">·</span>
-                      Kontrak: <span className="font-mono text-slate-400">{bap.noKontrak}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="hidden sm:flex items-center gap-2 text-xs">
-                    <span className={`text-xs font-medium ${bap.statusApproval === "approved" ? "text-emerald-600" : "text-amber-600"}`}>{bap.approver}</span>
-                    <span className="text-slate-300">·</span>
-                    <span className={`text-xs font-medium ${bap.statusApproval === "approved" ? "text-emerald-600" : "text-amber-600"}`}>{bap.statusApproval === "approved" ? "Disetujui" : "Menunggu"}</span>
-                  </div>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${bap.statusApproval === "approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
-                    {bap.statusApproval === "approved" ? "Disetujui" : "Draft"}
-                  </span>
-                  {isExpanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
-                </div>
-              </button>
-
-              {/* Expanded Detail */}
-              {isExpanded && (
-                <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-5">
-                  {/* Info Cards */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-                    <div className="bg-white rounded-lg border border-slate-200 p-3">
-                      <div className="text-[10px] text-slate-400 uppercase tracking-wide">Tanggal BAP</div>
-                      <div className="text-sm font-semibold text-slate-800 mt-0.5">{bap.tanggal}</div>
-                    </div>
-                    <div className="bg-white rounded-lg border border-slate-200 p-3">
-                      <div className="text-[10px] text-slate-400 uppercase tracking-wide">Pihak Pertama</div>
-                      <div className="text-sm font-semibold text-slate-800 mt-0.5">{bap.pihakPertama.nama}</div>
-                    </div>
-                    <div className="bg-white rounded-lg border border-slate-200 p-3">
-                      <div className="text-[10px] text-slate-400 uppercase tracking-wide">Pihak Kedua</div>
-                      <div className="text-sm font-semibold text-slate-800 mt-0.5">{bap.pihakKedua.nama}</div>
-                    </div>
-                    <div className="bg-white rounded-lg border border-slate-200 p-3">
-                      <div className="text-[10px] text-slate-400 uppercase tracking-wide">Jumlah Dibayar</div>
-                      <div className="text-sm font-semibold text-emerald-700 mt-0.5">{fmt(bap.jumlahDibayarkan)}</div>
-                    </div>
-                  </div>
-
-                  {/* Berdasarkan */}
-                  <div className="bg-white rounded-lg border border-slate-200 p-4 mb-5">
-                    <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Berdasarkan</div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                      <div className="flex items-start gap-2">
-                        <FileText className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                        <div>
-                          <div className="text-xs text-slate-400">Kontrak</div>
-                          <div className="font-medium text-slate-700">{bap.noKontrak}</div>
-                          <div className="text-[10px] text-slate-400">Tgl: {bap.tanggalKontrak}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <FileText className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                        <div>
-                          <div className="text-xs text-slate-400">Invoice</div>
-                          <div className="font-medium text-slate-700">{bap.invoiceFile || "—"}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <FileText className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
-                        <div>
-                          <div className="text-xs text-slate-400">Kwitansi</div>
-                          <div className="font-medium text-slate-700">{bap.kwitansiFile || "—"}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <FileText className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
-                        <div>
-                          <div className="text-xs text-slate-400">BAST</div>
-                          <div className="font-medium text-slate-700">{bap.bastFile || "—"}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Perhitungan Pembayaran */}
-                  {(() => {
-                    const v = getDisplay(bap);
-                    return (
-                      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-5">
-                        <div className="px-4 py-2.5 bg-slate-100 text-xs font-semibold text-slate-600 uppercase tracking-wide">Perhitungan Pembayaran</div>
-                        <table className="w-full text-sm">
-                          <tbody className="divide-y divide-slate-100">
-                            <tr>
-                              <td className="px-4 py-2 text-slate-600">1. Jumlah Pembayaran BAP Jika Terbayar Dengan Saat Ini</td>
-                              <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(v.pembayaranBapSekarang)}</td>
-                            </tr>
-                            <tr>
-                              <td className="px-4 py-2 text-slate-600">2. Jumlah Akumulasi Pembayaran Sebelumnya</td>
-                              <td className="px-4 py-2 text-right">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={v.akumulasi}
-                                  onChange={(e) => updateDraft(bap.id, "akumulasi", parseInt(e.target.value) || 0)}
-                                  className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                                />
-                              </td>
-                            </tr>
-                            <tr className="bg-slate-50/50">
-                              <td className="px-4 py-2 text-slate-700 font-medium">3. Jumlah Pembayaran Yang Akan Dibayar Periode Ini (1 - 2)</td>
-                              <td className="px-4 py-2 text-right font-mono text-xs font-bold text-slate-800">{fmt(v.periodeIni)}</td>
-                            </tr>
-                            <tr>
-                              <td className="px-4 py-2 text-slate-600 pl-8">Retensi (nominal)</td>
-                              <td className="px-4 py-2 text-right">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={v.retensi}
-                                  onChange={(e) => updateDraft(bap.id, "retensi", parseInt(e.target.value) || 0)}
-                                  className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                                />
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="px-4 py-2 text-slate-600 pl-8">Potongan Lainnya</td>
-                              <td className="px-4 py-2 text-right">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={v.potonganLain}
-                                  onChange={(e) => updateDraft(bap.id, "potonganLain", parseInt(e.target.value) || 0)}
-                                  className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                                />
-                              </td>
-                            </tr>
-                            <tr>
-                              <td className="px-4 py-2 text-slate-600">4. Jumlah Potongan Saat Ini</td>
-                              <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(v.jumlahPotongan)}</td>
-                            </tr>
-                            <tr className="bg-slate-50/50">
-                              <td className="px-4 py-2 text-slate-700 font-medium">5. Jumlah Pembayaran Yang Akan Dibayar Periode Ini (Setelah Dipotong)</td>
-                              <td className="px-4 py-2 text-right font-mono text-xs font-bold text-slate-800">{fmt(v.periodeIniSetelahPotong)}</td>
-                            </tr>
-                            <tr>
-                              <td className="px-4 py-2 text-slate-600 pl-8">PPN (nominal)</td>
-                              <td className="px-4 py-2 text-right">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={v.ppn}
-                                  onChange={(e) => updateDraft(bap.id, "ppn", parseInt(e.target.value) || 0)}
-                                  className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                                />
-                              </td>
-                            </tr>
-                            <tr className="bg-slate-50 font-semibold">
-                              <td className="px-4 py-2.5 text-slate-700">Jumlah Pembayaran BAP Ini (Setelah Dipotong) = 5 - PPN</td>
-                              <td className="px-4 py-2.5 text-right font-mono text-xs text-emerald-700">{fmt(v.jumlahSetelahPotong)}</td>
-                            </tr>
-                            <tr className="bg-slate-50 font-semibold">
-                              <td className="px-4 py-2.5 text-slate-700">Jumlah Dibayarkan</td>
-                              <td className="px-4 py-2.5 text-right font-mono text-xs text-emerald-700">{fmt(v.jumlahDibayarkan)}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
-                          <span className="font-semibold">Terbilang:</span> {fmt(v.jumlahDibayarkan).replace("Rp ", "")}
-                        </div>
-                        <div className="px-4 py-2 border-t border-slate-200 text-xs text-slate-500">
-                          <Banknote className="w-3 h-3 inline mr-1" />
-                          Bank: <span className="font-medium text-slate-700">{bap.bank}</span> · No Rek: <span className="font-medium text-slate-700">{bap.noRekening}</span> · Atas Nama: <span className="font-medium text-slate-700">{bap.atasNama}</span>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Item dari PO */}
-                  <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-5">
-                    <div className="px-4 py-2.5 bg-slate-100 text-xs font-semibold text-slate-600 uppercase tracking-wide">Item dari PO / Kontrak</div>
-                    <table className="w-full text-sm">
-                      <thead className="bg-slate-50 text-xs font-medium text-slate-500">
-                        <tr>
-                          <th className="px-4 py-2 text-left">Item</th>
-                          <th className="px-4 py-2 text-center w-16">Qty</th>
-                          <th className="px-4 py-2 text-center w-20">Satuan</th>
-                          <th className="px-4 py-2 text-right w-28">Harga Satuan</th>
-                          <th className="px-4 py-2 text-right w-28">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {bap.poItems.map((it, idx) => (
-                          <tr key={idx}>
-                            <td className="px-4 py-2 text-slate-800 font-medium text-xs">{it.nama}</td>
-                            <td className="px-4 py-2 text-center font-mono text-xs text-slate-600">{ribuan(it.qty)}</td>
-                            <td className="px-4 py-2 text-center text-xs text-slate-600">{it.satuan}</td>
-                            <td className="px-4 py-2 text-right font-mono text-xs text-slate-600">{fmt(it.hargaSatuan)}</td>
-                            <td className="px-4 py-2 text-right font-mono text-xs font-medium text-slate-700">{fmt(it.qty * it.hargaSatuan)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Rekapitulasi Kontrak */}
-                  <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-5">
-                    <div className="px-4 py-2.5 bg-slate-100 text-xs font-semibold text-slate-600 uppercase tracking-wide">Rekapitulasi Kontrak dan Pembayaran</div>
-                    <table className="w-full text-sm">
-                      <thead className="bg-slate-50 text-xs font-medium text-slate-500">
-                        <tr>
-                          <th className="px-4 py-2 text-left">No</th>
-                          <th className="px-4 py-2 text-left">Uraian</th>
-                          <th className="px-4 py-2 text-right">Jumlah (Rp)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        <tr>
-                          <td className="px-4 py-2 text-slate-600">I</td>
-                          <td className="px-4 py-2 font-medium text-slate-700">Nilai Kontrak</td>
-                          <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(bap.nilaiKontrak)}</td>
-                        </tr>
-                        <tr>
-                          <td className="px-4 py-2 text-slate-600">II</td>
-                          <td className="px-4 py-2 font-medium text-slate-700">Jumlah Pembayaran</td>
-                          <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(getDisplay(bap).pembayaranBapSekarang)}</td>
-                        </tr>
-                        {bap.historyPembayaran.map((h) => (
-                          <tr key={h.ke}>
-                            <td className="px-4 py-2"></td>
-                            <td className="px-4 py-2 text-slate-600 text-xs pl-6">{h.keterangan}</td>
-                            <td className="px-4 py-2 text-right font-mono text-xs text-slate-600">{fmt(h.jumlah)}</td>
-                          </tr>
-                        ))}
-                        <tr>
-                          <td className="px-4 py-2 text-slate-600">III</td>
-                          <td className="px-4 py-2 font-medium text-slate-700">Retensi</td>
-                          <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(getDisplay(bap).retensi)}</td>
-                        </tr>
-                        <tr className="bg-slate-50 font-semibold">
-                          <td className="px-4 py-2.5 text-slate-700">IV</td>
-                          <td className="px-4 py-2.5 text-slate-700">Sisa Kontrak (I - II - III)</td>
-                          <td className="px-4 py-2.5 text-right font-mono text-xs text-emerald-700">{fmt(bap.nilaiKontrak - getDisplay(bap).pembayaranBapSekarang - getDisplay(bap).retensi)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs text-slate-400">
-                      Penanggung Jawab: <span className="font-medium text-slate-600">{bap.pihakPertama.nama}</span>
-                      <span className="mx-2">·</span>
-                      Menyetujui: <span className="font-medium text-slate-600">{bap.pihakKedua.nama}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isDirty(bap.id) && (
-                        <>
-                          <button onClick={() => saveDraft(bap.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition">
-                            Simpan
-                          </button>
-                          <button onClick={() => cancelDraft(bap.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-50 transition">
-                            Batal
-                          </button>
-                        </>
-                      )}
-                      {!isDirty(bap.id) && bap.statusApproval === "draft" && (
-                        <button onClick={() => handleApprove(index)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition">
-                          <CheckCircle className="w-3.5 h-3.5" /> Setujui
+      {/* BAP Table */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-4">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <tr>
+                <th className="px-4 py-3 text-left w-12">No</th>
+                <th className="px-4 py-3 text-left">No BAP</th>
+                <th className="px-4 py-3 text-left">Vendor</th>
+                <th className="px-4 py-3 text-left">No Kontrak</th>
+                <th className="px-4 py-3 text-left w-32">Tanggal</th>
+                <th className="px-4 py-3 text-right w-36">Jumlah Dibayar</th>
+                <th className="px-4 py-3 text-center w-24">Status</th>
+                <th className="px-4 py-3 text-center w-16">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {baps.map((bap, index) => {
+                const isExpanded = expandedId === bap.id;
+                return (
+                  <>
+                    <tr key={bap.id} className={`transition ${isExpanded ? "bg-slate-50" : "hover:bg-slate-50/50"}`}>
+                      <td className="px-4 py-3 text-slate-600 font-mono text-xs">{index + 1}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-slate-700">{bap.noBap}</td>
+                      <td className="px-4 py-3 text-slate-800 font-medium">{bap.vendor.nama}</td>
+                      <td className="px-4 py-3 font-mono text-xs text-slate-600">{bap.noKontrak}</td>
+                      <td className="px-4 py-3 text-slate-600 text-xs">{bap.tanggal}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs font-medium text-emerald-700">{fmt(bap.jumlahDibayarkan)}</td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${bap.statusApproval === "approved" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>
+                          {bap.statusApproval === "approved" ? "Disetujui" : "Draft"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button onClick={() => toggleExpand(bap.id)} className="inline-flex items-center justify-center text-slate-400 hover:text-blue-600 transition">
+                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
-                      )}
-                      <button onClick={() => handleRemove(index)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-200 text-red-600 text-xs font-medium rounded-lg hover:bg-red-50 transition">
-                        <Trash2 className="w-3.5 h-3.5" /> Hapus
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+                      </td>
+                    </tr>
+                    {isExpanded && (
+                      <tr key={`${bap.id}-detail`}>
+                        <td colSpan={8} className="px-6 py-5 bg-slate-50/50 border-t border-slate-100">
+                          {/* Info Cards */}
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+                            <div className="bg-white rounded-lg border border-slate-200 p-3">
+                              <div className="text-[10px] text-slate-400 uppercase tracking-wide">Tanggal BAP</div>
+                              <div className="text-sm font-semibold text-slate-800 mt-0.5">{bap.tanggal}</div>
+                            </div>
+                            <div className="bg-white rounded-lg border border-slate-200 p-3">
+                              <div className="text-[10px] text-slate-400 uppercase tracking-wide">Pihak Pertama</div>
+                              <div className="text-sm font-semibold text-slate-800 mt-0.5">{bap.pihakPertama.nama}</div>
+                            </div>
+                            <div className="bg-white rounded-lg border border-slate-200 p-3">
+                              <div className="text-[10px] text-slate-400 uppercase tracking-wide">Pihak Kedua</div>
+                              <div className="text-sm font-semibold text-slate-800 mt-0.5">{bap.pihakKedua.nama}</div>
+                            </div>
+                            <div className="bg-white rounded-lg border border-slate-200 p-3">
+                              <div className="text-[10px] text-slate-400 uppercase tracking-wide">Jumlah Dibayar</div>
+                              <div className="text-sm font-semibold text-emerald-700 mt-0.5">{fmt(bap.jumlahDibayarkan)}</div>
+                            </div>
+                          </div>
+
+                          {/* Berdasarkan */}
+                          <div className="bg-white rounded-lg border border-slate-200 p-4 mb-5">
+                            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Berdasarkan</div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                              <div className="flex items-start gap-2">
+                                <FileText className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+                                <div>
+                                  <div className="text-xs text-slate-400">Kontrak</div>
+                                  <div className="font-medium text-slate-700">{bap.noKontrak}</div>
+                                  <div className="text-[10px] text-slate-400">Tgl: {bap.tanggalKontrak}</div>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <FileText className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                                <div>
+                                  <div className="text-xs text-slate-400">Invoice</div>
+                                  <div className="font-medium text-slate-700">{bap.invoiceFile || "—"}</div>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <FileText className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+                                <div>
+                                  <div className="text-xs text-slate-400">Kwitansi</div>
+                                  <div className="font-medium text-slate-700">{bap.kwitansiFile || "—"}</div>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <FileText className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
+                                <div>
+                                  <div className="text-xs text-slate-400">BAST</div>
+                                  <div className="font-medium text-slate-700">{bap.bastFile || "—"}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Perhitungan Pembayaran */}
+                          {(() => {
+                            const v = getDisplay(bap);
+                            return (
+                              <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-5">
+                                <div className="px-4 py-2.5 bg-slate-100 text-xs font-semibold text-slate-600 uppercase tracking-wide">Perhitungan Pembayaran</div>
+                                <table className="w-full text-sm">
+                                  <tbody className="divide-y divide-slate-100">
+                                    <tr>
+                                      <td className="px-4 py-2 text-slate-600">1. Jumlah Pembayaran BAP Jika Terbayar Dengan Saat Ini</td>
+                                      <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(v.pembayaranBapSekarang)}</td>
+                                    </tr>
+                                    <tr>
+                                      <td className="px-4 py-2 text-slate-600">2. Jumlah Akumulasi Pembayaran Sebelumnya</td>
+                                      <td className="px-4 py-2 text-right">
+                                        <input
+                                          type="number"
+                                          min={0}
+                                          value={v.akumulasi}
+                                          onChange={(e) => updateDraft(bap.id, "akumulasi", parseInt(e.target.value) || 0)}
+                                          className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+                                        />
+                                      </td>
+                                    </tr>
+                                    <tr className="bg-slate-50/50">
+                                      <td className="px-4 py-2 text-slate-700 font-medium">3. Jumlah Pembayaran Yang Akan Dibayar Periode Ini (1 - 2)</td>
+                                      <td className="px-4 py-2 text-right font-mono text-xs font-bold text-slate-800">{fmt(v.periodeIni)}</td>
+                                    </tr>
+                                    <tr>
+                                      <td className="px-4 py-2 text-slate-600 pl-8">Retensi (nominal)</td>
+                                      <td className="px-4 py-2 text-right">
+                                        <input
+                                          type="number"
+                                          min={0}
+                                          value={v.retensi}
+                                          onChange={(e) => updateDraft(bap.id, "retensi", parseInt(e.target.value) || 0)}
+                                          className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+                                        />
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td className="px-4 py-2 text-slate-600 pl-8">Potongan Lainnya</td>
+                                      <td className="px-4 py-2 text-right">
+                                        <input
+                                          type="number"
+                                          min={0}
+                                          value={v.potonganLain}
+                                          onChange={(e) => updateDraft(bap.id, "potonganLain", parseInt(e.target.value) || 0)}
+                                          className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+                                        />
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td className="px-4 py-2 text-slate-600">4. Jumlah Potongan Saat Ini</td>
+                                      <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(v.jumlahPotongan)}</td>
+                                    </tr>
+                                    <tr className="bg-slate-50/50">
+                                      <td className="px-4 py-2 text-slate-700 font-medium">5. Jumlah Pembayaran Yang Akan Dibayar Periode Ini (Setelah Dipotong)</td>
+                                      <td className="px-4 py-2 text-right font-mono text-xs font-bold text-slate-800">{fmt(v.periodeIniSetelahPotong)}</td>
+                                    </tr>
+                                    <tr>
+                                      <td className="px-4 py-2 text-slate-600 pl-8">PPN (nominal)</td>
+                                      <td className="px-4 py-2 text-right">
+                                        <input
+                                          type="number"
+                                          min={0}
+                                          value={v.ppn}
+                                          onChange={(e) => updateDraft(bap.id, "ppn", parseInt(e.target.value) || 0)}
+                                          className="w-32 text-right text-xs font-mono border border-slate-200 hover:border-blue-300 focus:border-blue-500 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+                                        />
+                                      </td>
+                                    </tr>
+                                    <tr className="bg-slate-50 font-semibold">
+                                      <td className="px-4 py-2.5 text-slate-700">Jumlah Pembayaran BAP Ini (Setelah Dipotong) = 5 - PPN</td>
+                                      <td className="px-4 py-2.5 text-right font-mono text-xs text-emerald-700">{fmt(v.jumlahSetelahPotong)}</td>
+                                    </tr>
+                                    <tr className="bg-slate-50 font-semibold">
+                                      <td className="px-4 py-2.5 text-slate-700">Jumlah Dibayarkan</td>
+                                      <td className="px-4 py-2.5 text-right font-mono text-xs text-emerald-700">{fmt(v.jumlahDibayarkan)}</td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                                <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
+                                  <span className="font-semibold">Terbilang:</span> {fmt(v.jumlahDibayarkan).replace("Rp ", "")}
+                                </div>
+                                <div className="px-4 py-2 border-t border-slate-200 text-xs text-slate-500">
+                                  <Banknote className="w-3 h-3 inline mr-1" />
+                                  Bank: <span className="font-medium text-slate-700">{bap.bank}</span> · No Rek: <span className="font-medium text-slate-700">{bap.noRekening}</span> · Atas Nama: <span className="font-medium text-slate-700">{bap.atasNama}</span>
+                                </div>
+                              </div>
+                            );
+                          })()}
+
+                          {/* Item dari PO */}
+                          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-5">
+                            <div className="px-4 py-2.5 bg-slate-100 text-xs font-semibold text-slate-600 uppercase tracking-wide">Item dari PO / Kontrak</div>
+                            <table className="w-full text-sm">
+                              <thead className="bg-slate-50 text-xs font-medium text-slate-500">
+                                <tr>
+                                  <th className="px-4 py-2 text-left">Item</th>
+                                  <th className="px-4 py-2 text-center w-16">Qty</th>
+                                  <th className="px-4 py-2 text-center w-20">Satuan</th>
+                                  <th className="px-4 py-2 text-right w-28">Harga Satuan</th>
+                                  <th className="px-4 py-2 text-right w-28">Total</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {bap.poItems.map((it, idx) => (
+                                  <tr key={idx}>
+                                    <td className="px-4 py-2 text-slate-800 font-medium text-xs">{it.nama}</td>
+                                    <td className="px-4 py-2 text-center font-mono text-xs text-slate-600">{ribuan(it.qty)}</td>
+                                    <td className="px-4 py-2 text-center text-xs text-slate-600">{it.satuan}</td>
+                                    <td className="px-4 py-2 text-right font-mono text-xs text-slate-600">{fmt(it.hargaSatuan)}</td>
+                                    <td className="px-4 py-2 text-right font-mono text-xs font-medium text-slate-700">{fmt(it.qty * it.hargaSatuan)}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          {/* Rekapitulasi Kontrak */}
+                          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden mb-5">
+                            <div className="px-4 py-2.5 bg-slate-100 text-xs font-semibold text-slate-600 uppercase tracking-wide">Rekapitulasi Kontrak dan Pembayaran</div>
+                            <table className="w-full text-sm">
+                              <thead className="bg-slate-50 text-xs font-medium text-slate-500">
+                                <tr>
+                                  <th className="px-4 py-2 text-left">No</th>
+                                  <th className="px-4 py-2 text-left">Uraian</th>
+                                  <th className="px-4 py-2 text-right">Jumlah (Rp)</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                <tr>
+                                  <td className="px-4 py-2 text-slate-600">I</td>
+                                  <td className="px-4 py-2 font-medium text-slate-700">Nilai Kontrak</td>
+                                  <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(bap.nilaiKontrak)}</td>
+                                </tr>
+                                <tr>
+                                  <td className="px-4 py-2 text-slate-600">II</td>
+                                  <td className="px-4 py-2 font-medium text-slate-700">Jumlah Pembayaran</td>
+                                  <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(getDisplay(bap).pembayaranBapSekarang)}</td>
+                                </tr>
+                                {bap.historyPembayaran.map((h) => (
+                                  <tr key={h.ke}>
+                                    <td className="px-4 py-2"></td>
+                                    <td className="px-4 py-2 text-slate-600 text-xs pl-6">{h.keterangan}</td>
+                                    <td className="px-4 py-2 text-right font-mono text-xs text-slate-600">{fmt(h.jumlah)}</td>
+                                  </tr>
+                                ))}
+                                <tr>
+                                  <td className="px-4 py-2 text-slate-600">III</td>
+                                  <td className="px-4 py-2 font-medium text-slate-700">Retensi</td>
+                                  <td className="px-4 py-2 text-right font-mono text-xs font-medium">{fmt(getDisplay(bap).retensi)}</td>
+                                </tr>
+                                <tr className="bg-slate-50 font-semibold">
+                                  <td className="px-4 py-2.5 text-slate-700">IV</td>
+                                  <td className="px-4 py-2.5 text-slate-700">Sisa Kontrak (I - II - III)</td>
+                                  <td className="px-4 py-2.5 text-right font-mono text-xs text-emerald-700">{fmt(bap.nilaiKontrak - getDisplay(bap).pembayaranBapSekarang - getDisplay(bap).retensi)}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center justify-between">
+                            <div className="text-xs text-slate-400">
+                              Penanggung Jawab: <span className="font-medium text-slate-600">{bap.pihakPertama.nama}</span>
+                              <span className="mx-2">·</span>
+                              Menyetujui: <span className="font-medium text-slate-600">{bap.pihakKedua.nama}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {isDirty(bap.id) && (
+                                <>
+                                  <button onClick={() => saveDraft(bap.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition">
+                                    Simpan
+                                  </button>
+                                  <button onClick={() => cancelDraft(bap.id)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 text-xs font-medium rounded-lg hover:bg-slate-50 transition">
+                                    Batal
+                                  </button>
+                                </>
+                              )}
+                              {!isDirty(bap.id) && bap.statusApproval === "draft" && (
+                                <button onClick={() => handleApprove(index)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition">
+                                  <CheckCircle className="w-3.5 h-3.5" /> Setujui
+                                </button>
+                              )}
+                              <button onClick={() => handleRemove(index)} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-red-200 text-red-600 text-xs font-medium rounded-lg hover:bg-red-50 transition">
+                                <Trash2 className="w-3.5 h-3.5" /> Hapus
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* CTA */}

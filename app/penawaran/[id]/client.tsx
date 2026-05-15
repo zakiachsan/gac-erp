@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
-import { ArrowLeft, FileText, Calendar, User, Building2, CheckCircle, XCircle, Clock, RotateCcw, Download } from "lucide-react";
+import { ArrowLeft, FileText, Calendar, User, Building2, CheckCircle, XCircle, Clock, RotateCcw, Download, MapPin, Briefcase, Users, AlignLeft } from "lucide-react";
 import Link from "next/link";
 
 const items = [
@@ -11,7 +11,7 @@ const items = [
 ];
 
 const history = [
-  { date: "05 Mei 2026 10:30", action: "Penawaran diajukan", oleh: "Siti Aminah", status: "Submit" },
+  { date: "05 Mei 2026 10:30", action: "Penawaran diajukan", oleh: "Siti Aminah", status: "Negosiasi" },
   { date: "04 Mei 2026 14:15", action: "Negosiasi harga", oleh: "Siti Aminah", status: "Negosiasi" },
   { date: "04 Mei 2026 16:00", action: "Update harga (revisi 1)", oleh: "Siti Aminah", status: "Negosiasi" },
 ];
@@ -32,7 +32,7 @@ export default function PenawaranDetailPage() {
               <Link href="/penawaran" className="text-slate-400 hover:text-slate-600"><ArrowLeft className="w-5 h-5" /></Link>
               <span className="font-mono text-xs text-slate-500">QT-2026-0020</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900 mb-3">Pengadaan AC Kantor Pusat</h2>
+            <h2 className="text-xl font-bold text-slate-900 mb-3">Pemasangan Pompa Industri</h2>
             <div className="flex flex-wrap gap-4 text-xs text-slate-500">
               <span className="inline-flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> 05 Mei 2026</span>
               <span className="inline-flex items-center gap-1"><Building2 className="w-3.5 h-3.5" /> PT Sejahtera Abadi</span>
@@ -43,12 +43,46 @@ export default function PenawaranDetailPage() {
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${
               currentStatus === "Menang" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
               currentStatus === "Tidak Menang" ? "bg-rose-50 text-rose-700 border-rose-100" :
-              currentStatus === "Negosiasi" ? "bg-amber-50 text-amber-700 border-amber-100" :
-              "bg-blue-50 text-blue-700 border-blue-100"
+              "bg-amber-50 text-amber-700 border-amber-100"
             }`}>
               {currentStatus}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Informasi Pekerjaan */}
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
+        <h3 className="text-sm font-bold text-slate-900 mb-4">Informasi Pekerjaan</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+          <div>
+            <div className="text-xs text-slate-500 font-medium uppercase mb-1 flex items-center gap-1"><Briefcase className="w-3 h-3" /> Nama Pekerjaan</div>
+            <div className="font-semibold text-slate-900">Pemasangan Pompa Industri</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 font-medium uppercase mb-1 flex items-center gap-1"><MapPin className="w-3 h-3" /> Lokasi</div>
+            <div className="font-semibold text-slate-900">Jakarta Selatan</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 font-medium uppercase mb-1 flex items-center gap-1"><Building2 className="w-3 h-3" /> Customer</div>
+            <div className="font-semibold text-slate-900">PT Sejahtera Abadi</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 font-medium uppercase mb-1 flex items-center gap-1"><Calendar className="w-3 h-3" /> Periode</div>
+            <div className="font-semibold text-slate-900">15 April 2026 — 15 Juni 2026</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 font-medium uppercase mb-1 flex items-center gap-1"><User className="w-3 h-3" /> Marketing</div>
+            <div className="font-semibold text-slate-900">Budi Santoso</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 font-medium uppercase mb-1 flex items-center gap-1"><Users className="w-3 h-3" /> PIC Project</div>
+            <div className="font-semibold text-slate-900">Dewi Kusuma</div>
+          </div>
+        </div>
+        <div className="mt-4 pt-4 border-t border-slate-100">
+          <div className="text-xs text-slate-500 font-medium uppercase mb-1 flex items-center gap-1"><AlignLeft className="w-3 h-3" /> Deskripsi Pekerjaan</div>
+          <p className="text-sm text-slate-700 leading-relaxed">Pemasangan dan commissioning pompa industri untuk kebutuhan pabrik PT Sejahtera Abadi.</p>
         </div>
       </div>
 
@@ -96,7 +130,6 @@ export default function PenawaranDetailPage() {
           {/* Action Card */}
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
             <h3 className="text-sm font-bold text-slate-900 mb-4">Aksi Penawaran</h3>
-            <p className="text-xs text-slate-500 mb-4">Maksimal 2x submit (penawaran awal & negosiasi).</p>
             <div className="space-y-2">
               <button
                 onClick={() => setCurrentStatus("Menang")}
@@ -132,7 +165,6 @@ export default function PenawaranDetailPage() {
                     <div className="text-sm font-medium text-slate-800">{h.action}</div>
                     <div className="text-xs text-slate-500">{h.date} • {h.oleh}</div>
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium mt-1 ${
-                      h.status === "Submit" ? "bg-blue-50 text-blue-700" :
                       h.status === "Negosiasi" ? "bg-amber-50 text-amber-700" :
                       "bg-slate-100 text-slate-600"
                     }`}>{h.status}</span>

@@ -21,69 +21,14 @@ interface MenuItem {
 
 const menus: Record<string, { section: string; items: MenuItem[] }[]> = {
   super_admin: [
-    { section: "Menu Utama", items: [
+    { section: "Menu", items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/hr", label: "Absensi", icon: Users },
-    ]},
-    { section: "Penjualan", items: [
-      { href: "/penawaran", label: "Penawaran", icon: FileText },
-      { href: "/project", label: "Detail Project", icon: BarChart3 },
-    ]},
-    { section: "Operasional", items: [
-      {
-        href: "/pengadaan/pr",
-        label: "Pengadaan",
-        icon: ShoppingCart,
-        group: "/pengadaan",
-        children: [
-          { href: "/pengadaan/pr", label: "1. Pengajuan Barang & Jasa" },
-          { href: "/pengadaan/pembanding", label: "2. Pembanding" },
-          { href: "/pengadaan/po", label: "3. PO" },
-          { href: "/pengadaan/bap", label: "4. BAP" },
-          { href: "/pengadaan/bayar", label: "5. Listing Bayar" },
-          { href: "/pengadaan/laporan", label: "6. Laporan" },
-        ],
-      },
-      { href: "/anggaran", label: "Anggaran", icon: Wallet },
-      {
-        href: "/operasional/pengajuan",
-        label: "Biaya Operasional",
-        icon: Receipt,
-        group: "/operasional",
-        children: [
-          { href: "/operasional/pengajuan", label: "1. Pengajuan Biaya" },
-          { href: "/operasional/bayar", label: "2. Listing Bayar" },
-          { href: "/operasional/laporan", label: "3. Laporan" },
-        ],
-      },
-    ]},
-    { section: "Keuangan", items: [
-      { href: "/keuangan/ringkasan", label: "Ringkasan Keuangan", icon: PieChart },
-      { href: "/keuangan/dana", label: "Kas & Bank", icon: Banknote },
-      { href: "/keuangan/invoice", label: "Invoice & Kwitansi", icon: FileText },
-      { href: "/keuangan/jurnal-umum", label: "Jurnal Umum", icon: BookOpen },
-      { href: "/keuangan/coa", label: "Chart of Accounts", icon: Book },
-      { href: "/keuangan/aset-tetap", label: "Aset Tetap", icon: Landmark },
-      { href: "/keuangan/buku-besar", label: "Buku Besar", icon: BookOpen },
-      { href: "/keuangan/neraca-saldo", label: "Neraca Saldo", icon: Book },
-      { href: "/keuangan/neraca", label: "Neraca", icon: Scale },
-      { href: "/keuangan/laba-rugi", label: "Laba Rugi", icon: TrendingUp },
-      { href: "/keuangan/cashflow", label: "Cashflow", icon: ArrowDownLeft },
-      { href: "/keuangan/hutang-piutang", label: "Hutang / Piutang", icon: Receipt },
-      { href: "/keuangan/rekonsiliasi", label: "Rekonsiliasi Bank", icon: ClipboardList },
-      { href: "/keuangan/perpajakan", label: "Perpajakan", icon: Receipt },
-      { href: "/keuangan/anggaran", label: "Anggaran vs Realisasi", icon: Wallet },
-    ]},
-    { section: "Pengaturan", items: [
-      { href: "/admin/user-management", label: "User Management", icon: UsersRound },
-      { href: "/vendor", label: "Vendor", icon: Truck },
       { href: "/super-admin", label: "Kelola Perusahaan", icon: Shield },
     ]},
   ],
   admin_perusahaan: [
     { section: "Menu Utama", items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/hr", label: "Absensi", icon: Users },
     ]},
     { section: "Penjualan", items: [
       { href: "/penawaran", label: "Penawaran", icon: FileText },
@@ -91,32 +36,14 @@ const menus: Record<string, { section: string; items: MenuItem[] }[]> = {
       { href: "/customer", label: "Customer", icon: Building2 },
     ]},
     { section: "Operasional", items: [
-      {
-        href: "/pengadaan/pr",
-        label: "Pengadaan",
-        icon: ShoppingCart,
-        group: "/pengadaan",
-        children: [
-          { href: "/pengadaan/pr", label: "1. Pengajuan Barang & Jasa" },
-          { href: "/pengadaan/pembanding", label: "2. Pembanding" },
-          { href: "/pengadaan/po", label: "3. PO" },
-          { href: "/pengadaan/bap", label: "4. BAP" },
-          { href: "/pengadaan/bayar", label: "5. Listing Bayar" },
-          { href: "/pengadaan/laporan", label: "6. Laporan" },
-        ],
-      },
+      { href: "/pengadaan/pr", label: "Pengadaan", icon: ShoppingCart, group: "/pengadaan" },
       { href: "/anggaran", label: "Anggaran", icon: Wallet },
-      {
-        href: "/operasional/pengajuan",
-        label: "Biaya Operasional",
-        icon: Receipt,
-        group: "/operasional",
-        children: [
-          { href: "/operasional/pengajuan", label: "1. Pengajuan Biaya" },
-          { href: "/operasional/bayar", label: "2. Listing Bayar" },
-          { href: "/operasional/laporan", label: "3. Laporan" },
-        ],
-      },
+      { href: "/operasional/pengajuan", label: "Biaya Operasional", icon: Receipt, group: "/operasional" },
+      { href: "/vendor", label: "Vendor", icon: Truck },
+    ]},
+    { section: "HRIS", items: [
+      { href: "/hr", label: "Absensi", icon: Users },
+      { href: "/admin/user-management", label: "User Management", icon: UsersRound },
     ]},
     { section: "Keuangan", items: [
       { href: "/keuangan/ringkasan", label: "Ringkasan Keuangan", icon: PieChart },
@@ -135,44 +62,20 @@ const menus: Record<string, { section: string; items: MenuItem[] }[]> = {
       { href: "/keuangan/perpajakan", label: "Perpajakan", icon: Receipt },
       { href: "/keuangan/anggaran", label: "Anggaran vs Realisasi", icon: Wallet },
     ]},
-    { section: "Pengaturan", items: [
-      { href: "/admin/user-management", label: "User Management", icon: UsersRound },
-      { href: "/vendor", label: "Vendor", icon: Truck },
-    ]},
   ],
   staff: [
     { section: "Menu", items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/hr", label: "Absensi", icon: Users },
       { href: "/penawaran", label: "Penawaran", icon: FileText },
       { href: "/project", label: "Detail Project", icon: BarChart3 },
       { href: "/customer", label: "Customer", icon: Building2 },
-      {
-        href: "/pengadaan/pr",
-        label: "Pengadaan",
-        icon: ShoppingCart,
-        group: "/pengadaan",
-        children: [
-          { href: "/pengadaan/pr", label: "1. Pengajuan Barang & Jasa" },
-          { href: "/pengadaan/pembanding", label: "2. Pembanding" },
-          { href: "/pengadaan/po", label: "3. PO" },
-          { href: "/pengadaan/bap", label: "4. BAP" },
-          { href: "/pengadaan/bayar", label: "5. Listing Bayar" },
-          { href: "/pengadaan/laporan", label: "6. Laporan" },
-        ],
-      },
-      {
-        href: "/operasional/pengajuan",
-        label: "Biaya Operasional",
-        icon: Receipt,
-        group: "/operasional",
-        children: [
-          { href: "/operasional/pengajuan", label: "1. Pengajuan Biaya" },
-          { href: "/operasional/bayar", label: "2. Listing Bayar" },
-          { href: "/operasional/laporan", label: "3. Laporan" },
-        ],
-      },
+      { href: "/pengadaan/pr", label: "Pengadaan", icon: ShoppingCart, group: "/pengadaan" },
+      { href: "/operasional/pengajuan", label: "Biaya Operasional", icon: Receipt, group: "/operasional" },
       { href: "/anggaran", label: "Anggaran", icon: Wallet },
+      { href: "/vendor", label: "Vendor", icon: Truck },
+    ]},
+    { section: "HRIS", items: [
+      { href: "/hr", label: "Absensi", icon: Users },
     ]},
     { section: "Keuangan", items: [
       { href: "/keuangan/ringkasan", label: "Ringkasan Keuangan", icon: PieChart },
@@ -251,7 +154,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
               const hasChildren = !!item.children?.length;
               const groupMatch = item.group ? pathname.startsWith(item.group) : false;
               const isParentActive = hasChildren && groupMatch;
-              const isItemActive = pathname === item.href;
+              const isItemActive = pathname === item.href || (item.group ? pathname.startsWith(item.group) : false);
               const Icon = item.icon;
 
               return (

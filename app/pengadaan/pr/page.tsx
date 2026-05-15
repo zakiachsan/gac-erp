@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import SidebarLayout from "@/components/SidebarLayout";
-import { Plus, CheckCircle, XCircle, ChevronRight } from "lucide-react";
+import { useRole } from "@/context/RoleContext";
+import { Plus, CheckCircle, XCircle, ChevronRight, Eye, X } from "lucide-react";
 
 interface PRItem {
   no: string;
@@ -29,7 +30,7 @@ const approvalLabels = ["Pengaju", "Mengetahui", "Menyetujui"];
 
 function ApprovalTracker({ step, maxStep, approvers }: { step: number; maxStep: number; approvers: string[] }) {
   return (
-    <div className="flex items-center">
+    <div className="flex items-center justify-center gap-2">
       {[0, 1, 2].map((i) => {
         const s = i + 1;
         const isDone = step > s || step === maxStep;
@@ -47,17 +48,18 @@ function ApprovalTracker({ step, maxStep, approvers }: { step: number; maxStep: 
           : "text-slate-400";
 
         return (
-          <div key={s} className="flex items-center">
-            <div className="flex flex-col items-center min-w-[70px]">
-              <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-[10px] font-bold ${circleColor}`}>
-                {isDone ? "✓" : s}
+          <div key={s} className="flex items-center gap-2">
+            <div className="flex flex-col items-center min-w-[80px]">
+              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold ${circleColor}`}>
+                {isDone ? <CheckCircle className="w-5 h-5" /> : s}
               </div>
-              <div className={`text-[10px] mt-0.5 text-center leading-tight ${nameColor}`}>
-                {approvers[i] || approvalLabels[i]}
+              <div className={`text-[10px] mt-1 text-center leading-tight ${nameColor}`}>
+                <div className="font-medium">{approvalLabels[i]}</div>
+                <div>{approvers[i] || "—"}</div>
               </div>
             </div>
             {i < 2 && (
-              <div className={`w-4 h-0.5 ${isDone ? "bg-emerald-500" : "bg-slate-300"}`} />
+              <div className={`w-8 h-0.5 ${isDone ? "bg-emerald-400" : "bg-slate-200"}`} />
             )}
           </div>
         );
@@ -66,7 +68,29 @@ function ApprovalTracker({ step, maxStep, approvers }: { step: number; maxStep: 
   );
 }
 
+function getPRStatus(step: number, maxStep: number) {
+  if (step === maxStep) return "Disetujui";
+  return "Menunggu";
+}
+
+function statusBadgeClass(status: string) {
+  switch (status) {
+    case "Disetujui": return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "Ditolak": return "bg-rose-50 text-rose-700 border-rose-200";
+    case "Menunggu": return "bg-amber-50 text-amber-700 border-amber-200";
+    default: return "bg-slate-50 text-slate-600 border-slate-200";
+  }
+}
+
+function getWaitingLabel(step: number, approvers: string[]) {
+  if (step > approvers.length) return "";
+  return approvers[step - 1] || "";
+}
+
 export default function PRPage() {
+  const { role } = useRole();
+  const showAksi = role !== "super_admin";
+
   const [items, setItems] = useState<PRItem[]>([
     {
       no: "PR-2026-0041",
@@ -91,6 +115,7 @@ export default function PRPage() {
   ]);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [historyModal, setHistoryModal] = useState<{ open: boolean; item: PRItem | null }>({ open: false, item: null });
   const [form, setForm] = useState({
     no: "",
     project: "",
@@ -180,13 +205,13 @@ export default function PRPage() {
                 <th className="px-6 py-3">Pengaju</th>
                 <th className="px-6 py-3">Total</th>
                 <th className="px-6 py-3">Approval</th>
-                <th className="px-6 py-3 text-right">Aksi</th>
+                {showAksi && <th className="px-6 py-3 text-right">Aksi</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {items.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
+                  <td colSpan={showAksi ? 6 : 5} className="px-6 py-8 text-center text-slate-400">
                     Tidak ada data pengajuan.
                   </td>
                 </tr>
@@ -202,34 +227,104 @@ export default function PRPage() {
                   <td className="px-6 py-3 text-slate-700">{item.pengaju}</td>
                   <td className="px-6 py-3 text-slate-700 font-medium">{item.total}</td>
                   <td className="px-6 py-3">
-                    <ApprovalTracker step={item.step} maxStep={item.maxStep} approvers={item.approvers} />
-                  </td>
-                  <td className="px-6 py-3 text-right">
-                    <div className="inline-flex items-center gap-1">
-                      {item.step < item.maxStep && (
-                        <button
-                          onClick={() => handleApprove(index)}
-                          className="inline-flex items-center justify-center p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
-                          title="Setujui"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                        </button>
+                    <button
+                      onClick={() => setHistoryModal({ open: true, item })}
+                      className="flex flex-col gap-0.5 items-start text-left"
+                    >
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border w-fit ${statusBadgeClass(getPRStatus(item.step, item.maxStep))}`}>
+                        {getPRStatus(item.step, item.maxStep)}
+                        <Eye className="w-3 h-3 ml-1 opacity-60" />
+                      </span>
+                      {getPRStatus(item.step, item.maxStep) === "Menunggu" && (
+                        <span className="text-[10px] text-amber-600 font-medium text-left">
+                          {getWaitingLabel(item.step, item.approvers)}
+                        </span>
                       )}
-                      <button
-                        onClick={() => handleReject(index)}
-                        className="inline-flex items-center justify-center p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition"
-                        title="Tolak"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                    </div>
+                    </button>
                   </td>
+                  {showAksi && (
+                    <td className="px-6 py-3 text-right">
+                      <div className="inline-flex items-center gap-1">
+                        {item.step < item.maxStep && (
+                          <button
+                            onClick={() => handleApprove(index)}
+                            className="inline-flex items-center justify-center p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                            title={`Setujui — ${getWaitingLabel(item.step, item.approvers)}`}
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleReject(index)}
+                          className="inline-flex items-center justify-center p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                          title="Tolak"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* History Modal */}
+      {historyModal.open && historyModal.item && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-lg w-full max-w-lg">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div>
+                <h3 className="text-base font-semibold text-slate-800">Riwayat Approval</h3>
+                <p className="text-xs text-slate-500">{historyModal.item.no}</p>
+              </div>
+              <button onClick={() => setHistoryModal({ open: false, item: null })} className="text-slate-400 hover:text-slate-600 transition">
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-5">
+              <ApprovalTracker step={historyModal.item.step} maxStep={historyModal.item.maxStep} approvers={historyModal.item.approvers} />
+              <div className="space-y-2">
+                {[0, 1, 2].map((i) => {
+                  const s = i + 1;
+                  const isDone = historyModal.item!.step > s || historyModal.item!.step === historyModal.item!.maxStep;
+                  const isCurrent = historyModal.item!.step === s && historyModal.item!.step < historyModal.item!.maxStep;
+                  return (
+                    <div key={s} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${isDone ? "bg-emerald-500" : isCurrent ? "bg-amber-500" : "bg-slate-300"}`} />
+                        <span className="text-slate-700">
+                          <span className="font-medium">Lv.{s}</span> {approvalLabels[i]} — {historyModal.item!.approvers[i] || approvalLabels[i]}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className={`text-xs font-medium ${isDone ? "text-emerald-600" : isCurrent ? "text-amber-600" : "text-slate-400"}`}>
+                          {isDone ? "Disetujui" : isCurrent ? "Menunggu" : "Menunggu"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs text-slate-500 border-t border-slate-100 pt-4">
+                <div><span className="font-medium text-slate-700">Project:</span> {historyModal.item.project}</div>
+                <div><span className="font-medium text-slate-700">Total:</span> {historyModal.item.total}</div>
+                <div><span className="font-medium text-slate-700">Pengaju:</span> {historyModal.item.pengaju}</div>
+              </div>
+            </div>
+            <div className="flex items-center justify-end px-6 py-4 border-t border-slate-200">
+              <button
+                onClick={() => setHistoryModal({ open: false, item: null })}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {modalOpen && (

@@ -206,17 +206,17 @@ export default function PengajuanBiayaPage() {
                     <td className="px-6 py-3">
                       <button
                         onClick={() => setHistoryModal({ open: true, item })}
-                        className="flex flex-col gap-0.5 items-start"
+                        className="flex flex-col gap-0.5 items-start text-left"
                       >
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border w-fit ${statusBadge(item.status)}`}>
                           {item.status}
                           <Eye className="w-3 h-3 ml-1 opacity-60" />
                         </span>
                         {item.status === "Menunggu" && (
-                          <span className="text-[10px] text-amber-600 font-medium">
+                          <span className="text-[10px] text-amber-600 font-medium text-left">
                             {(() => {
                               const ws = getWaitingStep(item);
-                              return ws ? `Lv.${ws.level} ${ws.role}` : "";
+                              return ws ? ws.name : "";
                             })()}
                           </span>
                         )}

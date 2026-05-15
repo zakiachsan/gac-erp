@@ -1,8 +1,14 @@
 "use client";
 
 import SidebarLayout from "@/components/SidebarLayout";
-import { Search, ArrowRight } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
+
+function firstThreeWords(str: string) {
+  const words = str.trim().split(/\s+/);
+  if (words.length <= 3) return str;
+  return words.slice(0, 3).join(" ") + "...";
+}
 
 const customers = [
   { id: 1, nama: "PT Maju Jaya", alamat: "Jl. Sudirman No. 45, Jakarta Pusat", contact: "Bapak Hendra", email: "hendra@majujaya.co.id", totalProject: 3, totalNilai: "Rp 2.1M", status: "Aktif" },
@@ -35,23 +41,21 @@ export default function CustomerListPage() {
                 <th className="px-6 py-3 font-medium">Email</th>
                 <th className="px-6 py-3 font-medium">Total Project</th>
                 <th className="px-6 py-3 font-medium">Total Nilai Kontrak</th>
-                <th className="px-6 py-3 font-medium text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {customers.map((c) => (
                 <tr key={c.id} className="hover:bg-slate-50 transition">
-                  <td className="px-6 py-3 font-medium text-slate-900">{c.nama}</td>
-                  <td className="px-6 py-3 text-slate-600 max-w-xs truncate">{c.alamat}</td>
+                  <td className="px-6 py-3">
+                    <Link href={`/customer/${c.id}`} className="font-medium text-blue-700 hover:text-blue-800 hover:underline">
+                      {c.nama}
+                    </Link>
+                  </td>
+                  <td className="px-6 py-3 text-slate-600 max-w-[200px] truncate">{firstThreeWords(c.alamat)}</td>
                   <td className="px-6 py-3 text-slate-700">{c.contact}</td>
                   <td className="px-6 py-3 text-slate-600">{c.email}</td>
                   <td className="px-6 py-3 font-semibold text-slate-900">{c.totalProject}</td>
                   <td className="px-6 py-3 font-semibold text-slate-900">{c.totalNilai}</td>
-                  <td className="px-6 py-3 text-right">
-                    <Link href={`/customer/${c.id}`} className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 text-xs font-semibold">
-                      Detail <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </td>
                 </tr>
               ))}
             </tbody>

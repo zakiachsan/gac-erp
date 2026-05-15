@@ -8,9 +8,10 @@ import { Menu } from "lucide-react";
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isLogin = pathname === "/login";
+  const isPublicAbsen = pathname.startsWith("/hr/absen-harian");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  if (isLogin) {
+  if (isLogin || isPublicAbsen) {
     return <>{children}</>;
   }
 
