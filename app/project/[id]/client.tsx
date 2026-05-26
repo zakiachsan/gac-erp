@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
-import { ArrowLeft, Download, FileText, Plus, X, Upload } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
+import { ArrowLeft, Download, FileText, Plus, X, Upload, Printer } from "lucide-react";
+import FileUpload from "@/components/FileUpload";
 import Link from "next/link";
 
 const tabs = [
@@ -83,8 +85,18 @@ const modalLabels: Record<string, string> = {
   pemasukan: "Pemasukan",
   pengeluaran: "Pengeluaran",
   hutang: "Hutang / Piutang",
+  anggaran: "Anggaran",
   dokumen: "Dokumen",
 };
+
+function parseRupiah(str: string): number {
+  if (!str) return 0;
+  return parseInt(str.replace(/[^0-9]/g, ""), 10) || 0;
+}
+function fmtRupiah(n: number): string {
+  if (n === 0) return "Rp 0";
+  return "Rp " + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
 
 function getDocColor(type: string) {
   if (type === "Kontrak") return "bg-rose-50 text-rose-600";
@@ -122,6 +134,21 @@ export default function ProjectDetailPage({ id }: Props) {
   const [pengeluaranData, setPengeluaranData] = useState(isAcProject ? initialPengeluaran : []);
   const [hutangData, setHutangData] = useState(isAcProject ? initialHutang : []);
   const [dokumenData, setDokumenData] = useState(isAcProject ? initialDokumen : []);
+  const [uploadedFile, setUploadedFile] = useState<{ url: string; name: string } | null>(null);
+
+  const [anggaranData, setAnggaranData] = useState([
+    { kategori: "Material & Jasa", anggaran: 600000000, realisasi: 432000000, color: "blue" },
+    { kategori: "Biaya Operasional", anggaran: 200000000, realisasi: 90000000, color: "amber" },
+    { kategori: "Pajak", anggaran: 100000000, realisasi: 60000000, color: "emerald" },
+  ]);
+
+  const [customers] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("gac-customers");
+      if (saved) return JSON.parse(saved);
+    }
+    return [];
+  });
 
   const [modalType, setModalType] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, string>>({});
@@ -152,7 +179,17 @@ export default function ProjectDetailPage({ id }: Props) {
         setHutangData((prev) => [...prev, { jenis: form.jenis || "Piutang", pihak: form.pihak || "", jumlah: form.jumlah || "", jatuhTempo: form.jatuhTempo || "", status: form.status || "Belum Dibayar" }]);
         break;
       case "dokumen":
-        setDokumenData((prev) => [...prev, { name: form.name || "", type: form.type || "Kontrak", date: form.date || "" }]);
+        setDokumenData((prev) => [...prev, { name: form.name || "", type: form.type || "Kontrak", date: form.date || "", fileUrl: uploadedFile?.url || "" }]);
+        setUploadedFile(null);
+        break;
+      case "anggaran":
+        setAnggaranData((prev) =>
+          prev.map((a) =>
+            a.kategori === form.kategori
+              ? { ...a, anggaran: parseInt(form.anggaran || "0", 10), realisasi: parseInt(form.realisasi || "0", 10) }
+              : a
+          )
+        );
         break;
     }
     closeModal();
@@ -183,12 +220,168 @@ export default function ProjectDetailPage({ id }: Props) {
     </div>
   );
 
+  const exportProjectPDF = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+    let y = 15;
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text(`LAPORAN DETAIL PROJECT`, 105, y, { align: "center" });
+    y += 8;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${project.name}`, 105, y, { align: "center" });
+    y += 6;
+    doc.text(`ID: ${id}  |  Customer: ${project.customer}  |  Kontrak: ${project.contract}`, 105, y, { align: "center" });
+    y += 12;
+
+    // Section: Informasi Pekerjaan
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("1. Informasi Pekerjaan", 14, y);
+    y += 6;
+    autoTable(doc, {
+      startY: y,
+      theme: "plain",
+      styles: { fontSize: 9, cellPadding: 2 },
+      columnStyles: { 0: { cellWidth: 50, fontStyle: "bold" } },
+      body: [
+        ["Nama Pekerjaan", project.name],
+        ["Lokasi", project.location],
+        ["Customer", project.customer],
+        ["No Kontrak", project.contract],
+        ["Periode", project.period],
+        ["Marketing", project.marketing],
+        ["PIC Project", project.pic],
+        ["Deskripsi", project.description],
+      ],
+    });
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // Section: Anggaran
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("2. Anggaran vs Realisasi", 14, y);
+    y += 6;
+    autoTable(doc, {
+      startY: y,
+      head: [["Kategori", "Anggaran", "Realisasi", "Sisa", "%"]],
+      body: anggaranData.map((a) => [
+        a.kategori,
+        fmtRupiah(a.anggaran),
+        fmtRupiah(a.realisasi),
+        fmtRupiah(a.anggaran - a.realisasi),
+        `${a.anggaran > 0 ? Math.round((a.realisasi / a.anggaran) * 100) : 0}%`,
+      ]),
+      styles: { fontSize: 9, cellPadding: 2 },
+      headStyles: { fillColor: [22, 119, 255], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 248, 255] },
+    });
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // Section: Pengajuan
+    if (pengajuanData.length > 0) {
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text("3. Listing Pengajuan", 14, y);
+      y += 6;
+      autoTable(doc, {
+        startY: y,
+        head: [["No PR", "Tanggal", "Keterangan", "Total", "Status"]],
+        body: pengajuanData.map((i) => [i.no, i.tanggal, i.keterangan, i.total, i.status]),
+        styles: { fontSize: 9, cellPadding: 2 },
+        headStyles: { fillColor: [22, 119, 255], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 248, 255] },
+      });
+      y = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // Section: Pemasukan
+    if (pemasukanData.length > 0) {
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text("4. Listing Pemasukan", 14, y);
+      y += 6;
+      autoTable(doc, {
+        startY: y,
+        head: [["Tanggal", "Keterangan", "Jumlah", "Status"]],
+        body: pemasukanData.map((i) => [i.tanggal, i.keterangan, i.jumlah, i.status]),
+        styles: { fontSize: 9, cellPadding: 2 },
+        headStyles: { fillColor: [22, 119, 255], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 248, 255] },
+      });
+      y = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // Section: Pengeluaran
+    if (pengeluaranData.length > 0) {
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text("5. Listing Pengeluaran", 14, y);
+      y += 6;
+      autoTable(doc, {
+        startY: y,
+        head: [["Tanggal", "Keperluan", "Vendor", "Jumlah"]],
+        body: pengeluaranData.map((i) => [i.tanggal, i.keperluan, i.vendor, i.jumlah]),
+        styles: { fontSize: 9, cellPadding: 2 },
+        headStyles: { fillColor: [22, 119, 255], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 248, 255] },
+      });
+      y = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // Section: Hutang/Piutang
+    if (hutangData.length > 0) {
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text("6. Hutang / Piutang", 14, y);
+      y += 6;
+      autoTable(doc, {
+        startY: y,
+        head: [["Jenis", "Pihak", "Jumlah", "Jatuh Tempo", "Status"]],
+        body: hutangData.map((i) => [i.jenis, i.pihak, i.jumlah, i.jatuhTempo, i.status]),
+        styles: { fontSize: 9, cellPadding: 2 },
+        headStyles: { fillColor: [22, 119, 255], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 248, 255] },
+      });
+      y = (doc as any).lastAutoTable.finalY + 10;
+    }
+
+    // Section: Dokumen
+    if (dokumenData.length > 0) {
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+      doc.text("7. Dokumen Arsip", 14, y);
+      y += 6;
+      autoTable(doc, {
+        startY: y,
+        head: [["Nama File", "Tipe", "Tanggal"]],
+        body: dokumenData.map((i) => [i.name, i.type, i.date]),
+        styles: { fontSize: 9, cellPadding: 2 },
+        headStyles: { fillColor: [22, 119, 255], textColor: 255 },
+        alternateRowStyles: { fillColor: [245, 248, 255] },
+      });
+    }
+
+    doc.save(`Project-Report-${id}.pdf`);
+  };
+
   return (
     <SidebarLayout
       title="Detail Project"
       subtitle="Dashboard lengkap project — finansial, pengajuan, dokumen, dan progress."
       action={
-        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">Aktif</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportProjectPDF}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+          >
+            <Printer className="w-3.5 h-3.5" /> Export Report PDF
+          </button>
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">Aktif</span>
+        </div>
       }
     >
       {/* Project Header Card */}
@@ -248,20 +441,29 @@ export default function ProjectDetailPage({ id }: Props) {
             </div>
           </div>
           <div className="space-y-4">
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-              <div className="text-xs text-slate-500 font-medium uppercase mb-1">Total Nilai Kontrak</div>
-              <div className="text-2xl font-bold text-slate-900">Rp 1.200.000.000</div>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-              <div className="text-xs text-slate-500 font-medium uppercase mb-1">Total Pemasukan</div>
-              <div className="text-2xl font-bold text-emerald-600">Rp 360.000.000</div>
-              <div className="text-xs text-slate-400 mt-0.5">30% dari nilai kontrak</div>
-            </div>
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-              <div className="text-xs text-slate-500 font-medium uppercase mb-1">Total Pengeluaran</div>
-              <div className="text-2xl font-bold text-rose-600">Rp 840.000.000</div>
-              <div className="text-xs text-slate-400 mt-0.5">70% dari nilai kontrak</div>
-            </div>
+            {(() => {
+              const totalPemasukan = pemasukanData.reduce((s, i) => s + parseRupiah(i.jumlah), 0);
+              const totalPengeluaran = pengeluaranData.reduce((s, i) => s + parseRupiah(i.jumlah), 0);
+              const totalAnggaran = anggaranData.reduce((s, i) => s + i.anggaran, 0);
+              return (
+                <>
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div className="text-xs text-slate-500 font-medium uppercase mb-1">Total Anggaran</div>
+                    <div className="text-2xl font-bold text-slate-900">{fmtRupiah(totalAnggaran)}</div>
+                  </div>
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div className="text-xs text-slate-500 font-medium uppercase mb-1">Total Pemasukan</div>
+                    <div className="text-2xl font-bold text-emerald-600">{fmtRupiah(totalPemasukan)}</div>
+                    <div className="text-xs text-slate-400 mt-0.5">{totalAnggaran > 0 ? Math.round((totalPemasukan / totalAnggaran) * 100) : 0}% dari anggaran</div>
+                  </div>
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+                    <div className="text-xs text-slate-500 font-medium uppercase mb-1">Total Pengeluaran</div>
+                    <div className="text-2xl font-bold text-rose-600">{fmtRupiah(totalPengeluaran)}</div>
+                    <div className="text-xs text-slate-400 mt-0.5">{totalAnggaran > 0 ? Math.round((totalPengeluaran / totalAnggaran) * 100) : 0}% dari anggaran</div>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -390,23 +592,70 @@ export default function ProjectDetailPage({ id }: Props) {
 
       {active === "anggaran" && (
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <h3 className="text-sm font-bold text-slate-900 mb-6">Anggaran vs Realisasi</h3>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-sm font-bold text-slate-900">Anggaran vs Realisasi</h3>
+            <button
+              onClick={() => openModal("anggaran", { kategori: "", anggaran: "", realisasi: "" })}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+            >
+              <Plus className="w-3.5 h-3.5" /> Atur Anggaran
+            </button>
+          </div>
           <div className="space-y-6 max-w-2xl">
-            <div>
-              <div className="flex justify-between text-sm font-semibold text-slate-700 mb-2"><span>Material & Jasa</span><span className="text-blue-600">72% tercapai</span></div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-blue-500 rounded-full" style={{ width: "72%" }} /></div>
-              <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>Anggaran: Rp 600.000.000</span><span>Realisasi: Rp 432.000.000</span></div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm font-semibold text-slate-700 mb-2"><span>Biaya Operasional</span><span className="text-amber-600">45% tercapai</span></div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-amber-500 rounded-full" style={{ width: "45%" }} /></div>
-              <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>Anggaran: Rp 200.000.000</span><span>Realisasi: Rp 90.000.000</span></div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm font-semibold text-slate-700 mb-2"><span>Pajak</span><span className="text-emerald-600">60% tercapai</span></div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{ width: "60%" }} /></div>
-              <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>Anggaran: Rp 100.000.000</span><span>Realisasi: Rp 60.000.000</span></div>
-            </div>
+            {anggaranData.map((a) => {
+              const pct = a.anggaran > 0 ? Math.min(100, Math.round((a.realisasi / a.anggaran) * 100)) : 0;
+              const over = a.realisasi > a.anggaran;
+              const color = a.color as "blue" | "amber" | "emerald";
+              const barColor = over ? "bg-rose-500" : color === "blue" ? "bg-blue-500" : color === "amber" ? "bg-amber-500" : "bg-emerald-500";
+              const textColor = over ? "text-rose-600" : color === "blue" ? "text-blue-600" : color === "amber" ? "text-amber-600" : "text-emerald-600";
+              return (
+                <div key={a.kategori}>
+                  <div className="flex justify-between text-sm font-semibold text-slate-700 mb-2">
+                    <span>{a.kategori}</span>
+                    <span className={textColor}>{over ? `Overbudget ${fmtRupiah(a.realisasi - a.anggaran)}` : `${pct}% tercapai`}</span>
+                  </div>
+                  <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div className={`h-full ${barColor} rounded-full transition-all duration-500`} style={{ width: `${over ? 100 : pct}%` }} />
+                  </div>
+                  <div className="flex justify-between text-xs text-slate-500 mt-1.5">
+                    <span>Anggaran: {fmtRupiah(a.anggaran)}</span>
+                    <span>Realisasi: {fmtRupiah(a.realisasi)}</span>
+                  </div>
+                  {over && (
+                    <div className="mt-2 text-xs font-medium text-rose-600 bg-rose-50 border border-rose-100 rounded-lg px-3 py-1.5">
+                      ⚠️ Realisasi melebihi anggaran sebesar {fmtRupiah(a.realisasi - a.anggaran)}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {anggaranData.length === 0 && (
+              <div className="text-center text-sm text-slate-400 py-6">Belum ada data anggaran</div>
+            )}
+          </div>
+          <div className="mt-8 pt-6 border-t border-slate-100">
+            <h4 className="text-xs font-bold text-slate-900 uppercase mb-3">Ringkasan</h4>
+            {(() => {
+              const totalAnggaran = anggaranData.reduce((s, a) => s + a.anggaran, 0);
+              const totalRealisasi = anggaranData.reduce((s, a) => s + a.realisasi, 0);
+              const sisa = totalAnggaran - totalRealisasi;
+              return (
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="bg-slate-50 rounded-lg p-3 text-center">
+                    <div className="text-xs text-slate-500">Total Anggaran</div>
+                    <div className="font-bold text-slate-900">{fmtRupiah(totalAnggaran)}</div>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3 text-center">
+                    <div className="text-xs text-slate-500">Total Realisasi</div>
+                    <div className="font-bold text-rose-600">{fmtRupiah(totalRealisasi)}</div>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3 text-center">
+                    <div className="text-xs text-slate-500">Sisa</div>
+                    <div className={`font-bold ${sisa < 0 ? "text-rose-600" : "text-emerald-600"}`}>{fmtRupiah(Math.abs(sisa))}</div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
@@ -423,14 +672,18 @@ export default function ProjectDetailPage({ id }: Props) {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dokumenData.map((d, i) => (
+            {dokumenData.map((d: any, i) => (
               <div key={i} className="p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-sm transition bg-white flex items-center gap-3">
                 <div className={`w-10 h-10 rounded-lg ${getDocColor(d.type)} flex items-center justify-center`}><FileText className="w-5 h-5" /></div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold text-slate-800 truncate">{d.name}</div>
                   <div className="text-xs text-slate-500">{d.type} • {d.date}</div>
                 </div>
-                <button className="text-slate-400 hover:text-blue-600"><Download className="w-4 h-4" /></button>
+                {d.fileUrl ? (
+                  <a href={d.fileUrl} download={d.name} className="text-slate-400 hover:text-blue-600"><Download className="w-4 h-4" /></a>
+                ) : (
+                  <button className="text-slate-400 hover:text-blue-600"><Download className="w-4 h-4" /></button>
+                )}
               </div>
             ))}
             {dokumenData.length === 0 && (
@@ -452,7 +705,10 @@ export default function ProjectDetailPage({ id }: Props) {
             {modalType === "pengajuan" && (
               <>
                 {formField("No PR", "no")}
-                {formField("Tanggal", "tanggal")}
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Tanggal</label>
+                  <DatePicker value={form.tanggal || ""} onChange={(d) => setForm((f) => ({ ...f, tanggal: d }))} />
+                </div>
                 {formField("Keterangan", "keterangan")}
                 {formField("Total", "total")}
                 {formField("Status", "status", "text", ["Menunggu", "Disetujui", "Ditolak"])}
@@ -470,9 +726,27 @@ export default function ProjectDetailPage({ id }: Props) {
 
             {modalType === "pengeluaran" && (
               <>
-                {formField("Tanggal", "tanggal")}
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Tanggal</label>
+                  <DatePicker value={form.tanggal || ""} onChange={(d) => setForm((f) => ({ ...f, tanggal: d }))} />
+                </div>
                 {formField("Keperluan", "keperluan")}
-                {formField("Vendor", "vendor")}
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Vendor</label>
+                  <select
+                    value={form.vendor || ""}
+                    onChange={(e) => setForm((f) => ({ ...f, vendor: e.target.value }))}
+                    className="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Pilih vendor...</option>
+                    {customers.map((c: any) => (
+                      <option key={c.id} value={c.nama}>{c.nama}</option>
+                    ))}
+                    {customers.length === 0 && (
+                      <option value="" disabled>Belum ada data customer</option>
+                    )}
+                  </select>
+                </div>
                 {formField("Jumlah", "jumlah")}
               </>
             )}
@@ -480,10 +754,36 @@ export default function ProjectDetailPage({ id }: Props) {
             {modalType === "hutang" && (
               <>
                 {formField("Jenis", "jenis", "text", ["Piutang", "Hutang"])}
-                {formField("Pihak", "pihak")}
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Pihak</label>
+                  <select
+                    value={form.pihak || ""}
+                    onChange={(e) => setForm((f) => ({ ...f, pihak: e.target.value }))}
+                    className="w-full text-sm rounded-lg border border-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Pilih pihak...</option>
+                    {customers.map((c: any) => (
+                      <option key={c.id} value={c.nama}>{c.nama}</option>
+                    ))}
+                    {customers.length === 0 && (
+                      <option value="" disabled>Belum ada data customer</option>
+                    )}
+                  </select>
+                </div>
                 {formField("Jumlah", "jumlah")}
-                {formField("Jatuh Tempo", "jatuhTempo")}
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Jatuh Tempo</label>
+                  <DatePicker value={form.jatuhTempo || ""} onChange={(d) => setForm((f) => ({ ...f, jatuhTempo: d }))} />
+                </div>
                 {formField("Status", "status", "text", ["Belum Dibayar", "Sudah Dibayar"])}
+              </>
+            )}
+
+            {modalType === "anggaran" && (
+              <>
+                {formField("Kategori", "kategori", "text", ["Material & Jasa", "Biaya Operasional", "Pajak"])}
+                {formField("Anggaran (Rp)", "anggaran", "number")}
+                {formField("Realisasi (Rp)", "realisasi", "number")}
               </>
             )}
 
@@ -491,14 +791,22 @@ export default function ProjectDetailPage({ id }: Props) {
               <>
                 {formField("Nama File", "name")}
                 {formField("Tipe", "type", "text", ["Kontrak", "BAST", "Invoice", "Lainnya"])}
-                {formField("Tanggal", "date")}
+                <div className="mb-3">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Tanggal</label>
+                  <DatePicker value={form.date || ""} onChange={(d) => setForm((f) => ({ ...f, date: d }))} />
+                </div>
                 <div className="mt-3">
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Upload File</label>
-                  <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 transition cursor-pointer">
-                    <Upload className="w-6 h-6 text-slate-400 mx-auto mb-2" />
-                    <p className="text-sm text-slate-600 font-medium">Klik atau seret file ke sini</p>
-                    <p className="text-xs text-slate-400 mt-1">PDF, JPG, PNG (maks. 10MB)</p>
-                  </div>
+                  <FileUpload
+                    onChange={(file, url) => {
+                      if (file) {
+                        setUploadedFile({ url, name: file.name });
+                        setForm((f) => ({ ...f, name: file.name }));
+                      } else {
+                        setUploadedFile(null);
+                      }
+                    }}
+                  />
                 </div>
               </>
             )}

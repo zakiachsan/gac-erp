@@ -31,6 +31,20 @@ const ribuan = (n: number) => {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
+function terbilang(n: number): string {
+  const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+  if (n < 12) return angka[Math.floor(n)];
+  if (n < 20) return terbilang(n - 10) + " Belas";
+  if (n < 100) return terbilang(Math.floor(n / 10)) + " Puluh " + terbilang(n % 10);
+  if (n < 200) return "Seratus " + terbilang(n - 100);
+  if (n < 1000) return terbilang(Math.floor(n / 100)) + " Ratus " + terbilang(n % 100);
+  if (n < 2000) return "Seribu " + terbilang(n - 1000);
+  if (n < 1000000) return terbilang(Math.floor(n / 1000)) + " Ribu " + terbilang(n % 1000);
+  if (n < 1000000000) return terbilang(Math.floor(n / 1000000)) + " Juta " + terbilang(n % 1000000);
+  if (n < 1000000000000) return terbilang(Math.floor(n / 1000000000)) + " Miliar " + terbilang(n % 1000000000);
+  return "Terlalu besar";
+}
+
 const bapMap: Record<string, BAPData> = {
   "BAP-001": {
     id: "BAP-001", noBap: "011/BAP.BLM/PT CoolTech/KEU.PW/VIII/2024", tanggal: "2024-08-20",
@@ -44,7 +58,7 @@ const bapMap: Record<string, BAPData> = {
     periodeIni: 70781800, retensi: 3539090, potonganLain: 0, ppn: 7396698,
     jumlahPotongan: 3539090, periodeIniSetelahPotong: 67242710,
     jumlahSetelahPotong: 59846012, jumlahDibayarkan: 59846012,
-    terbilang: "lima puluh sembilan juta delapan ratus empat puluh enam ribu dua belas",
+    terbilang: terbilang(59846012),
     historyPembayaran: [{ ke: 1, keterangan: "Pembayaran ke 1 (DP 50%)", jumlah: 59846012 }],
     poItems: [
       { nama: "AC Split 2 PK", qty: 10, satuan: "unit", hargaSatuan: 4200000 },
@@ -66,7 +80,7 @@ const bapMap: Record<string, BAPData> = {
     periodeIni: 34132500, retensi: 0, potonganLain: 500000, ppn: 3699575,
     jumlahPotongan: 500000, periodeIniSetelahPotong: 33632500,
     jumlahSetelahPotong: 29932925, jumlahDibayarkan: 29932925,
-    terbilang: "dua puluh sembilan juta sembilan ratus tiga puluh dua ribu sembilan ratus dua puluh lima",
+    terbilang: terbilang(29932925),
     historyPembayaran: [{ ke: 1, keterangan: "Pembayaran ke 1 (DP 60%)", jumlah: 29932925 }],
     poItems: [
       { nama: "Pompa Air Industri 5HP", qty: 2, satuan: "unit", hargaSatuan: 13250000 },
@@ -86,7 +100,7 @@ const bapMap: Record<string, BAPData> = {
     periodeIni: 139305000, retensi: 6965250, potonganLain: 0, ppn: 14561978,
     jumlahPotongan: 6965250, periodeIniSetelahPotong: 132339750,
     jumlahSetelahPotong: 117777772, jumlahDibayarkan: 117777772,
-    terbilang: "seratus tujuh belas juta tujuh ratus tujuh puluh tujuh ribu tujuh ratus tujuh puluh dua",
+    terbilang: terbilang(117777772),
     historyPembayaran: [],
     poItems: [
       { nama: "Semen Portland 50kg", qty: 100, satuan: "sak", hargaSatuan: 72000 },
@@ -217,6 +231,9 @@ export default function BAPDetailPage({ id }: Props) {
                 <tr className="bg-slate-50 font-semibold"><td className="px-4 py-2.5 text-slate-700">Jumlah Dibayarkan</td><td className="px-4 py-2.5 text-right font-mono text-xs text-emerald-700">{fmt(bap.jumlahDibayarkan)}</td></tr>
               </tbody>
             </table>
+            <div className="px-4 py-2.5 bg-slate-50 border-t border-slate-200 text-xs text-slate-600">
+              <span className="font-semibold">Terbilang:</span> {terbilang(bap.jumlahDibayarkan)} Rupiah
+            </div>
           </div>
 
           {/* Item PO */}

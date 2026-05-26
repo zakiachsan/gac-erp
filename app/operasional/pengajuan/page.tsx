@@ -8,6 +8,7 @@ import {
   Plus, XCircle, ChevronDown, CheckCircle2, X, AlertCircle,
   Clock, FileText, Banknote, UserCheck, ArrowRight, Eye
 } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 import {
   BiayaItem, ApprovalStep,
   loadBiayaItems, saveBiayaItems,
@@ -284,7 +285,7 @@ export default function PengajuanBiayaPage() {
             <div className="px-6 py-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Tanggal <span className="text-red-500">*</span></label>
-                <input type="date" value={form.tanggal} onChange={(e) => setForm((p) => ({ ...p, tanggal: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <DatePicker value={form.tanggal} onChange={(d) => setForm((p) => ({ ...p, tanggal: d }))} />
               </div>
               <div className="relative">
                 <label className="block text-sm font-medium text-slate-700 mb-1">Kategori <span className="text-red-500">*</span></label>

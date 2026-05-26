@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
+import DatePicker from "@/components/DatePicker";
 import { useRole } from "@/context/RoleContext";
-import { Plus, Search, X, Upload, CheckCircle, XCircle, RotateCcw, ArrowRight, Eye } from "lucide-react";
+import { Plus, Search, X, Upload, CheckCircle, XCircle, RotateCcw, ArrowRight, Eye, Pencil, Trash2 } from "lucide-react";
+import FileUpload from "@/components/FileUpload";
 import Link from "next/link";
 
 type QuotationStatus = "Negosiasi" | "Menang" | "Tidak Menang";
@@ -18,6 +20,7 @@ interface StatusLog {
 
 interface Quotation {
   no: string;
+  tanggal?: string;
   namaPekerjaan: string;
   deskripsi: string;
   customer: string;
@@ -148,12 +151,92 @@ export default function PenawaranPage() {
 
   const [open, setOpen] = useState(false);
   const [addCustomer, setAddCustomer] = useState(false);
+  const [newCustomerForm, setNewCustomerForm] = useState({ nama: "", alamat: "", contact: "", email: "", vms: "" });
+  const [customers, setCustomers] = useState<any[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("gac-customers");
+      if (saved) return JSON.parse(saved);
+    }
+    return [];
+  });
   const [data, setData] = useState<Quotation[]>(initialData);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const menuRef = useRef<HTMLDivElement>(null);
 
   const [historyModal, setHistoryModal] = useState<{ open: boolean; item: Quotation | null }>({ open: false, item: null });
+
+  const [editingNo, setEditingNo] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<{ url: string; name: string } | null>(null);
+  const [form, setForm] = useState<Partial<Quotation>>({
+    no: "",
+    namaPekerjaan: "",
+    deskripsi: "",
+    customer: "",
+    loc: "",
+    marketing: "",
+    pic: "",
+    periodeDari: "",
+    periodeSampai: "",
+    total: "",
+    status: "Negosiasi",
+    history: [],
+  });
+
+  const openCreate = () => {
+    const nextNo = `QT-2026-${String(data.length + 19).padStart(4, "0")}`;
+    setEditingNo(null);
+    setForm({
+      no: nextNo,
+      namaPekerjaan: "",
+      deskripsi: "",
+      customer: "",
+      loc: "",
+      marketing: isStaff ? currentStaffName : "Budi Santoso",
+      pic: "Andi Wijaya",
+      periodeDari: "",
+      periodeSampai: "",
+      total: "",
+      status: "Negosiasi",
+      history: [],
+    });
+    setOpen(true);
+  };
+
+  const openEdit = (q: Quotation) => {
+    setEditingNo(q.no);
+    setForm({ ...q });
+    setOpen(true);
+    setMenuOpen(null);
+  };
+
+  const handleSave = () => {
+    if (!form.no || !form.customer || !form.namaPekerjaan) return;
+    if (editingNo) {
+      setData((prev) =>
+        prev.map((q) =>
+          q.no === editingNo
+            ? { ...q, ...(form as Quotation) }
+            : q
+        )
+      );
+    } else {
+      const newQ: Quotation = {
+        ...(form as Quotation),
+        history: [],
+      };
+      setData((prev) => [newQ, ...prev]);
+    }
+    setOpen(false);
+    setEditingNo(null);
+  };
+
+  const handleDelete = (no: string) => {
+    setData((prev) => prev.filter((q) => q.no !== no));
+    setConfirmDelete(null);
+    setMenuOpen(null);
+  };
 
   const setStatus = (no: string, newStatus: QuotationStatus) => {
     setData((prev) =>
@@ -207,7 +290,7 @@ export default function PenawaranPage() {
       subtitle="Kelola quotation, negosiasi, dan closing penawaran."
       action={
         <button
-          onClick={() => setOpen(true)}
+          onClick={openCreate}
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-blue-500/20 transition active:scale-95"
         >
           <Plus className="w-4 h-4" /> Buat Penawaran
@@ -297,6 +380,10 @@ export default function PenawaranPage() {
           className="fixed z-[100] w-44 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden"
           style={{ left: menuPos.x, top: menuPos.y }}
         >
+          <button onClick={() => { const q = data.find((x) => x.no === menuOpen); if (q) openEdit(q); }} className="w-full text-left px-3 py-2.5 text-xs font-medium text-blue-700 hover:bg-blue-50 flex items-center gap-2 transition">
+            <Pencil className="w-3.5 h-3.5" /> Edit Penawaran
+          </button>
+          <div className="border-t border-slate-100 my-1" />
           <button onClick={() => setStatus(menuOpen, "Menang")} className="w-full text-left px-3 py-2.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50 flex items-center gap-2 transition">
             <CheckCircle className="w-3.5 h-3.5" /> Menang
           </button>
@@ -305,6 +392,10 @@ export default function PenawaranPage() {
           </button>
           <button onClick={() => setStatus(menuOpen, "Negosiasi")} className="w-full text-left px-3 py-2.5 text-xs font-medium text-amber-700 hover:bg-amber-50 flex items-center gap-2 transition">
             <RotateCcw className="w-3.5 h-3.5" /> Negosiasi
+          </button>
+          <div className="border-t border-slate-100 my-1" />
+          <button onClick={() => setConfirmDelete(menuOpen)} className="w-full text-left px-3 py-2.5 text-xs font-medium text-rose-700 hover:bg-rose-50 flex items-center gap-2 transition">
+            <Trash2 className="w-3.5 h-3.5" /> Hapus
           </button>
         </div>
       )}
@@ -372,60 +463,65 @@ export default function PenawaranPage() {
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto border border-slate-200">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10 rounded-t-2xl">
-              <h2 className="text-base font-bold text-slate-900">Buat Penawaran Baru</h2>
+              <h2 className="text-base font-bold text-slate-900">{editingNo ? "Edit" : "Buat"} Penawaran</h2>
               <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
             </div>
             <div className="p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nomor Penawaran</label>
-                  <input type="text" defaultValue="QT-2026-0021" readOnly className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600" />
+                  <input type="text" value={form.no} readOnly className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tanggal</label>
-                  <input type="date" defaultValue="2026-05-05" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <DatePicker value={form.tanggal} onChange={(d) => setForm((f) => ({ ...f, tanggal: d }))} />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nama Pekerjaan / Judul</label>
-                  <input type="text" placeholder="Contoh: Pengadaan & Pemasangan AC Kantor Pusat" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input type="text" placeholder="Contoh: Pengadaan & Pemasangan AC Kantor Pusat" value={form.namaPekerjaan || ""} onChange={(e) => setForm((f) => ({ ...f, namaPekerjaan: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Deskripsi Pekerjaan</label>
-                  <textarea placeholder="Jelaskan scope pekerjaan secara detail..." rows={3} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
+                  <textarea placeholder="Jelaskan scope pekerjaan secara detail..." rows={3} value={form.deskripsi || ""} onChange={(e) => setForm((f) => ({ ...f, deskripsi: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Customer</label>
                   <select
+                    value={form.customer || ""}
                     className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onChange={(e) => {
                       if (e.target.value === "add-new") {
-                        (e.target as HTMLSelectElement).value = "";
                         setAddCustomer(true);
+                        return;
                       }
+                      setForm((f) => ({ ...f, customer: e.target.value }));
                     }}
                   >
                     <option value="">Pilih customer...</option>
-                    <option>PT Sejahtera Abadi</option>
-                    <option>PT Maju Jaya</option>
-                    <option>CV Karya Mandiri</option>
+                    {customers.map((c: any) => (
+                      <option key={c.id} value={c.nama}>{c.nama}</option>
+                    ))}
+                    {customers.length === 0 && (
+                      <option value="" disabled>Belum ada data customer</option>
+                    )}
                     <option value="add-new" className="font-semibold text-blue-600">+ Tambah Customer Baru</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Lokasi</label>
-                  <input type="text" placeholder="Contoh: Jakarta Pusat" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input type="text" placeholder="Contoh: Jakarta Pusat" value={form.loc || ""} onChange={(e) => setForm((f) => ({ ...f, loc: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Marketing / Sales</label>
                   {isStaff ? (
                     <input
                       type="text"
-                      value={currentStaffName}
+                      value={form.marketing || currentStaffName}
                       readOnly
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-600 cursor-not-allowed"
                     />
                   ) : (
-                    <select className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select value={form.marketing || "Budi Santoso"} onChange={(e) => setForm((f) => ({ ...f, marketing: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                       <option>Budi Santoso</option>
                       <option>Siti Aminah</option>
                       <option>Andi Wijaya</option>
@@ -437,7 +533,7 @@ export default function PenawaranPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">PIC Project</label>
-                  <select className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select value={form.pic || "Andi Wijaya"} onChange={(e) => setForm((f) => ({ ...f, pic: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>Andi Wijaya</option>
                     <option>Budi Santoso</option>
                     <option>Dewi Kusuma</option>
@@ -447,20 +543,21 @@ export default function PenawaranPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Periode Dari</label>
-                  <input type="date" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <DatePicker value={form.periodeDari} onChange={(d) => setForm((f) => ({ ...f, periodeDari: d }))} />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Periode Sampai</label>
-                  <input type="date" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <DatePicker value={form.periodeSampai} onChange={(d) => setForm((f) => ({ ...f, periodeSampai: d }))} />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">Upload Lampiran</label>
-                <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50 transition cursor-pointer">
-                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-600 font-medium">Klik atau seret file ke sini</p>
-                  <p className="text-xs text-slate-400 mt-1">PDF, JPG, PNG (maks. 10MB)</p>
-                </div>
+                <FileUpload
+                  onChange={(file, url) => {
+                    if (file) setUploadedFile({ url, name: file.name });
+                    else setUploadedFile(null);
+                  }}
+                />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -493,6 +590,21 @@ export default function PenawaranPage() {
         </div>
       )}
 
+      {/* Delete Confirmation */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-sm p-6 text-center">
+            <Trash2 className="w-10 h-10 text-rose-500 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-slate-900 mb-1">Hapus Penawaran?</h3>
+            <p className="text-sm text-slate-500 mb-5">Data yang dihapus tidak bisa dikembalikan.</p>
+            <div className="flex justify-center gap-2">
+              <button onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition">Batal</button>
+              <button onClick={() => handleDelete(confirmDelete)} className="px-4 py-2 text-sm font-medium rounded-lg bg-rose-600 text-white hover:bg-rose-700 transition">Hapus</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal Tambah Customer */}
       {addCustomer && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
@@ -505,30 +617,50 @@ export default function PenawaranPage() {
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">Nama Customer</label>
-                <input type="text" placeholder="Contoh: PT Maju Jaya" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input type="text" placeholder="Contoh: PT Maju Jaya" value={newCustomerForm.nama} onChange={(e) => setNewCustomerForm((f) => ({ ...f, nama: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">Alamat</label>
-                <textarea placeholder="Alamat lengkap..." rows={2} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <textarea placeholder="Alamat lengkap..." rows={2} value={newCustomerForm.alamat} onChange={(e) => setNewCustomerForm((f) => ({ ...f, alamat: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Contact Person</label>
-                  <input type="text" placeholder="Nama contact person" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input type="text" placeholder="Nama contact person" value={newCustomerForm.contact} onChange={(e) => setNewCustomerForm((f) => ({ ...f, contact: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Email</label>
-                  <input type="email" placeholder="email@customer.co.id" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input type="email" placeholder="email@customer.co.id" value={newCustomerForm.email} onChange={(e) => setNewCustomerForm((f) => ({ ...f, email: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">VMS Link (Web Rekanan)</label>
-                <input type="url" placeholder="https://..." className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                <input type="url" placeholder="https://..." value={newCustomerForm.vms} onChange={(e) => setNewCustomerForm((f) => ({ ...f, vms: e.target.value }))} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
               </div>
             </div>
             <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3">
               <button onClick={() => setAddCustomer(false)} className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition">Batal</button>
-              <button onClick={() => setAddCustomer(false)} className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md shadow-blue-500/20 transition">Simpan Customer</button>
+              <button onClick={() => {
+                if (!newCustomerForm.nama.trim()) return;
+                const newId = "CUST-" + Date.now().toString().slice(-4);
+                const entry = {
+                  id: newId,
+                  nama: newCustomerForm.nama.trim(),
+                  alamat: newCustomerForm.alamat.trim(),
+                  contact: newCustomerForm.contact.trim(),
+                  email: newCustomerForm.email.trim(),
+                  vms: newCustomerForm.vms.trim(),
+                  totalProject: 0,
+                  totalNilai: "Rp 0",
+                  status: "Aktif",
+                };
+                const updated = [...customers, entry];
+                setCustomers(updated);
+                localStorage.setItem("gac-customers", JSON.stringify(updated));
+                setForm((f) => ({ ...f, customer: entry.nama }));
+                setNewCustomerForm({ nama: "", alamat: "", contact: "", email: "", vms: "" });
+                setAddCustomer(false);
+              }} className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md shadow-blue-500/20 transition">Simpan Customer</button>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Calendar, ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import ExportButtons from "./ExportButtons";
+import DatePicker from "@/components/DatePicker";
 
 const quickOptions = [
   { value: "today", label: "Hari Ini" },
@@ -129,36 +130,12 @@ export default function FinanceFilterBar({
         {/* Date Range / Single Date */}
         {!hideDateRange && (
           singleDate ? (
-            <div className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700">
-              <Calendar className="w-4 h-4 text-slate-400" />
-              <input
-                type="date"
-                value={from}
-                onChange={(e) => handleSingleDateChange(e.target.value)}
-                className="border-none outline-none text-sm bg-transparent"
-              />
-            </div>
+            <DatePicker value={from} onChange={handleSingleDateChange} />
           ) : (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                <input
-                  type="date"
-                  value={from}
-                  onChange={(e) => handleFromChange(e.target.value)}
-                  className="border-none outline-none text-sm bg-transparent"
-                />
-              </div>
+              <DatePicker value={from} onChange={handleFromChange} />
               <span className="text-slate-400 text-sm">s/d</span>
-              <div className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700">
-                <Calendar className="w-4 h-4 text-slate-400" />
-                <input
-                  type="date"
-                  value={to}
-                  onChange={(e) => handleToChange(e.target.value)}
-                  className="border-none outline-none text-sm bg-transparent"
-                />
-              </div>
+              <DatePicker value={to} onChange={handleToChange} />
             </div>
           )
         )}

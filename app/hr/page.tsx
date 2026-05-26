@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
+import DatePicker from "@/components/DatePicker";
 import { useRole } from "@/context/RoleContext";
 import {
   Download, Calendar, Filter, ScanFace, CheckCircle, Clock, MapPin,
@@ -560,11 +561,11 @@ function AdminView({ allData }: { allData: RawRecord[] }) {
             </div>
             <div>
               <label className="block text-[10px] text-slate-400 uppercase tracking-wide font-semibold mb-1">Dari Tanggal</label>
-              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <DatePicker value={dateFrom} onChange={(d) => setDateFrom(d)} />
             </div>
             <div>
               <label className="block text-[10px] text-slate-400 uppercase tracking-wide font-semibold mb-1">Sampai Tanggal</label>
-              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <DatePicker value={dateTo} onChange={(d) => setDateTo(d)} />
             </div>
             <div className="text-xs text-slate-500 pb-2">{filteredRaw.length} record ditemukan</div>
           </div>

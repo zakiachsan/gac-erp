@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { fmt, asetTetapList, type AsetTetapItem } from "@/lib/keuanganData";
 import { Plus, X, Package, Search, Archive } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 const kategoriOptions = ["Tanah", "Bangunan", "Kendaraan", "Peralatan", "Mesin"];
 
@@ -175,7 +176,7 @@ export default function AsetTetapPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Tanggal Beli</label>
-                  <input type="date" value={form.tanggalBeli} onChange={(e) => setForm({ ...form, tanggalBeli: e.target.value })} className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <DatePicker value={form.tanggalBeli} onChange={(val) => setForm({ ...form, tanggalBeli: val })} className="w-full" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

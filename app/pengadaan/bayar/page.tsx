@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Plus, Banknote, XCircle, Trash2, AlertTriangle, CheckCircle, Search, ChevronDown } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 interface BayarItem {
   id: string;
@@ -350,11 +351,9 @@ export default function BayarPage() {
               {/* Jatuh Tempo */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Jatuh Tempo <span className="text-red-500">*</span></label>
-                <input
-                  type="date"
+                <DatePicker
                   value={formJatuhTempo}
-                  onChange={(e) => setFormJatuhTempo(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onChange={(d) => setFormJatuhTempo(d)}
                 />
               </div>
             </div>

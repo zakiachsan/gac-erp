@@ -6,6 +6,7 @@ import { fmt, coaList, bukuBesarList, type CoaItem } from "@/lib/keuanganData";
 import { Scale, Search } from "lucide-react";
 import ExportButtons from "@/components/ExportButtons";
 import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
+import DatePicker from "@/components/DatePicker";
 
 export default function NeracaSaldoPage() {
   const [periodFrom, setPeriodFrom] = useState("2026-05-01");
@@ -61,11 +62,11 @@ export default function NeracaSaldoPage() {
         <div className="flex flex-wrap gap-4 items-end">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Dari Tanggal</label>
-            <input type="date" value={periodFrom} onChange={(e) => setPeriodFrom(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <DatePicker value={periodFrom} onChange={setPeriodFrom} />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Sampai Tanggal</label>
-            <input type="date" value={periodTo} onChange={(e) => setPeriodTo(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <DatePicker value={periodTo} onChange={setPeriodTo} />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Kategori</label>

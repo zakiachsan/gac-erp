@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Plus, FileText, Trash2, ChevronDown, ChevronUp, XCircle, Search, Check, AlertCircle } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 // ─── Data Pembanding Reference (vendor terpilih) ───
 interface RefItem { nama: string; qty: number; satuan: string; hargaSatuan: number; }
@@ -495,7 +496,7 @@ export default function POPage() {
                 {/* Delivery Date */}
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-1">Delivery Date</label>
-                  <input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} className="w-full sm:w-64 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <DatePicker value={deliveryDate} onChange={(d) => setDeliveryDate(d)} className="w-full sm:w-64" />
                 </div>
               </div>
 

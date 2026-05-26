@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { fmt, bankRecList, type BankRecItem } from "@/lib/keuanganData";
 import { Landmark, Search, CheckCircle2, Circle, AlertCircle } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 export default function RekonsiliasiPage() {
   const [periodFrom, setPeriodFrom] = useState("2026-05-01");
@@ -49,11 +50,11 @@ export default function RekonsiliasiPage() {
         <div className="flex flex-wrap gap-4 items-end">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Dari Tanggal</label>
-            <input type="date" value={periodFrom} onChange={(e) => setPeriodFrom(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <DatePicker value={periodFrom} onChange={setPeriodFrom} />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Sampai Tanggal</label>
-            <input type="date" value={periodTo} onChange={(e) => setPeriodTo(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <DatePicker value={periodTo} onChange={setPeriodTo} />
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Status</label>

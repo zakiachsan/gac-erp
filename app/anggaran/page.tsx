@@ -136,17 +136,39 @@ export default function AnggaranPage() {
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 mb-6">
         <h3 className="text-sm font-bold text-slate-900 mb-6">Anggaran vs Realisasi per Kategori</h3>
         <div className="space-y-6 max-w-3xl">
-          {[
-            { label: "Material & Jasa", pct: 80, color: "bg-blue-500", anggaran: 600000000, realisasi: 480000000 },
-            { label: "Biaya Operasional", pct: 60, color: "bg-amber-500", anggaran: 200000000, realisasi: 120000000 },
-            { label: "Pajak", pct: 100, color: "bg-emerald-500", anggaran: 100000000, realisasi: 100000000 },
-          ].map((cat) => (
-            <div key={cat.label}>
-              <div className="flex justify-between text-sm font-semibold text-slate-700 mb-2"><span>{cat.label}</span><span className={`${cat.color.replace("bg-", "text-")}`}>{cat.pct}% tercapai</span></div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden"><div className={`h-full ${cat.color} rounded-full`} style={{ width: `${cat.pct}%` }} /></div>
-              <div className="flex justify-between text-xs text-slate-500 mt-1.5"><span>Anggaran: Rp {cat.anggaran.toLocaleString("id-ID")}</span><span>Realisasi: Rp {cat.realisasi.toLocaleString("id-ID")}</span></div>
-            </div>
-          ))}
+          {(() => {
+            const grouped = kategoriOptions.map((k) => {
+              const catItems = items.filter((i) => i.kategori === k.label);
+              const anggaran = catItems.reduce((s, i) => s + (parseInt(i.anggaran.replace(/\D/g, "")) || 0), 0);
+              const realisasi = catItems.reduce((s, i) => s + (parseInt(i.realisasi.replace(/\D/g, "")) || 0), 0);
+              const pct = anggaran > 0 ? Math.min(100, Math.round((realisasi / anggaran) * 100)) : 0;
+              const over = realisasi > anggaran;
+              const color = k.label === "Material & Jasa" ? "bg-blue-500" : k.label === "Biaya Operasional" ? "bg-amber-500" : "bg-emerald-500";
+              const textColor = over ? "text-rose-600" : k.label === "Material & Jasa" ? "text-blue-600" : k.label === "Biaya Operasional" ? "text-amber-600" : "text-emerald-600";
+              const barColor = over ? "bg-rose-500" : color;
+              return { label: k.label, pct, anggaran, realisasi, over, barColor, textColor };
+            });
+            return grouped.map((cat) => (
+              <div key={cat.label}>
+                <div className="flex justify-between text-sm font-semibold text-slate-700 mb-2">
+                  <span>{cat.label}</span>
+                  <span className={cat.textColor}>{cat.over ? `Overbudget` : `${cat.pct}% tercapai`}</span>
+                </div>
+                <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                  <div className={`h-full ${cat.barColor} rounded-full transition-all duration-500`} style={{ width: `${cat.over ? 100 : cat.pct}%` }} />
+                </div>
+                <div className="flex justify-between text-xs text-slate-500 mt-1.5">
+                  <span>Anggaran: Rp {cat.anggaran.toLocaleString("id-ID")}</span>
+                  <span>Realisasi: Rp {cat.realisasi.toLocaleString("id-ID")}</span>
+                </div>
+                {cat.over && (
+                  <div className="mt-2 text-xs font-medium text-rose-600 bg-rose-50 border border-rose-100 rounded-lg px-3 py-1.5">
+                    ⚠️ Overbudget Rp {(cat.realisasi - cat.anggaran).toLocaleString("id-ID")}
+                  </div>
+                )}
+              </div>
+            ));
+          })()}
         </div>
       </div>
 

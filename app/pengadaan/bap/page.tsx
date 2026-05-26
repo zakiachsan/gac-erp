@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Plus, CheckCircle, XCircle, Upload, Trash2, ChevronDown, ChevronUp, FileText, Banknote, Search } from "lucide-react";
+import DatePicker from "@/components/DatePicker";
 
 // ─── Types ───
 interface Pihak { nama: string; nik: string; alamat: string; }
@@ -54,6 +55,20 @@ const ribuan = (n: number) => {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 const romanMonth = (m: number) => ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"][m - 1];
+
+function terbilang(n: number): string {
+  const angka = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+  if (n < 12) return angka[Math.floor(n)];
+  if (n < 20) return terbilang(n - 10) + " Belas";
+  if (n < 100) return terbilang(Math.floor(n / 10)) + " Puluh " + terbilang(n % 10);
+  if (n < 200) return "Seratus " + terbilang(n - 100);
+  if (n < 1000) return terbilang(Math.floor(n / 100)) + " Ratus " + terbilang(n % 100);
+  if (n < 2000) return "Seribu " + terbilang(n - 1000);
+  if (n < 1000000) return terbilang(Math.floor(n / 1000)) + " Ribu " + terbilang(n % 1000);
+  if (n < 1000000000) return terbilang(Math.floor(n / 1000000)) + " Juta " + terbilang(n % 1000000);
+  if (n < 1000000000000) return terbilang(Math.floor(n / 1000000000)) + " Miliar " + terbilang(n % 1000000000);
+  return "Terlalu besar";
+}
 const generateNoBAP = (index: number, vendorName: string) => {
   const now = new Date();
   const counter = String(index + 11).padStart(3, "0");
@@ -135,7 +150,7 @@ const initialBAPs: BAPData[] = [
     potonganLain: 0,
     retensiPercent: 5,
     ppnPercent: 11,
-    terbilang: fmt(c1.jumlahDibayarkan).replace("Rp ", ""),
+    terbilang: terbilang(c1.jumlahDibayarkan),
     historyPembayaran: [
       { ke: 1, keterangan: "Pembayaran ke 1 (DP 50%)", jumlah: c1.jumlahDibayarkan },
     ],
@@ -169,7 +184,7 @@ const initialBAPs: BAPData[] = [
     potonganLain: 500000,
     retensiPercent: 0,
     ppnPercent: 11,
-    terbilang: fmt(c2.jumlahDibayarkan).replace("Rp ", ""),
+    terbilang: terbilang(c2.jumlahDibayarkan),
     historyPembayaran: [
       { ke: 1, keterangan: "Pembayaran ke 1 (DP 60%)", jumlah: c2.jumlahDibayarkan },
     ],
@@ -201,7 +216,7 @@ const initialBAPs: BAPData[] = [
     potonganLain: 0,
     retensiPercent: 5,
     ppnPercent: 11,
-    terbilang: "nol",
+    terbilang: terbilang(c3.jumlahDibayarkan),
     historyPembayaran: [],
     poItems: [
       { nama: "Semen Portland 50kg", qty: 100, satuan: "sak", hargaSatuan: 72000 },
@@ -268,7 +283,7 @@ export default function BAPPage() {
     const bap = baps.find((b) => b.id === bapId);
     if (!bap) return;
     const v = getDisplay(bap);
-    setBaps((prev) => prev.map((b) => b.id === bapId ? { ...b, akumulasiSebelumnya: v.akumulasi, retensi: v.retensi, potonganLain: v.potonganLain, ppn: v.ppn, pembayaranBapSekarang: v.pembayaranBapSekarang, periodeIni: v.periodeIni, jumlahPotongan: v.jumlahPotongan, periodeIniSetelahPotong: v.periodeIniSetelahPotong, jumlahSetelahPotong: v.jumlahSetelahPotong, jumlahDibayarkan: v.jumlahDibayarkan } : b));
+    setBaps((prev) => prev.map((b) => b.id === bapId ? { ...b, akumulasiSebelumnya: v.akumulasi, retensi: v.retensi, potonganLain: v.potonganLain, ppn: v.ppn, pembayaranBapSekarang: v.pembayaranBapSekarang, periodeIni: v.periodeIni, jumlahPotongan: v.jumlahPotongan, periodeIniSetelahPotong: v.periodeIniSetelahPotong, jumlahSetelahPotong: v.jumlahSetelahPotong, jumlahDibayarkan: v.jumlahDibayarkan, terbilang: terbilang(v.jumlahDibayarkan) } : b));
     setDrafts((prev) => { const n = { ...prev }; delete n[bapId]; return n; });
   };
 
@@ -340,7 +355,7 @@ export default function BAPPage() {
       potonganLain,
       retensiPercent: retensiPct,
       ppnPercent: ppnPct,
-      terbilang: "-",
+      terbilang: terbilang(c.jumlahDibayarkan),
       historyPembayaran: [{ ke: 1, keterangan: "Pembayaran periode ini", jumlah: c.jumlahDibayarkan }],
       poItems: modalItems,
       approver: approverList[Math.floor(Math.random() * approverList.length)],
@@ -544,7 +559,7 @@ export default function BAPPage() {
                                   </tbody>
                                 </table>
                                 <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
-                                  <span className="font-semibold">Terbilang:</span> {fmt(v.jumlahDibayarkan).replace("Rp ", "")}
+                                  <span className="font-semibold">Terbilang:</span> {terbilang(v.jumlahDibayarkan)} Rupiah
                                 </div>
                                 <div className="px-4 py-2 border-t border-slate-200 text-xs text-slate-500">
                                   <Banknote className="w-3 h-3 inline mr-1" />
@@ -740,7 +755,7 @@ export default function BAPPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Tanggal BAP</label>
-                  <input type="date" value={form.tanggal} onChange={(e) => setForm((p) => ({ ...p, tanggal: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <DatePicker value={form.tanggal} onChange={(d) => setForm((p) => ({ ...p, tanggal: d }))} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Akumulasi Sebelumnya (Rp)</label>
