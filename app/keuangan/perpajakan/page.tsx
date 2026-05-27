@@ -3,9 +3,9 @@
 import { useState, useMemo } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import FinanceFilterBar, { formatPeriodLabel } from "@/components/FinanceFilterBar";
-import { fmt, pajakList, pphList, ppnList } from "@/lib/keuanganData";
+import { fmt, pajakList, pphList, ppnList, pajakTrend } from "@/lib/keuanganData";
 import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
-import { Search, Receipt, Calculator } from "lucide-react";
+import { Search, Receipt, Calculator, TrendingUp, AlertCircle, CheckCircle, Clock } from "lucide-react";
 
 type TabKey = "overview" | "pph" | "ppn";
 
@@ -17,10 +17,14 @@ const tabs: { key: TabKey; label: string }[] = [
 
 const statusBadge = (status: string) => {
   switch (status) {
-    case "Normal": return "bg-emerald-50 text-emerald-700 border-emerald-200";
-    case "Dibatalkan": return "bg-rose-50 text-rose-700 border-rose-200";
-    case "Direvisi": return "bg-amber-50 text-amber-700 border-amber-200";
-    default: return "bg-slate-50 text-slate-600 border-slate-200";
+    case "Normal":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "Dibatalkan":
+      return "bg-rose-50 text-rose-700 border-rose-200";
+    case "Direvisi":
+      return "bg-amber-50 text-amber-700 border-amber-200";
+    default:
+      return "bg-slate-50 text-slate-600 border-slate-200";
   }
 };
 
@@ -41,9 +45,7 @@ export default function PerpajakanPage() {
             key={t.key}
             onClick={() => setActiveTab(t.key)}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
-              activeTab === t.key
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-slate-600 hover:bg-slate-50"
+              activeTab === t.key ? "bg-blue-600 text-white shadow-sm" : "text-slate-600 hover:bg-slate-50"
             }`}
           >
             {t.label}
@@ -77,9 +79,21 @@ function OverviewTab({ period }: { period: { from: string; to: string } }) {
   const totalPph = filtered.reduce((s, p) => s + p.pph, 0);
   const selisih = totalKeluaran - totalMasukan;
 
+  const handleExportPDF = () => {
+    const headers = ["Jenis", "No Faktur", "Tanggal", "DPP", "PPN", "PPh", "Total", "Status"];
+    const rows = filtered.map((p) => [p.jenis, p.noFaktur, p.tanggal, p.dpp, p.ppn, p.pph || "—", p.total, p.status]);
+    exportToPDF("Laporan Pajak", headers, rows, `perpajakan-overview_${period.from}_${period.to}.pdf`);
+  };
+
+  const handleExportExcel = () => {
+    const headers = ["Jenis", "No Faktur", "Tanggal", "DPP", "PPN", "PPh", "Total", "Status"];
+    const rows = filtered.map((p) => [p.jenis, p.noFaktur, p.tanggal, p.dpp, p.ppn, p.pph || "—", p.total, p.status]);
+    exportToExcel("Laporan Pajak", headers, rows, `perpajakan-overview_${period.from}_${period.to}.xlsx`);
+  };
+
   return (
     <div className="space-y-5">
-      {/* Summary */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 text-center">
           <div className="text-[10px] text-slate-400 uppercase tracking-wide font-semibold">Pajak Keluaran</div>
@@ -99,12 +113,101 @@ function OverviewTab({ period }: { period: { from: string; to: string } }) {
         </div>
       </div>
 
+      {/* Chart & Status */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Simple Bar Chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-blue-500" /> Trend PPN per Bulan
+          </h3>
+          <div className="space-y-4">
+            {pajakTrend.map((t) => {
+              const maxVal = Math.max(t.ppnKeluaran, t.ppnMasukan, 1);
+              return (
+                <div key={t.bulan}>
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="font-medium text-slate-700 w-20">{t.bulan}</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-rose-600 font-mono">{fmt(t.ppnKeluaran)}</span>
+                      <span className="text-emerald-600 font-mono">{fmt(t.ppnMasukan)}</span>
+                      <span className="text-amber-600 font-mono">{fmt(t.pph)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden flex">
+                      <div
+                        className="h-full bg-rose-400"
+                        style={{ width: `${(t.ppnKeluaran / maxVal) * 50}%` }}
+                      />
+                      <div
+                        className="h-full bg-emerald-400"
+                        style={{ width: `${(t.ppnMasukan / maxVal) * 50}%` }}
+                      />
+                    </div>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                        t.status === "Sudah Lapor"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : t.status === "Jatuh Tempo"
+                          ? "bg-rose-50 text-rose-700 border-rose-200"
+                          : "bg-amber-50 text-amber-700 border-amber-200"
+                      }`}
+                    >
+                      {t.status}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex items-center gap-4 mt-4 text-xs text-slate-500">
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400" /> PPN Keluaran</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> PPN Masukan</span>
+          </div>
+        </div>
+
+        {/* Status Laporan */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+          <h3 className="text-sm font-bold text-slate-900 mb-4">Status Pelaporan</h3>
+          <div className="space-y-3">
+            {pajakTrend.map((t) => (
+              <div key={t.bulan} className="flex items-center justify-between p-3 rounded-lg border border-slate-100 bg-slate-50">
+                <div>
+                  <div className="text-xs font-semibold text-slate-800">{t.bulan}</div>
+                  <div className="text-[10px] text-slate-500">PPN + PPh</div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  {t.status === "Sudah Lapor" && <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />}
+                  {t.status === "Belum Lapor" && <Clock className="w-3.5 h-3.5 text-amber-500" />}
+                  {t.status === "Jatuh Tempo" && <AlertCircle className="w-3.5 h-3.5 text-rose-500" />}
+                  <span
+                    className={`text-[10px] font-medium ${
+                      t.status === "Sudah Lapor"
+                        ? "text-emerald-700"
+                        : t.status === "Jatuh Tempo"
+                        ? "text-rose-700"
+                        : "text-amber-700"
+                    }`}
+                  >
+                    {t.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
         <div className="flex flex-wrap gap-4 items-end">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Jenis Pajak</label>
-            <select value={jenisFilter} onChange={(e) => setJenisFilter(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[160px]">
+            <select
+              value={jenisFilter}
+              onChange={(e) => setJenisFilter(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[160px]"
+            >
               <option>Semua</option>
               <option>Pajak Keluaran</option>
               <option>Pajak Masukan</option>
@@ -112,19 +215,32 @@ function OverviewTab({ period }: { period: { from: string; to: string } }) {
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Status</label>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[160px]">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[160px]"
+            >
               <option>Semua</option>
               <option>Normal</option>
               <option>Dibatalkan</option>
               <option>Direvisi</option>
             </select>
           </div>
-          <div className="ml-auto">
-            <ExportPajakButtons
-              filename={`perpajakan-overview_${period.from}_${period.to}`}
-              headers={["Jenis", "No Faktur", "Tanggal", "DPP", "PPN", "PPh", "Total", "Status"]}
-              rows={filtered.map((p) => [p.jenis, p.noFaktur, p.tanggal, p.dpp, p.ppn, p.pph || "—", p.total, p.status])}
-            />
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-medium rounded-lg transition"
+            >
+              <Receipt className="w-3.5 h-3.5" />
+              PDF
+            </button>
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 text-xs font-medium rounded-lg transition"
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              Excel
+            </button>
           </div>
         </div>
       </div>
@@ -148,18 +264,36 @@ function OverviewTab({ period }: { period: { from: string; to: string } }) {
             <tbody className="divide-y divide-slate-100">
               {filtered.map((p) => (
                 <tr key={p.id} className="hover:bg-slate-50 transition">
-                  <td className="px-4 py-3"><span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${p.jenis === "Pajak Keluaran" ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>{p.jenis}</span></td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        p.jenis === "Pajak Keluaran" ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"
+                      }`}
+                    >
+                      {p.jenis}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs text-slate-600">{p.noFaktur}</td>
                   <td className="px-4 py-3 text-slate-700 text-xs">{p.tanggal}</td>
                   <td className="px-4 py-3 text-right font-mono text-xs">{fmt(p.dpp)}</td>
                   <td className="px-4 py-3 text-right font-mono text-xs">{fmt(p.ppn)}</td>
                   <td className="px-4 py-3 text-right font-mono text-xs">{p.pph ? fmt(p.pph) : "—"}</td>
                   <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-slate-800">{fmt(p.total)}</td>
-                  <td className="px-4 py-3"><span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${statusBadge(p.status)}`}>{p.status}</span></td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${statusBadge(p.status)}`}
+                    >
+                      {p.status}
+                    </span>
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={8} className="py-8 text-center text-sm text-slate-400">Tidak ada data</td></tr>
+                <tr>
+                  <td colSpan={8} className="py-8 text-center text-sm text-slate-400">
+                    Tidak ada data
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -187,6 +321,18 @@ function PphTab({ period }: { period: { from: string; to: string } }) {
   const totalDpp = filtered.reduce((s, p) => s + p.dpp, 0);
   const totalPph = filtered.reduce((s, p) => s + p.pph, 0);
 
+  const handleExportPDF = () => {
+    const headers = ["No Bukti", "Tanggal", "Pihak", "NPWP", "Jenis PPh", "Tarif (%)", "DPP", "PPh", "Status"];
+    const rows = filtered.map((p) => [p.noBukti, p.tanggal, p.pihak, p.npwp, p.jenisPph, p.tarif, p.dpp, p.pph, p.status]);
+    exportToPDF("PPh Report", headers, rows, `pph-report_${period.from}_${period.to}.pdf`);
+  };
+
+  const handleExportExcel = () => {
+    const headers = ["No Bukti", "Tanggal", "Pihak", "NPWP", "Jenis PPh", "Tarif (%)", "DPP", "PPh", "Status"];
+    const rows = filtered.map((p) => [p.noBukti, p.tanggal, p.pihak, p.npwp, p.jenisPph, p.tarif, p.dpp, p.pph, p.status]);
+    exportToExcel("PPh Report", headers, rows, `pph-report_${period.from}_${period.to}.xlsx`);
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -208,21 +354,42 @@ function PphTab({ period }: { period: { from: string; to: string } }) {
         <div className="flex flex-wrap gap-4 items-end">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Jenis PPh</label>
-            <select value={jenisFilter} onChange={(e) => setJenisFilter(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[160px]">
+            <select
+              value={jenisFilter}
+              onChange={(e) => setJenisFilter(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[160px]"
+            >
               <option value="Semua">Semua</option>
-              {jenisOptions.map((j) => <option key={j}>{j}</option>)}
+              {jenisOptions.map((j) => (
+                <option key={j}>{j}</option>
+              ))}
             </select>
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder="Cari pihak / no bukti..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="ml-auto">
-            <ExportPajakButtons
-              filename={`pph-report_${period.from}_${period.to}`}
-              headers={["No Bukti", "Tanggal", "Pihak", "NPWP", "Jenis PPh", "Tarif %", "DPP", "PPh", "Status"]}
-              rows={filtered.map((p) => [p.noBukti, p.tanggal, p.pihak, p.npwp, p.jenisPph, p.tarif, p.dpp, p.pph, p.status])}
+            <input
+              type="text"
+              placeholder="Cari pihak / no bukti..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-medium rounded-lg transition"
+            >
+              <Receipt className="w-3.5 h-3.5" />
+              PDF
+            </button>
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 text-xs font-medium rounded-lg transition"
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              Excel
+            </button>
           </div>
         </div>
       </div>
@@ -255,12 +422,24 @@ function PphTab({ period }: { period: { from: string; to: string } }) {
                   <td className="px-4 py-3 text-right font-mono text-xs text-slate-700">{fmt(p.dpp)}</td>
                   <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-rose-600">{fmt(p.pph)}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${p.status === "Normal" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-50 text-slate-600 border-slate-200"}`}>{p.status}</span>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                        p.status === "Normal"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-slate-50 text-slate-600 border-slate-200"
+                      }`}
+                    >
+                      {p.status}
+                    </span>
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={9} className="py-8 text-center text-sm text-slate-400">Tidak ada data PPh</td></tr>
+                <tr>
+                  <td colSpan={9} className="py-8 text-center text-sm text-slate-400">
+                    Tidak ada data PPh
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -290,6 +469,18 @@ function PpnTab({ period }: { period: { from: string; to: string } }) {
   const totalMasukan = filtered.filter((p) => p.jenis === "Masukan").reduce((s, p) => s + p.ppn, 0);
   const selisih = totalKeluaran - totalMasukan;
 
+  const handleExportPDF = () => {
+    const headers = ["No Faktur", "Tanggal", "Pihak", "NPWP", "Jenis", "DPP", "PPN", "Status"];
+    const rows = filtered.map((p) => [p.noFaktur, p.tanggal, p.pihak, p.npwp, p.jenis, p.dpp, p.ppn, p.status]);
+    exportToPDF("PPN Report", headers, rows, `ppn-report_${period.from}_${period.to}.pdf`);
+  };
+
+  const handleExportExcel = () => {
+    const headers = ["No Faktur", "Tanggal", "Pihak", "NPWP", "Jenis", "DPP", "PPN", "Status"];
+    const rows = filtered.map((p) => [p.noFaktur, p.tanggal, p.pihak, p.npwp, p.jenis, p.dpp, p.ppn, p.status]);
+    exportToExcel("PPN Report", headers, rows, `ppn-report_${period.from}_${period.to}.xlsx`);
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -311,7 +502,11 @@ function PpnTab({ period }: { period: { from: string; to: string } }) {
         <div className="flex flex-wrap gap-4 items-end">
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Jenis</label>
-            <select value={jenisFilter} onChange={(e) => setJenisFilter(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[130px]">
+            <select
+              value={jenisFilter}
+              onChange={(e) => setJenisFilter(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[130px]"
+            >
               <option value="Semua">Semua</option>
               <option value="Keluaran">Keluaran</option>
               <option value="Masukan">Masukan</option>
@@ -319,7 +514,11 @@ function PpnTab({ period }: { period: { from: string; to: string } }) {
           </div>
           <div>
             <label className="block text-xs font-medium text-slate-500 mb-1">Status</label>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[130px]">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white min-w-[130px]"
+            >
               <option value="Semua">Semua</option>
               <option value="Normal">Normal</option>
               <option value="Dibatalkan">Dibatalkan</option>
@@ -328,14 +527,29 @@ function PpnTab({ period }: { period: { from: string; to: string } }) {
           </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input type="text" placeholder="Cari pihak / no faktur..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-          </div>
-          <div className="ml-auto">
-            <ExportPajakButtons
-              filename={`ppn-report_${period.from}_${period.to}`}
-              headers={["No Faktur", "Tanggal", "Pihak", "NPWP", "Jenis", "DPP", "PPN", "Status"]}
-              rows={filtered.map((p) => [p.noFaktur, p.tanggal, p.pihak, p.npwp, p.jenis, p.dpp, p.ppn, p.status])}
+            <input
+              type="text"
+              placeholder="Cari pihak / no faktur..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-medium rounded-lg transition"
+            >
+              <Receipt className="w-3.5 h-3.5" />
+              PDF
+            </button>
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 text-xs font-medium rounded-lg transition"
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              Excel
+            </button>
           </div>
         </div>
       </div>
@@ -362,43 +576,43 @@ function PpnTab({ period }: { period: { from: string; to: string } }) {
                   <td className="px-4 py-3 text-slate-700 text-xs">{p.tanggal}</td>
                   <td className="px-4 py-3 text-slate-800 font-medium">{p.pihak}</td>
                   <td className="px-4 py-3 font-mono text-xs text-slate-500">{p.npwp}</td>
-                  <td className="px-4 py-3"><span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${p.jenis === "Keluaran" ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"}`}>{p.jenis}</span></td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                        p.jenis === "Keluaran" ? "bg-rose-50 text-rose-700" : "bg-emerald-50 text-emerald-700"
+                      }`}
+                    >
+                      {p.jenis}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-right font-mono text-xs text-slate-700">{fmt(p.dpp)}</td>
                   <td className="px-4 py-3 text-right font-mono text-xs font-semibold text-slate-800">{fmt(p.ppn)}</td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${p.status === "Normal" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : p.status === "Dibatalkan" ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-amber-50 text-amber-700 border-amber-200"}`}>{p.status}</span>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                        p.status === "Normal"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : p.status === "Dibatalkan"
+                          ? "bg-rose-50 text-rose-700 border-rose-200"
+                          : "bg-amber-50 text-amber-700 border-amber-200"
+                      }`}
+                    >
+                      {p.status}
+                    </span>
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={8} className="py-8 text-center text-sm text-slate-400">Tidak ada data PPN</td></tr>
+                <tr>
+                  <td colSpan={8} className="py-8 text-center text-sm text-slate-400">
+                    Tidak ada data PPN
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ───────────── Export Buttons ───────────── */
-function ExportPajakButtons({ filename, headers, rows }: { filename: string; headers: string[]; rows: (string | number)[][] }) {
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={() => exportToPDF("Laporan Pajak", headers, rows, `${filename}.pdf`)}
-        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-medium rounded-lg transition"
-      >
-        <Receipt className="w-3.5 h-3.5" />
-        PDF
-      </button>
-      <button
-        onClick={() => exportToExcel("Laporan Pajak", headers, rows, `${filename}.xlsx`)}
-        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 text-xs font-medium rounded-lg transition"
-      >
-        <Calculator className="w-3.5 h-3.5" />
-        Excel
-      </button>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { Banknote, Scale, Landmark } from "lucide-react";
 import {
   fmt, cashflowOperasional, cashflowInvestasi, cashflowPendanaan,
 } from "@/lib/keuanganData";
+import { exportToPDF } from "@/lib/exportUtils";
 
 export default function CashflowPage() {
   const [period, setPeriod] = useState({ from: "2026-05-01", to: "2026-05-31", quick: "thisMonth" });
@@ -36,7 +37,7 @@ export default function CashflowPage() {
     <SidebarLayout title="Cashflow" subtitle={subtitle}>
       <FinanceFilterBar
         onChange={setPeriod}
-        onExport={() => alert("Export Cashflow")}
+        onExport={() => handleCashflowExport(cashflowOperasional, cashflowInvestasi, cashflowPendanaan)}
         extraFilters={
           <div className="flex flex-wrap gap-5">
             <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
@@ -89,4 +90,25 @@ export default function CashflowPage() {
       </div>
     </SidebarLayout>
   );
+}
+
+/* ───────────── Export helpers ───────────── */
+function handleCashflowExport(
+  operasional: { nama: string; jumlah: number; tipe: string }[],
+  investasi: { nama: string; jumlah: number; tipe: string }[],
+  pendanaan: { nama: string; jumlah: number; tipe: string }[]
+) {
+  const headers = ["Kategori", "Keterangan", "Tipe", "Jumlah (Rp)"];
+  const rows: (string | number)[][] = [
+    ["OPERASIONAL", "", "", ""],
+    ...operasional.map((i) => ["", i.nama, i.tipe, i.jumlah]),
+    ["", "Subtotal Operasional", "", operasional.reduce((s, i) => s + i.jumlah, 0)],
+    ["INVESTASI", "", "", ""],
+    ...investasi.map((i) => ["", i.nama, i.tipe, i.jumlah]),
+    ["", "Subtotal Investasi", "", investasi.reduce((s, i) => s + i.jumlah, 0)],
+    ["PENDANAAN", "", "", ""],
+    ...pendanaan.map((i) => ["", i.nama, i.tipe, i.jumlah]),
+    ["", "Subtotal Pendanaan", "", pendanaan.reduce((s, i) => s + i.jumlah, 0)],
+  ];
+  exportToPDF("Arus Kas", headers, rows, "cashflow.pdf");
 }

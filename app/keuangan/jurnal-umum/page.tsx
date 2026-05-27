@@ -3,9 +3,12 @@
 import { useState, useMemo } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import FinanceFilterBar, { formatPeriodLabel } from "@/components/FinanceFilterBar";
-import { fmt, jurnalUmumList, type JurnalUmumItem } from "@/lib/keuanganData";
-import { Plus, X, ChevronDown, ChevronUp, BookOpen } from "lucide-react";
+import { fmt, jurnalUmumList, coaList, type JurnalUmumItem } from "@/lib/keuanganData";
+import { Plus, X, ChevronDown, ChevronUp, BookOpen, FileText, Link2 } from "lucide-react";
 import DatePicker from "@/components/DatePicker";
+import { exportToPDF, exportToExcel } from "@/lib/exportUtils";
+
+const referensiOptions = ["", "Invoice", "PO", "BAP", "Penawaran", "Project", "Lainnya"];
 
 export default function JurnalUmumPage() {
   const [period, setPeriod] = useState({ from: "2026-05-01", to: "2026-05-31", quick: "thisMonth" });
@@ -17,6 +20,8 @@ export default function JurnalUmumPage() {
     tanggal: new Date().toISOString().split("T")[0],
     noBukti: "",
     keterangan: "",
+    referensiTipe: "",
+    referensiNo: "",
     detail: [{ kodeAkun: "", namaAkun: "", debit: "", kredit: "" }],
   });
 
@@ -43,7 +48,17 @@ export default function JurnalUmumPage() {
     setForm((prev) => ({ ...prev, detail: prev.detail.filter((_, i) => i !== idx) }));
   };
 
-  const updateRow = (idx: number, field: string, value: string) => {
+  const updateRowKodeAkun = (idx: number, kode: string) => {
+    const account = coaList.find((c) => c.kode === kode);
+    setForm((prev) => ({
+      ...prev,
+      detail: prev.detail.map((d, i) =>
+        i === idx ? { ...d, kodeAkun: kode, namaAkun: account?.nama || "" } : d
+      ),
+    }));
+  };
+
+  const updateRowField = (idx: number, field: string, value: string) => {
     setForm((prev) => ({
       ...prev,
       detail: prev.detail.map((d, i) => (i === idx ? { ...d, [field]: value } : d)),
@@ -64,6 +79,7 @@ export default function JurnalUmumPage() {
       tanggal: form.tanggal,
       noBukti: form.noBukti,
       keterangan: form.keterangan,
+      referensi: form.referensiTipe ? { tipe: form.referensiTipe, noDokumen: form.referensiNo } : undefined,
       detail: form.detail.map((d) => ({
         kodeAkun: d.kodeAkun,
         namaAkun: d.namaAkun,
@@ -73,26 +89,86 @@ export default function JurnalUmumPage() {
     };
     setJournals((prev) => [...prev, newJournal]);
     setModalOpen(false);
-    setForm({ tanggal: new Date().toISOString().split("T")[0], noBukti: "", keterangan: "", detail: [{ kodeAkun: "", namaAkun: "", debit: "", kredit: "" }] });
+    setForm({
+      tanggal: new Date().toISOString().split("T")[0],
+      noBukti: "",
+      keterangan: "",
+      referensiTipe: "",
+      referensiNo: "",
+      detail: [{ kodeAkun: "", namaAkun: "", debit: "", kredit: "" }],
+    });
+  };
+
+  const handleExportPDF = () => {
+    const headers = ["Tanggal", "No Bukti", "Keterangan", "Referensi", "Total Debit", "Total Kredit", "Status"];
+    const rows = filtered.map((j) => [
+      j.tanggal,
+      j.noBukti,
+      j.keterangan,
+      j.referensi ? `${j.referensi.tipe}: ${j.referensi.noDokumen}` : "—",
+      totalDebit(j.detail),
+      totalKredit(j.detail),
+      totalDebit(j.detail) === totalKredit(j.detail) ? "Balance" : "Unbalance",
+    ]);
+    exportToPDF("Jurnal Umum", headers, rows, `jurnal-umum_${period.from}_${period.to}.pdf`);
+  };
+
+  const handleExportExcel = () => {
+    const headers = ["Tanggal", "No Bukti", "Keterangan", "Referensi", "Total Debit", "Total Kredit", "Status"];
+    const rows = filtered.map((j) => [
+      j.tanggal,
+      j.noBukti,
+      j.keterangan,
+      j.referensi ? `${j.referensi.tipe}: ${j.referensi.noDokumen}` : "—",
+      totalDebit(j.detail),
+      totalKredit(j.detail),
+      totalDebit(j.detail) === totalKredit(j.detail) ? "Balance" : "Unbalance",
+    ]);
+    exportToExcel("Jurnal Umum", headers, rows, `jurnal-umum_${period.from}_${period.to}.xlsx`);
   };
 
   const subtitle = `Jurnal umum — ${formatPeriodLabel(period.from, period.to, period.quick)}`;
 
   return (
-    <SidebarLayout title="Jurnal Umum" subtitle={subtitle} action={
-      <button onClick={() => setModalOpen(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md transition active:scale-95">
-        <Plus className="w-4 h-4" /> Buat Jurnal
-      </button>
-    }>
+    <SidebarLayout
+      title="Jurnal Umum"
+      subtitle={subtitle}
+      action={
+        <button
+          onClick={() => setModalOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md transition active:scale-95"
+        >
+          <Plus className="w-4 h-4" /> Buat Jurnal
+        </button>
+      }
+    >
       <FinanceFilterBar
         onChange={setPeriod}
-        onExport={() => alert("Export Jurnal Umum")}
+        onExport={handleExportPDF}
         extraFilters={
           <div className="flex items-center gap-3">
             <div className="relative">
               <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input type="text" placeholder="Cari no bukti / keterangan..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <input
+                type="text"
+                placeholder="Cari no bukti / keterangan..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
+            <button
+              onClick={handleExportPDF}
+              className="px-3 py-2 bg-white border border-rose-200 hover:bg-rose-50 text-rose-700 text-xs font-medium rounded-lg transition"
+            >
+              Export PDF
+            </button>
+            <button
+              onClick={handleExportExcel}
+              className="px-3 py-2 bg-white border border-emerald-200 hover:bg-emerald-50 text-emerald-700 text-xs font-medium rounded-lg transition"
+            >
+              Export Excel
+            </button>
           </div>
         }
       />
@@ -102,13 +178,14 @@ export default function JurnalUmumPage() {
           <table className="w-full text-sm">
             <thead className="text-left text-xs font-semibold text-slate-500 border-b border-slate-200 bg-slate-50">
               <tr>
-                <th className="px-6 py-3 font-medium w-10"></th>
-                <th className="px-6 py-3 font-medium">Tanggal</th>
-                <th className="px-6 py-3 font-medium">No Bukti</th>
-                <th className="px-6 py-3 font-medium">Keterangan</th>
-                <th className="px-6 py-3 font-medium text-right">Total Debit</th>
-                <th className="px-6 py-3 font-medium text-right">Total Kredit</th>
-                <th className="px-6 py-3 font-medium text-center">Balance</th>
+                <th className="px-4 py-3 font-medium w-10"></th>
+                <th className="px-4 py-3 font-medium">Tanggal</th>
+                <th className="px-4 py-3 font-medium">No Bukti</th>
+                <th className="px-4 py-3 font-medium">Keterangan</th>
+                <th className="px-4 py-3 font-medium">Referensi</th>
+                <th className="px-4 py-3 font-medium text-right">Debit</th>
+                <th className="px-4 py-3 font-medium text-right">Kredit</th>
+                <th className="px-4 py-3 font-medium text-center">Balance</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -120,31 +197,61 @@ export default function JurnalUmumPage() {
                 return (
                   <>
                     <tr key={j.id} className="hover:bg-slate-50 transition cursor-pointer" onClick={() => toggleExpand(j.id)}>
-                      <td className="px-6 py-3">{isOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}</td>
-                      <td className="px-6 py-3 text-slate-700 text-xs">{j.tanggal}</td>
-                      <td className="px-6 py-3 font-mono text-xs font-semibold text-blue-700">{j.noBukti}</td>
-                      <td className="px-6 py-3 text-slate-800 font-medium">{j.keterangan}</td>
-                      <td className="px-6 py-3 text-right font-mono text-xs text-slate-700">{fmt(d)}</td>
-                      <td className="px-6 py-3 text-right font-mono text-xs text-slate-700">{fmt(k)}</td>
-                      <td className="px-6 py-3 text-center">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${isBalanced ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-rose-50 text-rose-700 border-rose-200"}`}>
+                      <td className="px-4 py-3">
+                        {isOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                      </td>
+                      <td className="px-4 py-3 text-slate-700 text-xs">{j.tanggal}</td>
+                      <td className="px-4 py-3 font-mono text-xs font-semibold text-blue-700">{j.noBukti}</td>
+                      <td className="px-4 py-3 text-slate-800 font-medium">{j.keterangan}</td>
+                      <td className="px-4 py-3">
+                        {j.referensi ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                            <Link2 className="w-3 h-3" />
+                            {j.referensi.tipe}: {j.referensi.noDokumen}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-slate-400">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs text-slate-700">{fmt(d)}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs text-slate-700">{fmt(k)}</td>
+                      <td className="px-4 py-3 text-center">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium border ${
+                            isBalanced
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-rose-50 text-rose-700 border-rose-200"
+                          }`}
+                        >
                           {isBalanced ? "Balance" : "Unbalance"}
                         </span>
                       </td>
                     </tr>
                     {isOpen && (
                       <tr>
-                        <td colSpan={7} className="px-6 py-3 bg-slate-50">
+                        <td colSpan={8} className="px-4 py-3 bg-slate-50">
                           <table className="w-full text-xs">
                             <thead className="text-left text-slate-500 border-b border-slate-200">
-                              <tr><th className="pb-2 font-medium">Kode Akun</th><th className="pb-2 font-medium">Nama Akun</th><th className="pb-2 font-medium text-right">Debit</th><th className="pb-2 font-medium text-right">Kredit</th></tr>
+                              <tr>
+                                <th className="pb-2 font-medium">Kode Akun</th>
+                                <th className="pb-2 font-medium">Nama Akun</th>
+                                <th className="pb-2 font-medium text-right">Debit</th>
+                                <th className="pb-2 font-medium text-right">Kredit</th>
+                              </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                               {j.detail.map((det, i) => (
-                                <tr key={i}><td className="py-2 font-mono text-slate-600">{det.kodeAkun}</td><td className="py-2 text-slate-700">{det.namaAkun}</td><td className="py-2 text-right font-mono text-slate-700">{det.debit ? fmt(det.debit) : "—"}</td><td className="py-2 text-right font-mono text-slate-700">{det.kredit ? fmt(det.kredit) : "—"}</td></tr>
+                                <tr key={i}>
+                                  <td className="py-2 font-mono text-slate-600">{det.kodeAkun}</td>
+                                  <td className="py-2 text-slate-700">{det.namaAkun}</td>
+                                  <td className="py-2 text-right font-mono text-slate-700">{det.debit ? fmt(det.debit) : "—"}</td>
+                                  <td className="py-2 text-right font-mono text-slate-700">{det.kredit ? fmt(det.kredit) : "—"}</td>
+                                </tr>
                               ))}
                               <tr className="font-bold border-t-2 border-slate-200">
-                                <td colSpan={2} className="py-2 text-slate-800">Total</td>
+                                <td colSpan={2} className="py-2 text-slate-800">
+                                  Total
+                                </td>
                                 <td className="py-2 text-right font-mono text-slate-900">{fmt(d)}</td>
                                 <td className="py-2 text-right font-mono text-slate-900">{fmt(k)}</td>
                               </tr>
@@ -157,7 +264,11 @@ export default function JurnalUmumPage() {
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={7} className="py-8 text-center text-sm text-slate-400">Tidak ada data jurnal</td></tr>
+                <tr>
+                  <td colSpan={8} className="py-8 text-center text-sm text-slate-400">
+                    Tidak ada data jurnal
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -171,7 +282,9 @@ export default function JurnalUmumPage() {
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
               <h2 className="text-base font-bold text-slate-900">Buat Jurnal Umum Baru</h2>
-              <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X className="w-5 h-5" /></button>
+              <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-3 gap-4">
@@ -181,11 +294,55 @@ export default function JurnalUmumPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">No Bukti</label>
-                  <input type="text" value={form.noBukti} onChange={(e) => setForm({ ...form, noBukti: e.target.value })} placeholder="JU/2026/05/xxx" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                    type="text"
+                    value={form.noBukti}
+                    onChange={(e) => setForm({ ...form, noBukti: e.target.value })}
+                    placeholder="JU/2026/05/xxx"
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">Keterangan</label>
-                  <input type="text" value={form.keterangan} onChange={(e) => setForm({ ...form, keterangan: e.target.value })} placeholder="Keterangan transaksi" className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                    type="text"
+                    value={form.keterangan}
+                    onChange={(e) => setForm({ ...form, keterangan: e.target.value })}
+                    placeholder="Keterangan transaksi"
+                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Referensi Dokumen */}
+              <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <label className="block text-xs font-semibold text-slate-700 mb-2 flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5" /> Referensi Dokumen (Opsional)
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Tipe Dokumen</label>
+                    <select
+                      value={form.referensiTipe}
+                      onChange={(e) => setForm({ ...form, referensiTipe: e.target.value })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Tanpa Referensi</option>
+                      {referensiOptions.filter((o) => o).map((o) => (
+                        <option key={o} value={o}>{o}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-medium text-slate-500 mb-1">No Dokumen</label>
+                    <input
+                      type="text"
+                      value={form.referensiNo}
+                      onChange={(e) => setForm({ ...form, referensiNo: e.target.value })}
+                      placeholder="Contoh: INV-2026-0045"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -194,18 +351,62 @@ export default function JurnalUmumPage() {
                 <div className="border border-slate-200 rounded-lg overflow-hidden">
                   <table className="w-full text-xs">
                     <thead className="bg-slate-50 text-slate-500 border-b border-slate-200">
-                      <tr><th className="px-3 py-2 font-medium text-left">Kode Akun</th><th className="px-3 py-2 font-medium text-left">Nama Akun</th><th className="px-3 py-2 font-medium text-right">Debit</th><th className="px-3 py-2 font-medium text-right">Kredit</th><th className="px-3 py-2 w-10"></th></tr>
+                      <tr>
+                        <th className="px-3 py-2 font-medium text-left w-40">Kode Akun</th>
+                        <th className="px-3 py-2 font-medium text-left">Nama Akun</th>
+                        <th className="px-3 py-2 font-medium text-right w-28">Debit</th>
+                        <th className="px-3 py-2 font-medium text-right w-28">Kredit</th>
+                        <th className="px-3 py-2 w-10"></th>
+                      </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {form.detail.map((row, idx) => (
                         <tr key={idx}>
-                          <td className="px-2 py-2"><input type="text" value={row.kodeAkun} onChange={(e) => updateRow(idx, "kodeAkun", e.target.value)} placeholder="Kode" className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs" /></td>
-                          <td className="px-2 py-2"><input type="text" value={row.namaAkun} onChange={(e) => updateRow(idx, "namaAkun", e.target.value)} placeholder="Nama" className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs" /></td>
-                          <td className="px-2 py-2"><input type="text" value={row.debit} onChange={(e) => updateRow(idx, "debit", e.target.value)} placeholder="0" className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-right" /></td>
-                          <td className="px-2 py-2"><input type="text" value={row.kredit} onChange={(e) => updateRow(idx, "kredit", e.target.value)} placeholder="0" className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-right" /></td>
+                          <td className="px-2 py-2">
+                            <select
+                              value={row.kodeAkun}
+                              onChange={(e) => updateRowKodeAkun(idx, e.target.value)}
+                              className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs bg-white"
+                            >
+                              <option value="">Pilih akun...</option>
+                              {coaList.map((c) => (
+                                <option key={c.kode} value={c.kode}>
+                                  {c.kode} — {c.nama}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="px-2 py-2">
+                            <input
+                              type="text"
+                              value={row.namaAkun}
+                              readOnly
+                              className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs bg-slate-50 text-slate-600"
+                            />
+                          </td>
+                          <td className="px-2 py-2">
+                            <input
+                              type="text"
+                              value={row.debit}
+                              onChange={(e) => updateRowField(idx, "debit", e.target.value)}
+                              placeholder="0"
+                              className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-right"
+                            />
+                          </td>
+                          <td className="px-2 py-2">
+                            <input
+                              type="text"
+                              value={row.kredit}
+                              onChange={(e) => updateRowField(idx, "kredit", e.target.value)}
+                              placeholder="0"
+                              className="w-full px-2 py-1.5 border border-slate-200 rounded text-xs text-right"
+                            />
+                          </td>
                           <td className="px-2 py-2 text-center">
                             {form.detail.length > 1 && (
-                              <button onClick={() => removeRow(idx)} className="text-slate-400 hover:text-rose-500"><X className="w-3.5 h-3.5" /></button>
+                              <button onClick={() => removeRow(idx)} className="text-slate-400 hover:text-rose-500">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
                             )}
                           </td>
                         </tr>
@@ -213,17 +414,39 @@ export default function JurnalUmumPage() {
                     </tbody>
                   </table>
                 </div>
-                <button onClick={addRow} className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium">+ Tambah Baris</button>
+                <button onClick={addRow} className="mt-2 text-xs text-blue-600 hover:text-blue-800 font-medium">
+                  + Tambah Baris
+                </button>
 
                 <div className="flex justify-between items-center bg-slate-50 rounded-lg p-3 mt-3">
-                  <div className="text-xs text-slate-500">Total Debit: <span className="font-mono font-semibold text-slate-800">{fmt(form.detail.reduce((s, d) => s + (Number(d.debit.replace(/\D/g, "")) || 0), 0))}</span></div>
-                  <div className="text-xs text-slate-500">Total Kredit: <span className="font-mono font-semibold text-slate-800">{fmt(form.detail.reduce((s, d) => s + (Number(d.kredit.replace(/\D/g, "")) || 0), 0))}</span></div>
+                  <div className="text-xs text-slate-500">
+                    Total Debit:{" "}
+                    <span className="font-mono font-semibold text-slate-800">
+                      {fmt(form.detail.reduce((s, d) => s + (Number(d.debit.replace(/\D/g, "")) || 0), 0))}
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-500">
+                    Total Kredit:{" "}
+                    <span className="font-mono font-semibold text-slate-800">
+                      {fmt(form.detail.reduce((s, d) => s + (Number(d.kredit.replace(/\D/g, "")) || 0), 0))}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
             <div className="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 sticky bottom-0 bg-white">
-              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition">Batal</button>
-              <button onClick={saveJournal} className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition">Simpan Jurnal</button>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={saveJournal}
+                className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition"
+              >
+                Simpan Jurnal
+              </button>
             </div>
           </div>
         </div>

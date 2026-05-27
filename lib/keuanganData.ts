@@ -13,33 +13,40 @@ export interface NeracaItem {
   kode: string;
   nama: string;
   jumlah: number;
+  kodeAkun?: string[]; // link to COA for drill-down
 }
 
 export const neracaAktivaLancar: NeracaItem[] = [
-  { kode: "111", nama: "Kas & Bank", jumlah: 1250000000 },
-  { kode: "112", nama: "Piutang Usaha", jumlah: 730000000 },
-  { kode: "113", nama: "Persediaan Bahan", jumlah: 420000000 },
-  { kode: "114", nama: "Uang Muka", jumlah: 150000000 },
+  { kode: "111", nama: "Kas & Bank", jumlah: 1250000000, kodeAkun: ["1110", "1120"] },
+  { kode: "112", nama: "Piutang Usaha", jumlah: 730000000, kodeAkun: ["1130"] },
+  { kode: "113", nama: "Persediaan Bahan", jumlah: 420000000, kodeAkun: ["1140"] },
+  { kode: "114", nama: "Uang Muka", jumlah: 150000000, kodeAkun: ["1150"] },
 ];
 
 export const neracaAktivaTetap: NeracaItem[] = [
-  { kode: "121", nama: "Tanah", jumlah: 500000000 },
-  { kode: "122", nama: "Bangunan (netto)", jumlah: 1200000000 },
-  { kode: "123", nama: "Kendaraan (netto)", jumlah: 350000000 },
-  { kode: "124", nama: "Peralatan Kantor (netto)", jumlah: 180000000 },
+  { kode: "121", nama: "Tanah", jumlah: 500000000, kodeAkun: ["1210"] },
+  { kode: "122", nama: "Bangunan (netto)", jumlah: 1200000000, kodeAkun: ["1220", "1310"] },
+  { kode: "123", nama: "Kendaraan (netto)", jumlah: 350000000, kodeAkun: ["1230", "1320"] },
+  { kode: "124", nama: "Peralatan Kantor (netto)", jumlah: 180000000, kodeAkun: ["1240", "1330"] },
 ];
 
 export const neracaKewajiban: NeracaItem[] = [
-  { kode: "211", nama: "Hutang Usaha", jumlah: 890000000 },
-  { kode: "212", nama: "Hutang Bank", jumlah: 750000000 },
-  { kode: "213", nama: "Hutang Pajak", jumlah: 220000000 },
+  { kode: "211", nama: "Hutang Usaha", jumlah: 890000000, kodeAkun: ["2110"] },
+  { kode: "212", nama: "Hutang Bank", jumlah: 750000000, kodeAkun: ["2120"] },
+  { kode: "213", nama: "Hutang Pajak", jumlah: 220000000, kodeAkun: ["2130", "2140"] },
 ];
 
 export const neracaEkuitas: NeracaItem[] = [
-  { kode: "311", nama: "Modal Disetor", jumlah: 2000000000 },
-  { kode: "312", nama: "Laba Ditahan", jumlah: 950000000 },
-  { kode: "313", nama: "Laba Tahun Berjalan", jumlah: 1800000000 },
+  { kode: "311", nama: "Modal Disetor", jumlah: 2000000000, kodeAkun: ["3110"] },
+  { kode: "312", nama: "Laba Ditahan", jumlah: 950000000, kodeAkun: ["3120"] },
+  { kode: "313", nama: "Laba Tahun Berjalan", jumlah: 1800000000, kodeAkun: ["3130"] },
 ];
+
+// Komparasi periode sebelumnya (bulan lalu) — mock
+export const neracaAktivaLancarPrev: NeracaItem[] = neracaAktivaLancar.map((i) => ({ ...i, jumlah: Math.round(i.jumlah * 0.92) }));
+export const neracaAktivaTetapPrev: NeracaItem[] = neracaAktivaTetap.map((i) => ({ ...i, jumlah: Math.round(i.jumlah * 0.98) }));
+export const neracaKewajibanPrev: NeracaItem[] = neracaKewajiban.map((i) => ({ ...i, jumlah: Math.round(i.jumlah * 0.95) }));
+export const neracaEkuitasPrev: NeracaItem[] = neracaEkuitas.map((i) => ({ ...i, jumlah: Math.round(i.jumlah * 0.88) }));
 
 // ═══════════════════════════════════════════
 // LABA RUGI
@@ -47,29 +54,35 @@ export const neracaEkuitas: NeracaItem[] = [
 export interface LabaRugiItem {
   nama: string;
   jumlah: number;
+  kodeAkun?: string[]; // link to COA for drill-down
 }
 
 export const labaRugiPendapatan: LabaRugiItem[] = [
-  { nama: "Jasa Konstruksi", jumlah: 3200000000 },
-  { nama: "Jasa Maintenance", jumlah: 850000000 },
-  { nama: "Penjualan Barang", jumlah: 450000000 },
+  { nama: "Jasa Konstruksi", jumlah: 3200000000, kodeAkun: ["4110"] },
+  { nama: "Jasa Maintenance", jumlah: 850000000, kodeAkun: ["4120"] },
+  { nama: "Penjualan Barang", jumlah: 450000000, kodeAkun: ["4130"] },
 ];
 
 export const labaRugiCogs: LabaRugiItem[] = [
-  { nama: "Pembelian Material", jumlah: 1200000000 },
-  { nama: "Upah Langsung", jumlah: 650000000 },
-  { nama: "Subkontraktor", jumlah: 480000000 },
+  { nama: "Pembelian Material", jumlah: 1200000000, kodeAkun: ["5110"] },
+  { nama: "Upah Langsung", jumlah: 650000000, kodeAkun: ["5120"] },
+  { nama: "Subkontraktor", jumlah: 480000000, kodeAkun: ["5130"] },
 ];
 
 export const labaRugiBeban: LabaRugiItem[] = [
-  { nama: "Gaji & Tunjangan", jumlah: 420000000 },
-  { nama: "Transportasi", jumlah: 85000000 },
-  { nama: "Listrik & Air", jumlah: 45000000 },
-  { nama: "Sewa Kantor", jumlah: 120000000 },
-  { nama: "Biaya Admin & Umum", jumlah: 65000000 },
-  { nama: "Marketing", jumlah: 95000000 },
-  { nama: "Penyusutan Aset", jumlah: 180000000 },
+  { nama: "Gaji & Tunjangan", jumlah: 420000000, kodeAkun: ["6110"] },
+  { nama: "Transportasi", jumlah: 85000000, kodeAkun: ["6120"] },
+  { nama: "Listrik & Air", jumlah: 45000000, kodeAkun: ["6130"] },
+  { nama: "Sewa Kantor", jumlah: 120000000, kodeAkun: ["6140"] },
+  { nama: "Biaya Admin & Umum", jumlah: 65000000, kodeAkun: ["6150"] },
+  { nama: "Marketing", jumlah: 95000000, kodeAkun: ["6160"] },
+  { nama: "Penyusutan Aset", jumlah: 180000000, kodeAkun: ["6170"] },
 ];
+
+// Komparasi periode sebelumnya — mock
+export const labaRugiPendapatanPrev: LabaRugiItem[] = labaRugiPendapatan.map((i) => ({ ...i, jumlah: Math.round(i.jumlah * 0.90) }));
+export const labaRugiCogsPrev: LabaRugiItem[] = labaRugiCogs.map((i) => ({ ...i, jumlah: Math.round(i.jumlah * 0.93) }));
+export const labaRugiBebanPrev: LabaRugiItem[] = labaRugiBeban.map((i) => ({ ...i, jumlah: Math.round(i.jumlah * 0.95) }));
 
 // ═══════════════════════════════════════════
 // CASHFLOW
@@ -168,16 +181,17 @@ export interface DanaItem {
   jumlah: number;
   metode: string;
   referensi: string;
+  noJurnal?: string;
 }
 
 export const danaList: DanaItem[] = [
-  { id: "DM-001", tanggal: "2026-05-01", tipe: "Masuk", sumber: "PT Maju Jaya", kategori: "Pendapatan", deskripsi: "Pembayaran Invoice INV-2026-0045 (DP 50%)", jumlah: 240000000, metode: "Transfer BCA", referensi: "TRF-20260501-001" },
-  { id: "DM-002", tanggal: "2026-05-02", tipe: "Keluar", sumber: "PT CoolTech", kategori: "Pembelian", deskripsi: "Pembayaran PO-2026-0011 (AC Split 2 PK)", jumlah: 420000000, metode: "Transfer BCA", referensi: "TRF-20260502-002" },
-  { id: "DM-003", tanggal: "2026-05-03", tipe: "Keluar", sumber: "Karyawan", kategori: "Gaji", deskripsi: "Gaji bulan Mei 2026", jumlah: 180000000, metode: "Transfer", referensi: "PAY-20260503-001" },
-  { id: "DM-004", tanggal: "2026-05-04", tipe: "Masuk", sumber: "CV Karya Mandiri", kategori: "Pendapatan", deskripsi: "Pembayaran Invoice INV-2026-0051 (Lunas)", jumlah: 125000000, metode: "Transfer Mandiri", referensi: "TRF-20260504-003" },
-  { id: "DM-005", tanggal: "2026-05-05", tipe: "Keluar", sumber: "Bank", kategori: "Cicilan", deskripsi: "Cicilan pinjaman bank bulan Mei", jumlah: 125000000, metode: "Auto Debit", referensi: "LOAN-20260505-001" },
-  { id: "DM-006", tanggal: "2026-05-06", tipe: "Keluar", sumber: "Karyawan", kategori: "Biaya Operasional", deskripsi: "Reimburse transportasi & konsumsi", jumlah: 8500000, metode: "Kas", referensi: "REIM-20260506-001" },
-  { id: "DM-007", tanggal: "2026-05-07", tipe: "Masuk", sumber: "Bank", kategori: "Bunga", deskripsi: "Bunga deposito 3 bulan", jumlah: 12500000, metode: "Auto", referensi: "BG-20260507-001" },
+  { id: "DM-001", tanggal: "2026-05-01", tipe: "Masuk", sumber: "PT Maju Jaya", kategori: "Pendapatan", deskripsi: "Pembayaran Invoice INV-2026-0045 (DP 50%)", jumlah: 240000000, metode: "Transfer BCA", referensi: "TRF-20260501-001", noJurnal: "JU/2026/05/001" },
+  { id: "DM-002", tanggal: "2026-05-02", tipe: "Keluar", sumber: "PT CoolTech", kategori: "Pembelian", deskripsi: "Pembayaran PO-2026-0011 (AC Split 2 PK)", jumlah: 420000000, metode: "Transfer BCA", referensi: "TRF-20260502-002", noJurnal: "JU/2026/05/002" },
+  { id: "DM-003", tanggal: "2026-05-03", tipe: "Keluar", sumber: "Karyawan", kategori: "Gaji", deskripsi: "Gaji bulan Mei 2026", jumlah: 180000000, metode: "Transfer", referensi: "PAY-20260503-001", noJurnal: "JU/2026/05/003" },
+  { id: "DM-004", tanggal: "2026-05-04", tipe: "Masuk", sumber: "CV Karya Mandiri", kategori: "Pendapatan", deskripsi: "Pembayaran Invoice INV-2026-0051 (Lunas)", jumlah: 125000000, metode: "Transfer Mandiri", referensi: "TRF-20260504-003", noJurnal: "JU/2026/05/004" },
+  { id: "DM-005", tanggal: "2026-05-05", tipe: "Keluar", sumber: "Bank", kategori: "Cicilan", deskripsi: "Cicilan pinjaman bank bulan Mei", jumlah: 125000000, metode: "Auto Debit", referensi: "LOAN-20260505-001", noJurnal: "JU/2026/05/005" },
+  { id: "DM-006", tanggal: "2026-05-06", tipe: "Keluar", sumber: "Karyawan", kategori: "Biaya Operasional", deskripsi: "Reimburse transportasi & konsumsi", jumlah: 8500000, metode: "Kas", referensi: "REIM-20260506-001", noJurnal: "JU/2026/05/006" },
+  { id: "DM-007", tanggal: "2026-05-07", tipe: "Masuk", sumber: "Bank", kategori: "Bunga", deskripsi: "Bunga deposito 3 bulan", jumlah: 12500000, metode: "Auto", referensi: "BG-20260507-001", noJurnal: "JU/2026/05/007" },
 ];
 
 // ═══════════════════════════════════════════
@@ -289,6 +303,144 @@ export const coaCategories: CoaCategory[] = [
 ];
 
 // ═══════════════════════════════════════════
+// COA TREE STRUCTURE (for UI tree view)
+// ═══════════════════════════════════════════
+export interface CoaTreeNode {
+  kode: string;
+  nama: string;
+  kategori: CoaCategory;
+  tipe: "Debit" | "Kredit";
+  saldoAwal: number;
+  saldoAkhir: number;
+  status: "Aktif" | "Arsip";
+  children?: CoaTreeNode[];
+  isGroup?: boolean;
+}
+
+function getGroupPrefix(kode: string): string {
+  if (kode.length >= 1) return kode.substring(0, 1) + "000";
+  return kode;
+}
+
+function getSubgroupPrefix(kode: string): string {
+  if (kode.length >= 2) return kode.substring(0, 2) + "00";
+  return kode;
+}
+
+export function buildCoaTree(accounts: CoaItem[]): CoaTreeNode[] {
+  const roots: Record<string, CoaTreeNode> = {};
+  const groups: Record<string, CoaTreeNode> = {};
+
+  // Sort by kode ascending
+  const sorted = [...accounts].sort((a, b) => a.kode.localeCompare(b.kode));
+
+  sorted.forEach((acc) => {
+    const groupPrefix = getGroupPrefix(acc.kode);
+    const subgroupPrefix = getSubgroupPrefix(acc.kode);
+
+    // Ensure root group exists
+    if (!roots[groupPrefix]) {
+      const groupName = getRootGroupName(groupPrefix);
+      roots[groupPrefix] = {
+        kode: groupPrefix,
+        nama: groupName,
+        kategori: acc.kategori,
+        tipe: "Debit",
+        saldoAwal: 0,
+        saldoAkhir: 0,
+        status: "Aktif",
+        isGroup: true,
+        children: [],
+      };
+    }
+
+    // Ensure subgroup exists
+    if (subgroupPrefix !== groupPrefix && !groups[subgroupPrefix]) {
+      const subgroupNode: CoaTreeNode = {
+        kode: subgroupPrefix,
+        nama: getSubgroupName(subgroupPrefix),
+        kategori: acc.kategori,
+        tipe: "Debit",
+        saldoAwal: 0,
+        saldoAkhir: 0,
+        status: "Aktif",
+        isGroup: true,
+        children: [],
+      };
+      groups[subgroupPrefix] = subgroupNode;
+      roots[groupPrefix].children!.push(subgroupNode);
+    }
+
+    // Add leaf account
+    const leaf: CoaTreeNode = {
+      ...acc,
+      isGroup: false,
+    };
+
+    if (groups[subgroupPrefix]) {
+      groups[subgroupPrefix].children!.push(leaf);
+    } else {
+      roots[groupPrefix].children!.push(leaf);
+    }
+  });
+
+  // Recalculate group balances from children
+  Object.values(roots).forEach((root) => {
+    recalcGroupBalance(root);
+  });
+
+  return Object.values(roots).sort((a, b) => a.kode.localeCompare(b.kode));
+}
+
+function recalcGroupBalance(node: CoaTreeNode): number {
+  if (!node.children || node.children.length === 0) {
+    return node.saldoAkhir;
+  }
+  let total = 0;
+  node.children.forEach((child) => {
+    total += recalcGroupBalance(child);
+  });
+  node.saldoAkhir = total;
+  node.saldoAwal = total; // simplified
+  return total;
+}
+
+function getRootGroupName(prefix: string): string {
+  const map: Record<string, string> = {
+    "1000": "1 - ASET",
+    "2000": "2 - HUTANG",
+    "3000": "3 - EKUITAS",
+    "4000": "4 - PENDAPATAN",
+    "5000": "5 - BEBAN POKOK PENDAPATAN",
+    "6000": "6 - BEBAN OPERASIONAL",
+    "7000": "7 - PENDAPATAN LAIN",
+    "8000": "8 - BEBAN LAIN",
+  };
+  return map[prefix] || `${prefix} - AKUN`;
+}
+
+function getSubgroupName(prefix: string): string {
+  const map: Record<string, string> = {
+    "1100": "11 - Aset Lancar",
+    "1200": "12 - Aset Tetap",
+    "1300": "13 - Akumulasi Penyusutan",
+    "2100": "21 - Hutang Jangka Pendek",
+    "2200": "22 - Hutang Jangka Panjang",
+    "3100": "31 - Ekuitas",
+    "4100": "41 - Pendapatan Usaha",
+    "4200": "42 - Pendapatan Maintenance",
+    "4300": "43 - Penjualan Barang",
+    "5100": "51 - Pembelian Material",
+    "5200": "52 - Upah Langsung",
+    "5300": "53 - Subkontraktor",
+    "6100": "61 - Beban Operasional",
+    "7100": "71 - Pendapatan Lain",
+    "8100": "81 - Beban Lain",
+  };
+  return map[prefix] || `${prefix} - Sub Grup`;
+}
+
+// ═══════════════════════════════════════════
 // JURNAL UMUM (GENERAL JOURNAL)
 // ═══════════════════════════════════════════
 export interface JurnalUmumItem {
@@ -296,6 +448,7 @@ export interface JurnalUmumItem {
   tanggal: string;
   noBukti: string;
   keterangan: string;
+  referensi?: { tipe: string; noDokumen: string };
   detail: { kodeAkun: string; namaAkun: string; debit: number; kredit: number }[];
 }
 
@@ -305,6 +458,7 @@ export const jurnalUmumList: JurnalUmumItem[] = [
     tanggal: "2026-05-01",
     noBukti: "JU/2026/05/001",
     keterangan: "Penerimaan pembayaran invoice PT Maju Jaya",
+    referensi: { tipe: "Invoice", noDokumen: "INV-2026-0045" },
     detail: [
       { kodeAkun: "1120", namaAkun: "Bank BCA", debit: 240000000, kredit: 0 },
       { kodeAkun: "1130", namaAkun: "Piutang Usaha", debit: 0, kredit: 240000000 },
@@ -315,6 +469,7 @@ export const jurnalUmumList: JurnalUmumItem[] = [
     tanggal: "2026-05-02",
     noBukti: "JU/2026/05/002",
     keterangan: "Pembayaran pembelian material PT CoolTech",
+    referensi: { tipe: "PO", noDokumen: "PO-2026-0011" },
     detail: [
       { kodeAkun: "2110", namaAkun: "Hutang Usaha", debit: 420000000, kredit: 0 },
       { kodeAkun: "1120", namaAkun: "Bank BCA", debit: 0, kredit: 420000000 },
@@ -345,6 +500,7 @@ export const jurnalUmumList: JurnalUmumItem[] = [
     tanggal: "2026-05-05",
     noBukti: "JU/2026/05/005",
     keterangan: "Pembayaran cicilan pinjaman bank",
+    referensi: { tipe: "BAP", noDokumen: "BAP-2026-0003" },
     detail: [
       { kodeAkun: "2210", namaAkun: "Pinjaman Jangka Panjang", debit: 75000000, kredit: 0 },
       { kodeAkun: "8110", namaAkun: "Beban Bunga", debit: 45000000, kredit: 0 },
@@ -714,3 +870,22 @@ export const totalPpnMasukan = ppnList.filter((p) => p.jenis === "Masukan").redu
 export const totalAnggaran = budgetActualList.reduce((s, b) => s + b.anggaran, 0);
 export const totalRealisasi = budgetActualList.reduce((s, b) => s + b.realisasi, 0);
 export const totalSelisihBudget = totalAnggaran - totalRealisasi;
+
+// ═══════════════════════════════════════════
+// PAJAK TREND (for chart)
+// ═══════════════════════════════════════════
+export interface PajakTrendItem {
+  bulan: string;
+  ppnKeluaran: number;
+  ppnMasukan: number;
+  pph: number;
+  status: "Sudah Lapor" | "Belum Lapor" | "Jatuh Tempo";
+}
+
+export const pajakTrend: PajakTrendItem[] = [
+  { bulan: "Jan 2026", ppnKeluaran: 280000000, ppnMasukan: 120000000, pph: 45000000, status: "Sudah Lapor" },
+  { bulan: "Feb 2026", ppnKeluaran: 310000000, ppnMasukan: 135000000, pph: 52000000, status: "Sudah Lapor" },
+  { bulan: "Mar 2026", ppnKeluaran: 295000000, ppnMasukan: 110000000, pph: 48000000, status: "Sudah Lapor" },
+  { bulan: "Apr 2026", ppnKeluaran: 352000000, ppnMasukan: 93500000, pph: 64000000, status: "Sudah Lapor" },
+  { bulan: "Mei 2026", ppnKeluaran: 49500000, ppnMasukan: 46200000, pph: 9000000, status: "Belum Lapor" },
+];
