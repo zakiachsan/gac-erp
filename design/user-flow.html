@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>User Flow — ERP GAC</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background:#f8f9fa; padding: 40px; color:#333; }
+    h1 { text-align:center; margin-bottom:8px; }
+    .subtitle { text-align:center; color:#666; margin-bottom:32px; }
+    .diagram { background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:32px; overflow:auto; }
+    .legend { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-bottom:24px; }
+    .legend span { display:inline-flex; align-items:center; gap:6px; font-size:14px; }
+    .dot { width:12px; height:12px; border-radius:50%; display:inline-block; }
+    .dot-superadmin { background:#e74c3c; }
+    .dot-admin { background:#3498db; }
+    .dot-staff { background:#2ecc71; }
+    .dot-system { background:#9b59b6; }
+  </style>
+</head>
+<body>
+  <h1>User Flow Diagram</h1>
+  <div class="subtitle">ERP SCM & Keuangan — PT Gemilang Agung Cemerlang</div>
+
+  <div class="legend">
+    <span><span class="dot dot-superadmin"></span> Super Admin</span>
+    <span><span class="dot dot-admin"></span> Admin Perusahaan</span>
+    <span><span class="dot dot-staff"></span> Karyawan / Staf</span>
+    <span><span class="dot dot-system"></span> System / AI</span>
+  </div>
+
+  <div class="diagram">
+    <pre class="mermaid">
+flowchart TD
+    subgraph LOGIN["🔐 Auth & Tenant Selection"]
+        A[Login] --> B{Pilih Perusahaan}
+        B --> C[Dashboard]
+    end
+
+    subgraph PENAWARAN["📄 Modul Penawaran"]
+        C --> D[Create Penawaran]
+        D --> D1[Input Barang/Jasa & Harga]
+        D1 --> D2[Pilih Customer & Marketing]
+        D2 --> D3[Upload Lampiran]
+        D3 --> D4[Submit Penawaran]
+        D4 --> D5{Status}
+        D5 -->|Negosiasi| D6[Update Harga - max 2x]
+        D6 --> D5
+        D5 -->|Close Menang| D7[Auto-generate Dashboard Project]
+        D5 -->|Close Kalah| D8[Arsip Penawaran Kalah]
+        D7 --> E[Dashboard Project]
+    end
+
+    subgraph PROJECT["📊 Dashboard Project"]
+        E --> E1[Detail Pekerjaan]
+        E --> E2[TAB: Pengajuan / Pemasukan / Pengeluaran]
+        E --> E3[TAB: Hutang / Piutang]
+        E --> E4[TAB: Anggaran vs Realisasi]
+        E --> E5[Dokumen Arsip]
+    end
+
+    subgraph ANGGARAN["💰 Modul Anggaran"]
+        C --> F[Create Anggaran]
+        F --> F1[Material & Jasa]
+        F --> F2[Biaya Operasional]
+        F --> F3[Pajak]
+        F1 & F2 & F3 --> F4[Monitoring Realisasi]
+        F4 --> E4
+    end
+
+    subgraph PENGADAAN["🛒 Pengadaan Barang & Jasa"]
+        C --> G1[Pengajuan Barang/Jasa PR]
+        G1 -->|Approval 1| G2[Pembanding Vendor >=2]
+        G2 -->|Approval 2| G3[Purchase Order PO]
+        G3 -->|Approval 3| G4[BAP + Lampiran]
+        G4 -->|Approval| G5[Listing Pembayaran]
+        G5 --> G6[Keuangan: Bayar]
+        G6 --> G7[Laporan Transaksi]
+
+        C --> H1[Pengajuan Biaya Operasional]
+        H1 -->|Approval| H2[Listing Pembayaran Biaya]
+        H2 --> H3[Keuangan: Bayar]
+        H3 --> H4[Laporan Biaya Operasional]
+    end
+
+    subgraph KEUANGAN["🏦 Modul Keuangan"]
+        C --> I1[Laporan Keuangan]
+        I1 --> I2[Neraca]
+        I1 --> I3[Laba Rugi]
+        I1 --> I4[Cashflow]
+        I1 --> I5[Hutang Piutang]
+        C --> J1[Perpajakan]
+        J1 --> J2[Pajak Masukan / Keluaran]
+        J1 --> J3[Lebih / Kurang Bayar]
+        C --> K1[Invoice & Kwitansi]
+        C --> L1[AI Asisten]
+        L1 --> L2[Tanya Data Keuangan / History Harga]
+    end
+
+    subgraph HR["👥 Modul HR"]
+        C --> M1[Absensi Staff]
+        M1 --> M2[Face ID Scan]
+        M2 --> M3{Wajah Cocok?}
+        M3 -->|Ya| M4[Absen Tercatat]
+        M3 -->|Tidak| M5[Absen Ditolak]
+        C --> N1[Absensi Pekerja Harian]
+        N1 --> N2[Input Nama Manual]
+        N1 --> N3[Absensi Manual]
+        C --> O1[Rekap Absensi]
+    end
+
+    subgraph ADMIN["⚙️ Admin & Super Admin"]
+        P1[Super Admin] --> P2[Kelola Perusahaan]
+        P1 --> P3[Aktivasi / Nonaktifkan Tenant]
+        Q1[Admin Perusahaan] --> Q2[Setting Approval Flow]
+        Q1 --> Q3[Kelola User & Role]
+        Q1 --> Q4[Kelola Customer / Supplier]
+    end
+
+    style A fill:#ecf0f1,stroke:#333
+    style C fill:#ecf0f1,stroke:#333
+    style D7 fill:#d5f5e3,stroke:#27ae60
+    style D8 fill:#fadbd8,stroke:#c0392b
+    style P1 fill:#fadbd8,stroke:#c0392b
+    style Q1 fill:#d6eaf8,stroke:#2980b9
+    style L1 fill:#e8daef,stroke:#8e44ad
+    style M2 fill:#d5f5e3,stroke:#27ae60
+    </pre>
+  </div>
+
+  <div class="diagram">
+    <h3>Approval Flow — Pengadaan & Biaya</h3>
+    <pre class="mermaid">
+sequenceDiagram
+    actor Pengaju as Pengaju (Admin/Staff)
+    actor Mengetahui as Mengetahui (SPV/Manager)
+    actor Menyetujui as Menyetujui (Keuangan/Direktur)
+    participant System as ERP System
+
+    Pengaju->>System: Submit Pengajuan PR / Biaya
+    System->>Mengetahui: Notifikasi Approval
+    Mengetahui->>System: Approve / Reject
+    alt Rejected
+        System->>Pengaju: Pengajuan Ditolak
+    else Approved
+        System->>Menyetujui: Notifikasi Approval
+        Menyetujui->>System: Approve / Reject
+        alt Rejected
+            System->>Pengaju: Pengajuan Ditolak
+        else Approved
+            System->>Pengaju: Pengajuan Disetujui
+            System->>System: Masuk ke Tahap Berikutnya (PO/BAP/Bayar)
+        end
+    end
+    </pre>
+  </div>
+
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+</body>
+</html>

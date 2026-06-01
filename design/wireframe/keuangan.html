@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Keuangan — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; color:#334155; display:flex; height:100vh; }
+  .sidebar { width:240px; background:#fff; border-right:2px dashed #cbd5e1; padding:24px 16px; display:flex; flex-direction:column; gap:6px; overflow:auto; }
+  .sidebar .logo { font-weight:700; font-size:18px; margin-bottom:24px; padding:0 8px; }
+  .sidebar a { text-decoration:none; color:#475569; font-size:14px; padding:10px 12px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+  .sidebar a:hover, .sidebar a.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .sidebar .section { font-size:11px; text-transform:uppercase; color:#94a3b8; margin:16px 8px 8px; font-weight:600; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .header { height:64px; background:#fff; border-bottom:2px dashed #cbd5e1; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .header .title { font-size:18px; font-weight:700; }
+  .content { padding:32px; overflow:auto; display:flex; gap:24px; }
+  .left { flex:1; }
+  .right { width:340px; }
+  .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px dashed #e2e8f0; padding-bottom:8px; }
+  .tabs button { background:transparent; border:none; padding:8px 16px; font-size:14px; cursor:pointer; color:#64748b; border-radius:6px; }
+  .tabs button.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .panel { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; margin-bottom:20px; }
+  .panel h3 { font-size:16px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:10px; text-align:left; border-bottom:1px dashed #e2e8f0; }
+  th { color:#64748b; font-weight:600; text-transform:uppercase; font-size:11px; }
+  .report-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .report-card { background:#f8fafc; border:2px dashed #e2e8f0; border-radius:8px; padding:16px; text-align:center; }
+  .report-card .num { font-size:24px; font-weight:700; }
+  .report-card .lbl { font-size:12px; color:#64748b; margin-top:4px; }
+  .chatbox { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; display:flex; flex-direction:column; height: calc(100vh - 180px); }
+  .chat-header { padding:16px; border-bottom:2px dashed #e2e8f0; font-weight:700; }
+  .chat-body { flex:1; padding:16px; overflow:auto; display:flex; flex-direction:column; gap:12px; }
+  .chat-msg { max-width:85%; padding:10px 14px; border-radius:12px; font-size:13px; }
+  .chat-msg.user { background:#334155; color:#fff; align-self:flex-end; border-bottom-right-radius:2px; }
+  .chat-msg.ai { background:#f1f5f9; color:#334155; align-self:flex-start; border-bottom-left-radius:2px; }
+  .chat-input { padding:12px; border-top:2px dashed #e2e8f0; display:flex; gap:8px; }
+  .chat-input input { flex:1; padding:10px; border:2px solid #cbd5e1; border-radius:6px; font-size:14px; }
+  .chat-input button { padding:10px 14px; background:#334155; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">ERP GAC</div>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <div class="section">Penjualan</div>
+    <a href="penawaran.html">📄 Penawaran</a>
+    <a href="project.html">📊 Detail Project</a>
+    <div class="section">Operasional</div>
+    <a href="anggaran.html">💰 Anggaran</a>
+    <a href="pengadaan.html">🛒 Pengadaan & Biaya</a>
+    <div class="section">Keuangan</div>
+    <a href="keuangan.html" class="active">🏦 Laporan Keuangan</a>
+    <div class="section">HR</div>
+    <a href="hr.html">👥 Absensi</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="title">Modul Keuangan & AI Asisten</div>
+    </div>
+    <div class="content">
+      <div class="left">
+        <div class="tabs">
+          <button class="active" onclick="switchTab('t1')">Laporan Keuangan</button>
+          <button onclick="switchTab('t2')">Perpajakan</button>
+          <button onclick="switchTab('t3')">Invoice & Kwitansi</button>
+        </div>
+
+        <div class="tab-panel active" id="t1">
+          <div class="panel">
+            <h3>Ringkasan Keuangan (Real-Time)</h3>
+            <div class="report-grid">
+              <div class="report-card"><div class="num">Rp 5.2M</div><div class="lbl">Total Aset (Neraca)</div></div>
+              <div class="report-card"><div class="num">Rp 1.8M</div><div class="lbl">Laba Bersih</div></div>
+              <div class="report-card"><div class="num">Rp 420jt</div><div class="lbl">Cashflow Masuk (Bulan Ini)</div></div>
+              <div class="report-card"><div class="num">Rp 380jt</div><div class="lbl">Cashflow Keluar (Bulan Ini)</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <h3>Hutang / Piutang</h3>
+            <table>
+              <tr><th>Jenis</th><th>Pihak</th><th>Jumlah</th><th>Status</th></tr>
+              <tr><td>Piutang</td><td>PT Maju Jaya</td><td>Rp 480.000.000</td><td>Belum Lunas</td></tr>
+              <tr><td>Hutang</td><td>PT CoolTech</td><td>Rp 8.000.000</td><td>Belum Lunas</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="t2">
+          <div class="panel">
+            <h3>Monitoring Pajak</h3>
+            <table>
+              <tr><th>Jenis</th><th>No Faktur</th><th>DPP</th><th>PPN</th><th>Status</th></tr>
+              <tr><td>Pajak Keluaran</td><td>010.123-45.67890123</td><td>Rp 100.000.000</td><td>Rp 11.000.000</td><td><span style="font-size:12px; background:#dcfce7; padding:4px 8px; border-radius:999px;">Normal</span></td></tr>
+              <tr><td>Pajak Masukan</td><td>020.987-65.43210987</td><td>Rp 80.000.000</td><td>Rp 8.800.000</td><td><span style="font-size:12px; background:#dcfce7; padding:4px 8px; border-radius:999px;">Normal</span></td></tr>
+            </table>
+          </div>
+          <div class="panel">
+            <h3>Rekapitulasi Pajak</h3>
+            <div class="report-grid">
+              <div class="report-card"><div class="num">Rp 11jt</div><div class="lbl">Total Pajak Keluaran</div></div>
+              <div class="report-card"><div class="num">Rp 8.8jt</div><div class="lbl">Total Pajak Masukan</div></div>
+              <div class="report-card"><div class="num">Rp 2.2jt</div><div class="lbl">Kurang Bayar</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="t3">
+          <div class="panel">
+            <h3>Invoice & Kwitansi</h3>
+            <table>
+              <tr><th>No Invoice</th><th>Customer</th><th>Total</th><th>Status</th></tr>
+              <tr><td>INV-2026-0045</td><td>PT Maju Jaya</td><td>Rp 480.000.000</td><td>Terbit</td></tr>
+              <tr><td>INV-2026-0038</td><td>PT Sejahtera</td><td>Rp 250.000.000</td><td>Dibayar</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="chatbox">
+          <div class="chat-header">🤖 AI Asisten</div>
+          <div class="chat-body">
+            <div class="chat-msg ai">Halo! Saya AI Asisten ERP GAC. Ada yang bisa saya bantu terkait data keuangan atau history harga barang?</div>
+            <div class="chat-msg user">Berapa harga beli AC 2 PK terakhir?</div>
+            <div class="chat-msg ai">Berdasarkan data sistem, harga pembelian AC Split 2 PK terakhir adalah <strong>Rp 4.200.000/unit</strong> dari supplier PT CoolTech pada tanggal 28 April 2026 (PR-2026-0011).</div>
+            <div class="chat-msg user">Total pengeluaran bulan ini?</div>
+            <div class="chat-msg ai">Total pengeluaran bulan Mei 2026 hingga saat ini adalah <strong>Rp 380.000.000</strong>. Rincian: Pengadaan 72%, Biaya Operasional 21%, Pajak 7%.</div>
+          </div>
+          <div class="chat-input">
+            <input placeholder="Tanya data keuangan..." readonly>
+            <button>➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(id) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

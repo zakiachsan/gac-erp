@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anggaran — ERP GAC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#eff6ff',100:'#dbeafe',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',900:'#1e3a8a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar-link { @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition; }
+    .sidebar-link.active { @apply bg-brand-50 text-brand-700 font-semibold; }
+    .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
+      <div class="h-16 flex items-center px-6 border-b border-slate-100">
+        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white mr-3"><i class="ph ph-cube text-lg"></i></div>
+        <div>
+          <div class="text-sm font-bold text-slate-900 leading-tight">ERP GAC</div>
+          <div class="text-[10px] text-slate-500 leading-tight">v1.0.0</div>
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Menu Utama</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="ph ph-squares-four text-lg"></i> Dashboard</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Penjualan</div>
+        <a href="penawaran.html" class="sidebar-link"><i class="ph ph-file-text text-lg"></i> Penawaran</a>
+        <a href="project.html" class="sidebar-link"><i class="ph ph-chart-bar text-lg"></i> Detail Project</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Operasional</div>
+        <a href="anggaran.html" class="sidebar-link active"><i class="ph ph-wallet text-lg"></i> Anggaran</a>
+        <a href="pengadaan.html" class="sidebar-link"><i class="ph ph-shopping-cart text-lg"></i> Pengadaan & Biaya</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Keuangan & HR</div>
+        <a href="keuangan.html" class="sidebar-link"><i class="ph ph-bank text-lg"></i> Keuangan & AI</a>
+        <a href="hr.html" class="sidebar-link"><i class="ph ph-users text-lg"></i> Absensi</a>
+      </nav>
+      <div class="p-4 border-t border-slate-100">
+        <div class="flex items-center gap-3">
+          <img src="https://ui-avatars.com/api/?name=Rizal&background=0D8ABC&color=fff" class="w-9 h-9 rounded-full">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-slate-900 truncate">Rizal</div>
+            <div class="text-xs text-slate-500 truncate">Admin Perusahaan</div>
+          </div>
+          <a href="index.html" class="text-slate-400 hover:text-red-500"><i class="ph ph-sign-out text-lg"></i></a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0">
+      <header class="h-16 bg-white/80 backdrop-blur border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">
+        <div>
+          <h1 class="text-lg font-bold text-slate-900">Manajemen Anggaran</h1>
+          <p class="text-xs text-slate-500">Monitoring budget proyek secara real-time.</p>
+        </div>
+        <button class="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-brand-500/20 transition active:scale-95">
+          <i class="ph ph-plus-bold"></i> Create Anggaran
+        </button>
+      </header>
+
+      <div class="flex-1 overflow-y-auto p-8">
+        <div class="flex items-center gap-2 mb-6">
+          <span class="text-xs text-slate-500">Project:</span>
+          <select class="text-sm font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <option>Pengadaan & Pemasangan AC Kantor Pusat</option>
+            <option>Pemasangan Pompa Industri</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-6">
+          <div class="card p-5 text-center">
+            <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Total Anggaran</div>
+            <div class="text-2xl font-bold text-slate-900">Rp 900jt</div>
+          </div>
+          <div class="card p-5 text-center">
+            <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Total Realisasi</div>
+            <div class="text-2xl font-bold text-brand-600">Rp 720jt</div>
+          </div>
+          <div class="card p-5 text-center">
+            <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Sisa Budget</div>
+            <div class="text-2xl font-bold text-emerald-600">Rp 180jt</div>
+          </div>
+        </div>
+
+        <div class="card p-6 mb-6">
+          <h3 class="text-sm font-bold text-slate-900 mb-6">Anggaran vs Realisasi per Kategori</h3>
+          <div class="space-y-6 max-w-3xl">
+            <div>
+              <div class="flex justify-between text-sm font-semibold text-slate-700 mb-2"><span>Material & Jasa</span><span class="text-brand-600">80% tercapai</span></div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-brand-500 rounded-full" style="width:80%"></div></div>
+              <div class="flex justify-between text-xs text-slate-500 mt-1.5"><span>Anggaran: Rp 600.000.000</span><span>Realisasi: Rp 480.000.000</span></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-semibold text-slate-700 mb-2"><span>Biaya Operasional</span><span class="text-amber-600">60% tercapai</span></div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-amber-500 rounded-full" style="width:60%"></div></div>
+              <div class="flex justify-between text-xs text-slate-500 mt-1.5"><span>Anggaran: Rp 200.000.000</span><span>Realisasi: Rp 120.000.000</span></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-sm font-semibold text-slate-700 mb-2"><span>Pajak</span><span class="text-emerald-600">100% tercapai</span></div>
+              <div class="h-3 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-emerald-500 rounded-full" style="width:100%"></div></div>
+              <div class="flex justify-between text-xs text-slate-500 mt-1.5"><span>Anggaran: Rp 100.000.000</span><span>Realisasi: Rp 100.000.000</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-6">
+          <h3 class="text-sm font-bold text-slate-900 mb-4">Detail Breakdown Anggaran</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="text-left text-xs font-semibold text-slate-500 border-b border-slate-200">
+                <tr><th class="pb-3 font-medium">Kategori</th><th class="pb-3 font-medium">Item</th><th class="pb-3 font-medium text-right">Anggaran</th><th class="pb-3 font-medium text-right">Realisasi</th><th class="pb-3 font-medium text-right">Selisih</th></tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-50 text-brand-700">Material</span></td>
+                  <td class="py-3 font-medium text-slate-800">AC Split 2 PK</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 45.000.000</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 42.000.000</td>
+                  <td class="py-3 text-right text-emerald-600 font-semibold text-xs">+ Rp 3jt</td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-50 text-brand-700">Material</span></td>
+                  <td class="py-3 font-medium text-slate-800">Pipa & Instalasi</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 15.000.000</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 12.000.000</td>
+                  <td class="py-3 text-right text-emerald-600 font-semibold text-xs">+ Rp 3jt</td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700">Biaya Ops</span></td>
+                  <td class="py-3 font-medium text-slate-800">Transportasi</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 5.000.000</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 3.000.000</td>
+                  <td class="py-3 text-right text-emerald-600 font-semibold text-xs">+ Rp 2jt</td>
+                </tr>
+                <tr class="hover:bg-slate-50 transition">
+                  <td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700">Pajak</span></td>
+                  <td class="py-3 font-medium text-slate-800">PPN 11%</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 100.000.000</td>
+                  <td class="py-3 text-right font-mono text-xs">Rp 100.000.000</td>
+                  <td class="py-3 text-right text-slate-500 font-semibold text-xs">Rp 0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

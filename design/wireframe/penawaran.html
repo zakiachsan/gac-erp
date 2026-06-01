@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Penawaran — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; color:#334155; display:flex; height:100vh; }
+  .sidebar { width:240px; background:#fff; border-right:2px dashed #cbd5e1; padding:24px 16px; display:flex; flex-direction:column; gap:6px; overflow:auto; }
+  .sidebar .logo { font-weight:700; font-size:18px; margin-bottom:24px; padding:0 8px; }
+  .sidebar a { text-decoration:none; color:#475569; font-size:14px; padding:10px 12px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+  .sidebar a:hover, .sidebar a.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .sidebar .section { font-size:11px; text-transform:uppercase; color:#94a3b8; margin:16px 8px 8px; font-weight:600; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .header { height:64px; background:#fff; border-bottom:2px dashed #cbd5e1; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .header .title { font-size:18px; font-weight:700; }
+  .content { padding:32px; overflow:auto; }
+  .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .btn { background:#334155; color:#fff; padding:10px 16px; border-radius:6px; text-decoration:none; font-size:14px; font-weight:600; border:none; cursor:pointer; }
+  .panel { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:10px; text-align:left; border-bottom:1px dashed #e2e8f0; }
+  th { color:#64748b; font-weight:600; text-transform:uppercase; font-size:11px; }
+  .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#f1f5f9; }
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); align-items:center; justify-content:center; z-index:50; }
+  .modal { background:#fff; border:2px dashed #94a3b8; border-radius:12px; width:720px; max-height:90vh; overflow:auto; padding:32px; }
+  .modal h2 { font-size:18px; margin-bottom:20px; }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .field label { display:block; font-size:12px; font-weight:600; color:#64748b; margin-bottom:6px; }
+  .field input, .field select { width:100%; padding:10px; border:2px solid #cbd5e1; border-radius:6px; font-size:14px; background:#fff; }
+  .items-table { width:100%; margin-top:16px; border-collapse:collapse; }
+  .items-table th { background:#f8fafc; }
+  .items-table td { border-bottom:1px dashed #e2e8f0; padding:8px; }
+  .ghost-box { background:#e2e8f0; border-radius:4px; height:20px; width:100%; }
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">ERP GAC</div>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <div class="section">Penjualan</div>
+    <a href="penawaran.html" class="active">📄 Penawaran</a>
+    <a href="project.html">📊 Detail Project</a>
+    <div class="section">Operasional</div>
+    <a href="anggaran.html">💰 Anggaran</a>
+    <a href="pengadaan.html">🛒 Pengadaan & Biaya</a>
+    <div class="section">Keuangan</div>
+    <a href="keuangan.html">🏦 Laporan Keuangan</a>
+    <div class="section">HR</div>
+    <a href="hr.html">👥 Absensi</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="title">Manajemen Penawaran</div>
+    </div>
+    <div class="content">
+      <div class="toolbar">
+        <div style="display:flex; gap:8px;">
+          <input placeholder="Cari nomor / customer..." style="padding:8px 12px; border:2px solid #cbd5e1; border-radius:6px; width:260px;">
+          <select style="padding:8px 12px; border:2px solid #cbd5e1; border-radius:6px;"><option>Semua Status</option></select>
+        </div>
+        <button class="btn" onclick="openModal()">+ Create Penawaran</button>
+      </div>
+
+      <div class="panel">
+        <table>
+          <tr><th>No Penawaran</th><th>Customer</th><th>Marketing</th><th>Total</th><th>Status</th><th>Aksi</th></tr>
+          <tr>
+            <td>QT-2026-0020</td>
+            <td>PT Sejahtera Abadi</td>
+            <td>Budi Santoso</td>
+            <td>Rp 450.000.000</td>
+            <td><span class="badge" style="background:#fef9c3;color:#854d0e;">Negosiasi</span></td>
+            <td><a href="#" style="color:#334155;">Detail →</a></td>
+          </tr>
+          <tr>
+            <td>QT-2026-0019</td>
+            <td>PT Maju Jaya</td>
+            <td>Siti Aminah</td>
+            <td>Rp 1.200.000.000</td>
+            <td><span class="badge" style="background:#dcfce7;color:#166534;">Close Menang</span></td>
+            <td><a href="project.html" style="color:#334155;">Lihat Project →</a></td>
+          </tr>
+          <tr>
+            <td>QT-2026-0018</td>
+            <td>CV Karya Mandiri</td>
+            <td>Budi Santoso</td>
+            <td>Rp 85.000.000</td>
+            <td><span class="badge" style="background:#fee2e2;color:#991b1b;">Close Kalah</span></td>
+            <td><a href="#" style="color:#334155;">Detail →</a></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Create Penawaran -->
+  <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h2>Create Penawaran Baru</h2>
+      <div class="form-row">
+        <div class="field"><label>Nomor Otomatis</label><input value="QT-2026-0021" readonly></div>
+        <div class="field"><label>Tanggal</label><input value="05/05/2026" readonly></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>Customer</label><select><option>PT Sejahtera Abadi</option></select></div>
+        <div class="field"><label>Marketing / Sales</label><select><option>Budi Santoso</option></select></div>
+      </div>
+      <div class="field"><label>Upload Lampiran</label><input type="text" value="[Area upload PDF / Gambar]" readonly style="background:#f8fafc;"></div>
+
+      <h3 style="font-size:14px; margin:24px 0 12px;">Item Penawaran</h3>
+      <table class="items-table">
+        <tr><th>Nama Barang/Jasa</th><th>Qty</th><th>Harga Satuan</th><th>Total</th></tr>
+        <tr><td><div class="ghost-box"></div></td><td><div class="ghost-box" style="width:50px;"></div></td><td><div class="ghost-box"></div></td><td><div class="ghost-box"></div></td></tr>
+        <tr><td><div class="ghost-box"></div></td><td><div class="ghost-box" style="width:50px;"></div></td><td><div class="ghost-box"></div></td><td><div class="ghost-box"></div></td></tr>
+      </table>
+
+      <div style="margin-top:20px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn" style="background:#cbd5e1; color:#334155;" onclick="closeModal()">Batal</button>
+        <button class="btn" onclick="closeModal()">Submit Penawaran</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(){ document.getElementById('modal').style.display='flex'; }
+    function closeModal(){ document.getElementById('modal').style.display='none'; }
+  </script>
+</body>
+</html>

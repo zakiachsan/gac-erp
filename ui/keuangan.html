@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keuangan & AI — ERP GAC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#eff6ff',100:'#dbeafe',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',900:'#1e3a8a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar-link { @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition; }
+    .sidebar-link.active { @apply bg-brand-50 text-brand-700 font-semibold; }
+    .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm; }
+    .tab-btn { @apply px-4 py-2 text-sm font-medium text-slate-500 rounded-lg hover:bg-slate-100 transition whitespace-nowrap; }
+    .tab-btn.active { @apply bg-white text-brand-700 shadow-sm border border-slate-200 font-semibold; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
+      <div class="h-16 flex items-center px-6 border-b border-slate-100">
+        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white mr-3"><i class="ph ph-cube text-lg"></i></div>
+        <div>
+          <div class="text-sm font-bold text-slate-900 leading-tight">ERP GAC</div>
+          <div class="text-[10px] text-slate-500 leading-tight">v1.0.0</div>
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Menu Utama</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="ph ph-squares-four text-lg"></i> Dashboard</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Penjualan</div>
+        <a href="penawaran.html" class="sidebar-link"><i class="ph ph-file-text text-lg"></i> Penawaran</a>
+        <a href="project.html" class="sidebar-link"><i class="ph ph-chart-bar text-lg"></i> Detail Project</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Operasional</div>
+        <a href="anggaran.html" class="sidebar-link"><i class="ph ph-wallet text-lg"></i> Anggaran</a>
+        <a href="pengadaan.html" class="sidebar-link"><i class="ph ph-shopping-cart text-lg"></i> Pengadaan & Biaya</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Keuangan & HR</div>
+        <a href="keuangan.html" class="sidebar-link active"><i class="ph ph-bank text-lg"></i> Keuangan & AI</a>
+        <a href="hr.html" class="sidebar-link"><i class="ph ph-users text-lg"></i> Absensi</a>
+      </nav>
+      <div class="p-4 border-t border-slate-100">
+        <div class="flex items-center gap-3">
+          <img src="https://ui-avatars.com/api/?name=Rizal&background=0D8ABC&color=fff" class="w-9 h-9 rounded-full">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-slate-900 truncate">Rizal</div>
+            <div class="text-xs text-slate-500 truncate">Admin Perusahaan</div>
+          </div>
+          <a href="index.html" class="text-slate-400 hover:text-red-500"><i class="ph ph-sign-out text-lg"></i></a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0">
+      <header class="h-16 bg-white/80 backdrop-blur border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">
+        <div>
+          <h1 class="text-lg font-bold text-slate-900">Keuangan & AI Asisten</h1>
+          <p class="text-xs text-slate-500">Laporan keuangan real-time dan chatbot internal.</p>
+        </div>
+      </header>
+
+      <div class="flex-1 overflow-hidden flex">
+        <div class="flex-1 overflow-y-auto p-8">
+          <div class="flex gap-2 mb-6 overflow-x-auto pb-1">
+            <button class="tab-btn active" onclick="switchTab('t1', this)">Laporan Keuangan</button>
+            <button class="tab-btn" onclick="switchTab('t2', this)">Perpajakan</button>
+            <button class="tab-btn" onclick="switchTab('t3', this)">Invoice & Kwitansi</button>
+          </div>
+
+          <div id="t1" class="tab-panel space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div class="card p-5 text-center">
+                <div class="w-10 h-10 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center text-xl mx-auto mb-3"><i class="ph ph-scales"></i></div>
+                <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Total Aset</div>
+                <div class="text-xl font-bold text-slate-900 mt-1">Rp 5.2M</div>
+                <div class="text-[10px] text-slate-400 mt-1">Neraca</div>
+              </div>
+              <div class="card p-5 text-center">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mx-auto mb-3"><i class="ph ph-trend-up"></i></div>
+                <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Laba Bersih</div>
+                <div class="text-xl font-bold text-slate-900 mt-1">Rp 1.8M</div>
+                <div class="text-[10px] text-slate-400 mt-1">Laba Rugi</div>
+              </div>
+              <div class="card p-5 text-center">
+                <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl mx-auto mb-3"><i class="ph ph-arrow-down-left"></i></div>
+                <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Cashflow Masuk</div>
+                <div class="text-xl font-bold text-slate-900 mt-1">Rp 420jt</div>
+                <div class="text-[10px] text-slate-400 mt-1">Bulan Ini</div>
+              </div>
+              <div class="card p-5 text-center">
+                <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-xl mx-auto mb-3"><i class="ph ph-arrow-up-right"></i></div>
+                <div class="text-xs text-slate-500 uppercase tracking-wide font-semibold">Cashflow Keluar</div>
+                <div class="text-xl font-bold text-slate-900 mt-1">Rp 380jt</div>
+                <div class="text-[10px] text-slate-400 mt-1">Bulan Ini</div>
+              </div>
+            </div>
+
+            <div class="card p-6">
+              <h3 class="text-sm font-bold text-slate-900 mb-4">Hutang / Piutang</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="text-left text-xs font-semibold text-slate-500 border-b border-slate-200"><tr><th class="pb-3 font-medium">Jenis</th><th class="pb-3 font-medium">Pihak</th><th class="pb-3 font-medium text-right">Jumlah</th><th class="pb-3 font-medium">Status</th></tr></thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <tr class="hover:bg-slate-50 transition"><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700">Piutang</span></td><td class="py-3 font-medium text-slate-800">PT Maju Jaya</td><td class="py-3 text-right font-semibold">Rp 480.000.000</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">Belum Lunas</span></td></tr>
+                    <tr class="hover:bg-slate-50 transition"><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-50 text-rose-700">Hutang</span></td><td class="py-3 font-medium text-slate-800">PT CoolTech</td><td class="py-3 text-right font-semibold">Rp 8.000.000</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">Belum Lunas</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div id="t2" class="tab-panel hidden space-y-6">
+            <div class="card p-6">
+              <h3 class="text-sm font-bold text-slate-900 mb-4">Monitoring Pajak</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="text-left text-xs font-semibold text-slate-500 border-b border-slate-200"><tr><th class="pb-3 font-medium">Jenis</th><th class="pb-3 font-medium">No Faktur</th><th class="pb-3 font-medium text-right">DPP</th><th class="pb-3 font-medium text-right">PPN</th><th class="pb-3 font-medium">Status</th></tr></thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Pajak Keluaran</td><td class="py-3 font-mono text-xs">010.123-45.67890123</td><td class="py-3 text-right font-mono text-xs">Rp 100.000.000</td><td class="py-3 text-right font-mono text-xs">Rp 11.000.000</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Normal</span></td></tr>
+                    <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Pajak Masukan</td><td class="py-3 font-mono text-xs">020.987-65.43210987</td><td class="py-3 text-right font-mono text-xs">Rp 80.000.000</td><td class="py-3 text-right font-mono text-xs">Rp 8.800.000</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Normal</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+              <div class="card p-5 text-center"><div class="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Pajak Keluaran</div><div class="text-2xl font-bold text-slate-900">Rp 11jt</div></div>
+              <div class="card p-5 text-center"><div class="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Pajak Masukan</div><div class="text-2xl font-bold text-slate-900">Rp 8.8jt</div></div>
+              <div class="card p-5 text-center"><div class="text-xs text-slate-500 uppercase tracking-wide font-semibold mb-1">Kurang Bayar</div><div class="text-2xl font-bold text-rose-600">Rp 2.2jt</div></div>
+            </div>
+          </div>
+
+          <div id="t3" class="tab-panel hidden">
+            <div class="card p-6">
+              <h3 class="text-sm font-bold text-slate-900 mb-4">Invoice & Kwitansi</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                  <thead class="text-left text-xs font-semibold text-slate-500 border-b border-slate-200"><tr><th class="pb-3 font-medium">No Invoice</th><th class="pb-3 font-medium">Customer</th><th class="pb-3 font-medium text-right">Total</th><th class="pb-3 font-medium">Status</th><th class="pb-3 font-medium text-right">Aksi</th></tr></thead>
+                  <tbody class="divide-y divide-slate-100">
+                    <tr class="hover:bg-slate-50 transition"><td class="py-3 font-mono text-xs text-slate-600">INV-2026-0045</td><td class="py-3 font-medium text-slate-800">PT Maju Jaya</td><td class="py-3 text-right font-semibold">Rp 480.000.000</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-100">Terbit</span></td><td class="py-3 text-right"><button class="text-brand-600 text-xs font-semibold">Download →</button></td></tr>
+                    <tr class="hover:bg-slate-50 transition"><td class="py-3 font-mono text-xs text-slate-600">INV-2026-0038</td><td class="py-3 font-medium text-slate-800">PT Sejahtera</td><td class="py-3 text-right font-semibold">Rp 250.000.000</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Dibayar</span></td><td class="py-3 text-right"><button class="text-brand-600 text-xs font-semibold">Download →</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Chat Sidebar -->
+        <div class="w-96 bg-white border-l border-slate-200 flex flex-col">
+          <div class="h-14 border-b border-slate-100 flex items-center px-4 gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white"><i class="ph ph-sparkle"></i></div>
+            <div>
+              <div class="text-sm font-bold text-slate-900">AI Asisten</div>
+              <div class="text-[10px] text-emerald-600 font-medium flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Online</div>
+            </div>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 space-y-4">
+            <div class="flex gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs shrink-0"><i class="ph ph-sparkle"></i></div>
+              <div class="bg-slate-100 rounded-2xl rounded-tl-none px-3.5 py-2.5 text-sm text-slate-700 leading-relaxed">Halo! Saya AI Asisten ERP GAC. Ada yang bisa saya bantu terkait data keuangan atau history harga barang?</div>
+            </div>
+            <div class="flex gap-2.5 justify-end">
+              <div class="bg-brand-600 rounded-2xl rounded-tr-none px-3.5 py-2.5 text-sm text-white leading-relaxed">Berapa harga beli AC 2 PK terakhir?</div>
+            </div>
+            <div class="flex gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs shrink-0"><i class="ph ph-sparkle"></i></div>
+              <div class="bg-slate-100 rounded-2xl rounded-tl-none px-3.5 py-2.5 text-sm text-slate-700 leading-relaxed">Berdasarkan data sistem, harga pembelian AC Split 2 PK terakhir adalah <strong>Rp 4.200.000/unit</strong> dari supplier PT CoolTech pada 28 April 2026 (PR-2026-0011).</div>
+            </div>
+            <div class="flex gap-2.5 justify-end">
+              <div class="bg-brand-600 rounded-2xl rounded-tr-none px-3.5 py-2.5 text-sm text-white leading-relaxed">Total pengeluaran bulan ini?</div>
+            </div>
+            <div class="flex gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center text-xs shrink-0"><i class="ph ph-sparkle"></i></div>
+              <div class="bg-slate-100 rounded-2xl rounded-tl-none px-3.5 py-2.5 text-sm text-slate-700 leading-relaxed">Total pengeluaran Mei 2026 hingga saat ini adalah <strong>Rp 380.000.000</strong>. Rincian: Pengadaan 72%, Biaya Operasional 21%, Pajak 7%.</div>
+            </div>
+          </div>
+          <div class="p-3 border-t border-slate-100">
+            <div class="flex gap-2">
+              <input type="text" placeholder="Tanya data keuangan..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+              <button class="w-9 h-9 bg-brand-600 hover:bg-brand-700 text-white rounded-lg flex items-center justify-center transition"><i class="ph ph-paper-plane-right"></i></button>
+            </div>
+            <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
+              <button class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[11px] text-slate-600 font-medium whitespace-nowrap transition">History harga barang</button>
+              <button class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[11px] text-slate-600 font-medium whitespace-nowrap transition">Status project</button>
+              <button class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 rounded-md text-[11px] text-slate-600 font-medium whitespace-nowrap transition">Neraca hari ini</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

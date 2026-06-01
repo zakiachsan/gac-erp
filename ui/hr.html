@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi — ERP GAC</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#eff6ff',100:'#dbeafe',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',900:'#1e3a8a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .sidebar-link { @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition; }
+    .sidebar-link.active { @apply bg-brand-50 text-brand-700 font-semibold; }
+    .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm; }
+    .tab-btn { @apply px-4 py-2 text-sm font-medium text-slate-500 rounded-lg hover:bg-slate-100 transition whitespace-nowrap; }
+    .tab-btn.active { @apply bg-white text-brand-700 shadow-sm border border-slate-200 font-semibold; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
+      <div class="h-16 flex items-center px-6 border-b border-slate-100">
+        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white mr-3"><i class="ph ph-cube text-lg"></i></div>
+        <div>
+          <div class="text-sm font-bold text-slate-900 leading-tight">ERP GAC</div>
+          <div class="text-[10px] text-slate-500 leading-tight">v1.0.0</div>
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto p-4 space-y-1">
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Menu Utama</div>
+        <a href="dashboard.html" class="sidebar-link"><i class="ph ph-squares-four text-lg"></i> Dashboard</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Penjualan</div>
+        <a href="penawaran.html" class="sidebar-link"><i class="ph ph-file-text text-lg"></i> Penawaran</a>
+        <a href="project.html" class="sidebar-link"><i class="ph ph-chart-bar text-lg"></i> Detail Project</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Operasional</div>
+        <a href="anggaran.html" class="sidebar-link"><i class="ph ph-wallet text-lg"></i> Anggaran</a>
+        <a href="pengadaan.html" class="sidebar-link"><i class="ph ph-shopping-cart text-lg"></i> Pengadaan & Biaya</a>
+        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-6 mb-2 px-3">Keuangan & HR</div>
+        <a href="keuangan.html" class="sidebar-link"><i class="ph ph-bank text-lg"></i> Keuangan & AI</a>
+        <a href="hr.html" class="sidebar-link active"><i class="ph ph-users text-lg"></i> Absensi</a>
+      </nav>
+      <div class="p-4 border-t border-slate-100">
+        <div class="flex items-center gap-3">
+          <img src="https://ui-avatars.com/api/?name=Rizal&background=0D8ABC&color=fff" class="w-9 h-9 rounded-full">
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-slate-900 truncate">Rizal</div>
+            <div class="text-xs text-slate-500 truncate">Admin Perusahaan</div>
+          </div>
+          <a href="index.html" class="text-slate-400 hover:text-red-500"><i class="ph ph-sign-out text-lg"></i></a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0">
+      <header class="h-16 bg-white/80 backdrop-blur border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">
+        <div>
+          <h1 class="text-lg font-bold text-slate-900">Absensi Karyawan</h1>
+          <p class="text-xs text-slate-500">Face ID attendance untuk staff & formulir harian.</p>
+        </div>
+        <div class="text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg font-medium">Hari Ini: Senin, 05 Mei 2026</div>
+      </header>
+
+      <div class="flex-1 overflow-y-auto p-8">
+        <div class="flex gap-2 mb-6 overflow-x-auto pb-1">
+          <button class="tab-btn active" onclick="switchTab('t1', this)">Absensi Staff (Face ID)</button>
+          <button class="tab-btn" onclick="switchTab('t2', this)">Pekerja Harian</button>
+          <button class="tab-btn" onclick="switchTab('t3', this)">Rekap Absensi</button>
+        </div>
+
+        <div id="t1" class="tab-panel">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-1">
+              <div class="card p-6 text-center">
+                <h3 class="text-sm font-bold text-slate-900 mb-4">Face ID Scanner</h3>
+                <div class="relative w-full aspect-[4/3] bg-slate-900 rounded-2xl overflow-hidden mb-4 flex items-center justify-center">
+                  <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-40 h-40 rounded-full border-2 border-dashed border-white/30"></div>
+                  </div>
+                  <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white/10 backdrop-blur px-3 py-1.5 rounded-full text-white text-xs font-medium">
+                    <i class="ph ph-scan"></i> Mencari wajah...
+                  </div>
+                  <span class="text-white/20 text-sm font-medium relative z-10">[Camera Feed]</span>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Posisikan wajah di dalam lingkaran. Sistem akan mencocokkan dengan database.</p>
+                <button class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-brand-500/20 transition active:scale-95">Mulai Scan Face ID</button>
+                <div class="mt-4 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-2 rounded-lg text-xs font-semibold border border-emerald-100">
+                  <i class="ph ph-check-circle"></i> Wajah Cocok — Absensi Tercatat (08:05)
+                </div>
+              </div>
+            </div>
+            <div class="lg:col-span-2">
+              <div class="card p-6">
+                <h3 class="text-sm font-bold text-slate-900 mb-4">Daftar Hadir Staff — 05 Mei 2026</h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead class="text-left text-xs font-semibold text-slate-500 border-b border-slate-200"><tr><th class="pb-3 font-medium">Nama</th><th class="pb-3 font-medium">Jam Masuk</th><th class="pb-3 font-medium">Jam Keluar</th><th class="pb-3 font-medium">Status</th><th class="pb-3 font-medium">Verifikasi</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                      <tr class="hover:bg-slate-50 transition"><td class="py-3"><div class="flex items-center gap-2"><img src="https://ui-avatars.com/api/?name=Rizal&background=0D8ABC&color=fff" class="w-6 h-6 rounded-full"> <span class="font-medium text-slate-800">Rizal</span></div></td><td class="py-3 text-slate-700">08:00</td><td class="py-3 text-slate-400">—</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Hadir</span></td><td class="py-3 text-xs text-emerald-600 font-semibold">Face ID ✅</td></tr>
+                      <tr class="hover:bg-slate-50 transition"><td class="py-3"><div class="flex items-center gap-2"><img src="https://ui-avatars.com/api/?name=Andi+Wijaya&background=10b981&color=fff" class="w-6 h-6 rounded-full"> <span class="font-medium text-slate-800">Andi Wijaya</span></div></td><td class="py-3 text-slate-700">08:12</td><td class="py-3 text-slate-400">—</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Hadir</span></td><td class="py-3 text-xs text-emerald-600 font-semibold">Face ID ✅</td></tr>
+                      <tr class="hover:bg-slate-50 transition"><td class="py-3"><div class="flex items-center gap-2"><img src="https://ui-avatars.com/api/?name=Siti+Aminah&background=f59e0b&color=fff" class="w-6 h-6 rounded-full"> <span class="font-medium text-slate-800">Siti Aminah</span></div></td><td class="py-3 text-slate-400">—</td><td class="py-3 text-slate-400">—</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-rose-50 text-rose-700 border border-rose-100">Alfa</span></td><td class="py-3 text-xs text-slate-400">—</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="t2" class="tab-panel hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-1">
+              <div class="card p-6">
+                <h3 class="text-sm font-bold text-slate-900 mb-4">Input Pekerja Harian</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Nama Pekerja</label>
+                    <input type="text" placeholder="Contoh: Pak Tarno" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1.5">Jam Masuk</label>
+                      <input type="time" value="07:30" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                    <div>
+                      <label class="block text-xs font-semibold text-slate-700 mb-1.5">Jam Keluar</label>
+                      <input type="time" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1.5">Status</label>
+                    <select class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                      <option>Hadir</option><option>Izin</option><option>Sakit</option>
+                    </select>
+                  </div>
+                  <button class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg shadow-md shadow-brand-500/20 transition active:scale-95">Simpan Absensi Manual</button>
+                </div>
+              </div>
+            </div>
+            <div class="lg:col-span-2">
+              <div class="card p-6">
+                <h3 class="text-sm font-bold text-slate-900 mb-4">Daftar Pekerja Harian — 05 Mei 2026</h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead class="text-left text-xs font-semibold text-slate-500 border-b border-slate-200"><tr><th class="pb-3 font-medium">Nama</th><th class="pb-3 font-medium">Jam Masuk</th><th class="pb-3 font-medium">Jam Keluar</th><th class="pb-3 font-medium">Status</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                      <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Pak Tarno</td><td class="py-3 text-slate-700">07:30</td><td class="py-3 text-slate-400">—</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Hadir</span></td></tr>
+                      <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Pak Sujono</td><td class="py-3 text-slate-700">07:45</td><td class="py-3 text-slate-400">—</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">Hadir</span></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="t3" class="tab-panel hidden">
+          <div class="card p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-slate-900">Rekap Absensi Periode: 01 — 05 Mei 2026</h3>
+              <button class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition"><i class="ph ph-download-simple mr-1"></i> Export Excel</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="text-left text-xs font-semibold text-slate-500 border-b border-slate-200"><tr><th class="pb-3 font-medium">Nama</th><th class="pb-3 font-medium">Tipe</th><th class="pb-3 font-medium text-center">Hadir</th><th class="pb-3 font-medium text-center">Izin</th><th class="pb-3 font-medium text-center">Sakit</th><th class="pb-3 font-medium text-center">Alfa</th></tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Rizal</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-50 text-brand-700">Staff</span></td><td class="py-3 text-center font-bold text-slate-900">5</td><td class="py-3 text-center text-slate-500">0</td><td class="py-3 text-center text-slate-500">0</td><td class="py-3 text-center text-slate-500">0</td></tr>
+                  <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Andi Wijaya</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-50 text-brand-700">Staff</span></td><td class="py-3 text-center font-bold text-slate-900">4</td><td class="py-3 text-center text-slate-500">1</td><td class="py-3 text-center text-slate-500">0</td><td class="py-3 text-center text-slate-500">0</td></tr>
+                  <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Siti Aminah</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-brand-50 text-brand-700">Staff</span></td><td class="py-3 text-center font-bold text-slate-900">3</td><td class="py-3 text-center text-slate-500">0</td><td class="py-3 text-center text-slate-500">0</td><td class="py-3 text-center font-bold text-rose-600">2</td></tr>
+                  <tr class="hover:bg-slate-50 transition"><td class="py-3 font-medium text-slate-800">Pak Tarno</td><td class="py-3"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700">Harian</span></td><td class="py-3 text-center font-bold text-slate-900">5</td><td class="py-3 text-center text-slate-500">0</td><td class="py-3 text-center text-slate-500">0</td><td class="py-3 text-center text-slate-500">0</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

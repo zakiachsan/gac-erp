@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pengadaan & Biaya — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; color:#334155; display:flex; height:100vh; }
+  .sidebar { width:240px; background:#fff; border-right:2px dashed #cbd5e1; padding:24px 16px; display:flex; flex-direction:column; gap:6px; overflow:auto; }
+  .sidebar .logo { font-weight:700; font-size:18px; margin-bottom:24px; padding:0 8px; }
+  .sidebar a { text-decoration:none; color:#475569; font-size:14px; padding:10px 12px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+  .sidebar a:hover, .sidebar a.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .sidebar .section { font-size:11px; text-transform:uppercase; color:#94a3b8; margin:16px 8px 8px; font-weight:600; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .header { height:64px; background:#fff; border-bottom:2px dashed #cbd5e1; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .header .title { font-size:18px; font-weight:700; }
+  .content { padding:32px; overflow:auto; }
+  .flow { display:flex; align-items:center; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+  .flow-step { background:#fff; border:2px dashed #94a3b8; border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600; }
+  .flow-arrow { color:#94a3b8; font-weight:700; }
+  .flow-step.active { border-color:#334155; background:#f8fafc; }
+  .panel { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; margin-bottom:20px; }
+  .panel h3 { font-size:16px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:10px; text-align:left; border-bottom:1px dashed #e2e8f0; }
+  th { color:#64748b; font-weight:600; text-transform:uppercase; font-size:11px; }
+  .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#f1f5f9; }
+  .approval-track { display:flex; gap:8px; margin-top:8px; }
+  .approval-node { display:flex; align-items:center; gap:6px; font-size:12px; }
+  .approval-node .circle { width:18px; height:18px; border-radius:50%; background:#e2e8f0; border:2px solid #cbd5e1; }
+  .approval-node.done .circle { background:#22c55e; border-color:#16a34a; }
+  .approval-node.waiting .circle { background:#f59e0b; border-color:#d97706; }
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">ERP GAC</div>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <div class="section">Penjualan</div>
+    <a href="penawaran.html">📄 Penawaran</a>
+    <a href="project.html">📊 Detail Project</a>
+    <div class="section">Operasional</div>
+    <a href="anggaran.html">💰 Anggaran</a>
+    <a href="pengadaan.html" class="active">🛒 Pengadaan & Biaya</a>
+    <div class="section">Keuangan</div>
+    <a href="keuangan.html">🏦 Laporan Keuangan</a>
+    <div class="section">HR</div>
+    <a href="hr.html">👥 Absensi</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="title">Pengadaan Barang & Jasa</div>
+    </div>
+    <div class="content">
+      <div class="flow">
+        <div class="flow-step active">1. Pengajuan (PR)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">2. Pembanding Vendor</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">3. PO</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">4. BAP</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">5. Listing Bayar</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">6. Laporan</div>
+      </div>
+
+      <div class="panel">
+        <h3>Pengajuan Barang & Jasa (PR) — Menunggu Approval</h3>
+        <table>
+          <tr><th>No PR</th><th>Project</th><th>Pengaju</th><th>Total</th><th>Approval</th><th>Aksi</th></tr>
+          <tr>
+            <td>PR-2026-0041</td>
+            <td>Pengadaan AC Kantor Pusat</td>
+            <td>Andi Wijaya</td>
+            <td>Rp 45.000.000</td>
+            <td>
+              <div class="approval-track">
+                <div class="approval-node done" title="Pengaju">🟢</div>
+                <div class="approval-node waiting" title="Mengetahui">🟡</div>
+                <div class="approval-node" title="Menyetujui">⚪</div>
+              </div>
+            </td>
+            <td><a href="#">Detail →</a></td>
+          </tr>
+          <tr>
+            <td>PR-2026-0042</td>
+            <td>Pemasangan Pompa Industri</td>
+            <td>Siti Aminah</td>
+            <td>Rp 28.500.000</td>
+            <td>
+              <div class="approval-track">
+                <div class="approval-node done">🟢</div>
+                <div class="approval-node done">🟢</div>
+                <div class="approval-node waiting">🟡</div>
+              </div>
+            </td>
+            <td><a href="#">Detail →</a></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Pembanding Harga Vendor</h3>
+        <table>
+          <tr><th>Supplier</th><th>Harga Penawaran</th><th>Lampiran</th><th>Pilihan</th></tr>
+          <tr><td>PT CoolTech</td><td>Rp 42.000.000</td><td><a href="#">Lihat PDF</a></td><td><span class="badge" style="background:#dcfce7;color:#166534;">Dipilih</span></td></tr>
+          <tr><td>PT AirSolutions</td><td>Rp 45.500.000</td><td><a href="#">Lihat PDF</a></td><td><span class="badge">Alternatif</span></td></tr>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h3>Listing Pembayaran (Dari BAP yang Disetujui)</h3>
+        <table>
+          <tr><th>No BAP</th><th>Vendor</th><th>Jumlah</th><th>Jatuh Tempo</th><th>Status</th></tr>
+          <tr><td>BAP-2026-0012</td><td>PT CoolTech</td><td>Rp 21.000.000</td><td>10 Mei 2026</td><td><span class="badge" style="background:#fef9c3;color:#854d0e;">Menunggu Dibayar</span></td></tr>
+          <tr><td>BAP-2026-0008</td><td>CV SteelWorks</td><td>Rp 15.000.000</td><td>05 Mei 2026</td><td><span class="badge" style="background:#dcfce7;color:#166534;">Dibayar</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

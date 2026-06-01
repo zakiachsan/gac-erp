@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; color:#334155; display:flex; height:100vh; }
+  .sidebar { width:240px; background:#fff; border-right:2px dashed #cbd5e1; padding:24px 16px; display:flex; flex-direction:column; gap:6px; overflow:auto; }
+  .sidebar .logo { font-weight:700; font-size:18px; margin-bottom:24px; padding:0 8px; }
+  .sidebar a { text-decoration:none; color:#475569; font-size:14px; padding:10px 12px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+  .sidebar a:hover, .sidebar a.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .sidebar .section { font-size:11px; text-transform:uppercase; color:#94a3b8; margin:16px 8px 8px; font-weight:600; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .header { height:64px; background:#fff; border-bottom:2px dashed #cbd5e1; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .header .title { font-size:18px; font-weight:700; }
+  .header .user { display:flex; align-items:center; gap:12px; font-size:14px; }
+  .content { padding:32px; overflow:auto; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:32px; }
+  .card { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:20px; }
+  .card .label { font-size:12px; color:#64748b; text-transform:uppercase; font-weight:600; margin-bottom:8px; }
+  .card .value { font-size:28px; font-weight:700; color:#0f172a; }
+  .panel { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; }
+  .panel h3 { font-size:16px; margin-bottom:16px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:10px; text-align:left; border-bottom:1px dashed #e2e8f0; }
+  th { color:#64748b; font-weight:600; text-transform:uppercase; font-size:11px; }
+  .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#f1f5f9; }
+  .placeholder { background:#e2e8f0; border-radius:4px; display:inline-block; }
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">ERP GAC</div>
+    <a href="dashboard.html" class="active">🏠 Dashboard</a>
+    <div class="section">Penjualan</div>
+    <a href="penawaran.html">📄 Penawaran</a>
+    <a href="project.html">📊 Detail Project</a>
+    <div class="section">Operasional</div>
+    <a href="anggaran.html">💰 Anggaran</a>
+    <a href="pengadaan.html">🛒 Pengadaan & Biaya</a>
+    <div class="section">Keuangan</div>
+    <a href="keuangan.html">🏦 Laporan Keuangan</a>
+    <div class="section">HR</div>
+    <a href="hr.html">👥 Absensi</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="title">Dashboard Utama</div>
+      <div class="user">
+        <span>🔔</span>
+        <span>👤 Rizal — Admin</span>
+      </div>
+    </div>
+    <div class="content">
+      <div class="cards">
+        <div class="card">
+          <div class="label">Project Aktif</div>
+          <div class="value">12</div>
+        </div>
+        <div class="card">
+          <div class="label">Penawaran Menunggu</div>
+          <div class="value">8</div>
+        </div>
+        <div class="card">
+          <div class="label">Total Hutang Vendor</div>
+          <div class="value">Rp 2.4M</div>
+        </div>
+        <div class="card">
+          <div class="label">Total Piutang Customer</div>
+          <div class="value">Rp 1.8M</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Aktivitas Terbaru</h3>
+        <table>
+          <tr><th>Tanggal</th><th>Aktivitas</th><th>Project / No. Doc</th><th>Status</th></tr>
+          <tr><td>05 Mei 2026</td><td>Pengajuan Barang & Jasa</td><td>PR-2026-0041</td><td><span class="badge">Menunggu Approval</span></td></tr>
+          <tr><td>04 Mei 2026</td><td>Penawaran Diclose Menang</td><td>QT-2026-0018</td><td><span class="badge" style="background:#dcfce7;color:#166534;">Menang</span></td></tr>
+          <tr><td>04 Mei 2026</td><td>Pembayaran BAP</td><td>BAP-2026-0012</td><td><span class="badge" style="background:#dbeafe;color:#1e40af;">Dibayar</span></td></tr>
+          <tr><td>03 Mei 2026</td><td>Absensi Staff</td><td>Face ID — 24 hadir</td><td><span class="badge">Tercatat</span></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

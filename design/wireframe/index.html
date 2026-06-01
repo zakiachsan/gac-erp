@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Login — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#eef1f5; display:flex; align-items:center; justify-content:center; height:100vh; color:#334155; }
+  .login-box { background:#fff; border:2px dashed #94a3b8; border-radius:12px; padding:48px; width:420px; text-align:center; }
+  .brand { font-size:22px; font-weight:700; margin-bottom:8px; color:#0f172a; }
+  .sub { font-size:13px; color:#64748b; margin-bottom:32px; }
+  .field { text-align:left; margin-bottom:16px; }
+  .field label { display:block; font-size:12px; font-weight:600; margin-bottom:6px; text-transform:uppercase; color:#64748b; }
+  .field input { width:100%; padding:10px; border:2px solid #cbd5e1; border-radius:6px; font-size:14px; }
+  .btn { width:100%; padding:12px; background:#334155; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; margin-top:8px; text-decoration:none; display:inline-block; }
+  .btn:hover { background:#1e293b; }
+  .tenant-select { display:none; margin-top:24px; text-align:left; }
+  .tenant-select h3 { font-size:14px; margin-bottom:12px; color:#64748b; }
+  .tenant-option { border:2px solid #e2e8f0; border-radius:8px; padding:12px; margin-bottom:8px; cursor:pointer; display:flex; align-items:center; gap:10px; }
+  .tenant-option:hover { border-color:#334155; background:#f8fafc; }
+  .tenant-option .logo { width:32px; height:32px; background:#cbd5e1; border-radius:50%; }
+  .tenant-option .info { font-size:14px; }
+</style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="brand">ERP GAC</div>
+    <div class="sub">Wireframe — Login & Tenant Selection</div>
+
+    <div id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input type="text" value="user@gemilangagung.co.id" readonly>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" value="********" readonly>
+      </div>
+      <a href="#" class="btn" onclick="showTenant()">Login</a>
+    </div>
+
+    <div class="tenant-select" id="tenantSelect">
+      <h3>Pilih Perusahaan</h3>
+      <a href="dashboard.html" class="tenant-option" style="text-decoration:none; color:inherit;">
+        <div class="logo"></div>
+        <div class="info"><strong>PT Gemilang Agung Cemerlang</strong><br><small>Admin</small></div>
+      </a>
+      <a href="dashboard.html" class="tenant-option" style="text-decoration:none; color:inherit;">
+        <div class="logo"></div>
+        <div class="info"><strong>PT Mitra Sejahtera (Joint Venture)</strong><br><small>Viewer</small></div>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function showTenant() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('tenantSelect').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

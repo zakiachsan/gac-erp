@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>HR Absensi — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; color:#334155; display:flex; height:100vh; }
+  .sidebar { width:240px; background:#fff; border-right:2px dashed #cbd5e1; padding:24px 16px; display:flex; flex-direction:column; gap:6px; overflow:auto; }
+  .sidebar .logo { font-weight:700; font-size:18px; margin-bottom:24px; padding:0 8px; }
+  .sidebar a { text-decoration:none; color:#475569; font-size:14px; padding:10px 12px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+  .sidebar a:hover, .sidebar a.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .sidebar .section { font-size:11px; text-transform:uppercase; color:#94a3b8; margin:16px 8px 8px; font-weight:600; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .header { height:64px; background:#fff; border-bottom:2px dashed #cbd5e1; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .header .title { font-size:18px; font-weight:700; }
+  .content { padding:32px; overflow:auto; }
+  .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px dashed #e2e8f0; padding-bottom:8px; }
+  .tabs button { background:transparent; border:none; padding:8px 16px; font-size:14px; cursor:pointer; color:#64748b; border-radius:6px; }
+  .tabs button.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .panel { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; margin-bottom:20px; }
+  .panel h3 { font-size:16px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:10px; text-align:left; border-bottom:1px dashed #e2e8f0; }
+  th { color:#64748b; font-weight:600; text-transform:uppercase; font-size:11px; }
+  .face-id-box { width:320px; height:240px; background:#0f172a; border-radius:12px; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; position:relative; }
+  .face-id-box .face-guide { width:140px; height:140px; border:2px dashed rgba(255,255,255,0.4); border-radius:50%; position:absolute; }
+  .face-id-box .status { position:absolute; bottom:16px; font-size:12px; background:rgba(255,255,255,0.15); padding:6px 14px; border-radius:999px; }
+  .btn { background:#334155; color:#fff; padding:10px 20px; border-radius:6px; border:none; cursor:pointer; font-weight:600; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .field label { display:block; font-size:12px; font-weight:600; color:#64748b; margin-bottom:6px; }
+  .field input, .field select { width:100%; padding:10px; border:2px solid #cbd5e1; border-radius:6px; font-size:14px; }
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">ERP GAC</div>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <div class="section">Penjualan</div>
+    <a href="penawaran.html">📄 Penawaran</a>
+    <a href="project.html">📊 Detail Project</a>
+    <div class="section">Operasional</div>
+    <a href="anggaran.html">💰 Anggaran</a>
+    <a href="pengadaan.html">🛒 Pengadaan & Biaya</a>
+    <div class="section">Keuangan</div>
+    <a href="keuangan.html">🏦 Laporan Keuangan</a>
+    <div class="section">HR</div>
+    <a href="hr.html" class="active">👥 Absensi</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="title">HR — Absensi</div>
+    </div>
+    <div class="content">
+      <div class="tabs">
+        <button class="active" onclick="switchTab('t1')">Absensi Staff (Face ID)</button>
+        <button onclick="switchTab('t2')">Pekerja Harian</button>
+        <button onclick="switchTab('t3')">Rekap Absensi</button>
+      </div>
+
+      <div class="tab-panel active" id="t1">
+        <div class="panel" style="text-align:center;">
+          <h3>Face ID Attendance</h3>
+          <div class="face-id-box">
+            <div class="face-guide"></div>
+            <span>[Kamera Feed]</span>
+            <div class="status">🔍 Mencari wajah...</div>
+          </div>
+          <p style="font-size:13px; color:#64748b; margin-bottom:16px;">Posisikan wajah di dalam lingkaran. Sistem akan mencocokkan dengan database.</p>
+          <button class="btn">Mulai Scan Face ID</button>
+          <div style="margin-top:20px; font-size:13px; color:#166534; background:#dcfce7; display:inline-block; padding:8px 16px; border-radius:8px;">✅ Wajah Cocok — Absensi Tercatat (08:05)</div>
+        </div>
+        <div class="panel">
+          <h3>Daftar Hadir Staff Hari Ini (05 Mei 2026)</h3>
+          <table>
+            <tr><th>Nama</th><th>Jam Masuk</th><th>Jam Keluar</th><th>Status</th><th>Verifikasi</th></tr>
+            <tr><td>Rizal</td><td>08:00</td><td>—</td><td>Hadir</td><td>Face ID ✅</td></tr>
+            <tr><td>Andi Wijaya</td><td>08:12</td><td>—</td><td>Hadir</td><td>Face ID ✅</td></tr>
+            <tr><td>Siti Aminah</td><td>—</td><td>—</td><td>Alfa</td><td>—</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="t2">
+        <div class="panel">
+          <h3>Input Absensi Pekerja Harian</h3>
+          <div class="form-grid" style="max-width:600px;">
+            <div class="field"><label>Nama Pekerja</label><input placeholder="Contoh: Pak Tarno"></div>
+            <div class="field"><label>Tanggal</label><input type="date" value="2026-05-05"></div>
+            <div class="field"><label>Jam Masuk</label><input type="time" value="07:30"></div>
+            <div class="field"><label>Jam Keluar</label><input type="time"></div>
+            <div class="field" style="grid-column:1/-1;">
+              <label>Status</label>
+              <select><option>Hadir</option><option>Izin</option><option>Sakit</option></select>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="btn">Simpan Absensi Manual</button>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Daftar Pekerja Harian Hari Ini</h3>
+          <table>
+            <tr><th>Nama</th><th>Jam Masuk</th><th>Jam Keluar</th><th>Status</th></tr>
+            <tr><td>Pak Tarno</td><td>07:30</td><td>—</td><td>Hadir</td></tr>
+            <tr><td>Pak Sujono</td><td>07:45</td><td>—</td><td>Hadir</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="t3">
+        <div class="panel">
+          <h3>Rekap Absensi Periode: 01 - 05 Mei 2026</h3>
+          <table>
+            <tr><th>Nama</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alfa</th></tr>
+            <tr><td>Rizal</td><td>5</td><td>0</td><td>0</td><td>0</td></tr>
+            <tr><td>Andi Wijaya</td><td>4</td><td>1</td><td>0</td><td>0</td></tr>
+            <tr><td>Siti Aminah</td><td>3</td><td>0</td><td>0</td><td>2</td></tr>
+            <tr><td>Pak Tarno (Harian)</td><td>5</td><td>0</td><td>0</td><td>0</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(id) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

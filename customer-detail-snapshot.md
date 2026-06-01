@@ -1,0 +1,219 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - img [ref=e6]
+        - generic [ref=e9]:
+          - generic [ref=e10]: ERP GAC
+          - generic [ref=e11]: Admin Perusahaan
+      - navigation [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: Menu Utama
+          - link "Dashboard" [ref=e16] [cursor=pointer]:
+            - /url: /dashboard
+            - img [ref=e17]
+            - generic [ref=e22]: Dashboard
+          - link "Absensi" [ref=e24] [cursor=pointer]:
+            - /url: /hr
+            - img [ref=e25]
+            - generic [ref=e30]: Absensi
+        - generic [ref=e31]:
+          - generic [ref=e32]: Penjualan
+          - link "Penawaran" [ref=e34] [cursor=pointer]:
+            - /url: /penawaran
+            - img [ref=e35]
+            - generic [ref=e38]: Penawaran
+          - link "Detail Project" [ref=e40] [cursor=pointer]:
+            - /url: /project
+            - img [ref=e41]
+            - generic [ref=e43]: Detail Project
+          - link "Customer" [ref=e45] [cursor=pointer]:
+            - /url: /customer
+            - img [ref=e46]
+            - generic [ref=e50]: Customer
+        - generic [ref=e51]:
+          - generic [ref=e52]: Operasional
+          - link "Pengadaan" [ref=e54] [cursor=pointer]:
+            - /url: /pengadaan/pr
+            - img [ref=e55]
+            - generic [ref=e59]: Pengadaan
+          - link "Anggaran" [ref=e61] [cursor=pointer]:
+            - /url: /anggaran
+            - img [ref=e62]
+            - generic [ref=e65]: Anggaran
+          - link "Biaya Operasional" [ref=e67] [cursor=pointer]:
+            - /url: /operasional/pengajuan
+            - img [ref=e68]
+            - generic [ref=e71]: Biaya Operasional
+        - generic [ref=e72]:
+          - generic [ref=e73]: Keuangan
+          - link "Ringkasan Keuangan" [ref=e75] [cursor=pointer]:
+            - /url: /keuangan/ringkasan
+            - img [ref=e76]
+            - generic [ref=e79]: Ringkasan Keuangan
+          - link "Kas & Bank" [ref=e81] [cursor=pointer]:
+            - /url: /keuangan/dana
+            - img [ref=e82]
+            - generic [ref=e85]: Kas & Bank
+          - link "Invoice & Kwitansi" [ref=e87] [cursor=pointer]:
+            - /url: /keuangan/invoice
+            - img [ref=e88]
+            - generic [ref=e91]: Invoice & Kwitansi
+          - link "Jurnal Umum" [ref=e93] [cursor=pointer]:
+            - /url: /keuangan/jurnal-umum
+            - img [ref=e94]
+            - generic [ref=e96]: Jurnal Umum
+          - link "Chart of Accounts" [ref=e98] [cursor=pointer]:
+            - /url: /keuangan/coa
+            - img [ref=e99]
+            - generic [ref=e101]: Chart of Accounts
+          - link "Aset Tetap" [ref=e103] [cursor=pointer]:
+            - /url: /keuangan/aset-tetap
+            - img [ref=e104]
+            - generic [ref=e106]: Aset Tetap
+          - link "Buku Besar" [ref=e108] [cursor=pointer]:
+            - /url: /keuangan/buku-besar
+            - img [ref=e109]
+            - generic [ref=e111]: Buku Besar
+          - link "Neraca Saldo" [ref=e113] [cursor=pointer]:
+            - /url: /keuangan/neraca-saldo
+            - img [ref=e114]
+            - generic [ref=e116]: Neraca Saldo
+          - link "Neraca" [ref=e118] [cursor=pointer]:
+            - /url: /keuangan/neraca
+            - img [ref=e119]
+            - generic [ref=e123]: Neraca
+          - link "Laba Rugi" [ref=e125] [cursor=pointer]:
+            - /url: /keuangan/laba-rugi
+            - img [ref=e126]
+            - generic [ref=e129]: Laba Rugi
+          - link "Cashflow" [ref=e131] [cursor=pointer]:
+            - /url: /keuangan/cashflow
+            - img [ref=e132]
+            - generic [ref=e135]: Cashflow
+          - link "Hutang / Piutang" [ref=e137] [cursor=pointer]:
+            - /url: /keuangan/hutang-piutang
+            - img [ref=e138]
+            - generic [ref=e141]: Hutang / Piutang
+          - link "Rekonsiliasi Bank" [ref=e143] [cursor=pointer]:
+            - /url: /keuangan/rekonsiliasi
+            - img [ref=e144]
+            - generic [ref=e147]: Rekonsiliasi Bank
+          - link "Perpajakan" [ref=e149] [cursor=pointer]:
+            - /url: /keuangan/perpajakan
+            - img [ref=e150]
+            - generic [ref=e153]: Perpajakan
+          - link "Anggaran vs Realisasi" [ref=e155] [cursor=pointer]:
+            - /url: /keuangan/anggaran
+            - img [ref=e156]
+            - generic [ref=e159]: Anggaran vs Realisasi
+        - generic [ref=e160]:
+          - generic [ref=e161]: Pengaturan
+          - link "User Management" [ref=e163] [cursor=pointer]:
+            - /url: /admin/user-management
+            - img [ref=e164]
+            - generic [ref=e168]: User Management
+          - link "Vendor" [ref=e170] [cursor=pointer]:
+            - /url: /vendor
+            - img [ref=e171]
+            - generic [ref=e176]: Vendor
+      - generic [ref=e178]:
+        - img "User" [ref=e179]
+        - generic [ref=e180]:
+          - generic [ref=e181]: User
+          - generic [ref=e182]: Admin Perusahaan
+        - link [ref=e183] [cursor=pointer]:
+          - /url: /login
+          - img [ref=e184]
+    - generic [ref=e187]:
+      - banner [ref=e188]:
+        - generic [ref=e189]:
+          - heading "Detail Customer" [level=1] [ref=e190]
+          - paragraph [ref=e191]: Informasi lengkap & history project customer.
+        - button "Edit Customer" [ref=e193]:
+          - img [ref=e194]
+          - text: Edit Customer
+      - generic [ref=e197]:
+        - generic [ref=e199]:
+          - generic [ref=e200]:
+            - generic [ref=e201]:
+              - link [ref=e202] [cursor=pointer]:
+                - /url: /customer
+                - img [ref=e203]
+              - img [ref=e206]
+              - generic [ref=e210]:
+                - heading "PT Maju Jaya" [level=2] [ref=e211]
+                - generic [ref=e212]: Aktif
+            - generic [ref=e213]:
+              - generic [ref=e214]:
+                - img [ref=e215]
+                - generic [ref=e218]: Jl. Sudirman No. 45, Jakarta Pusat
+              - generic [ref=e219]:
+                - img [ref=e220]
+                - generic [ref=e222]: Bapak Hendra (Contact Person)
+              - generic [ref=e223]:
+                - img [ref=e224]
+                - generic [ref=e227]: hendra@majujaya.co.id
+              - generic [ref=e228]:
+                - img [ref=e229]
+                - link "https://vms.majujaya.co.id" [ref=e232] [cursor=pointer]:
+                  - /url: https://vms.majujaya.co.id
+          - generic [ref=e233]:
+            - generic [ref=e234]:
+              - generic [ref=e235]: Total Project
+              - generic [ref=e236]: "3"
+            - generic [ref=e237]:
+              - generic [ref=e238]: Total Nilai Kontrak
+              - generic [ref=e239]: Rp 2.1M
+        - generic [ref=e240]:
+          - generic [ref=e241]:
+            - generic [ref=e242]:
+              - img [ref=e243]
+              - heading "Listing Project Berjalan" [level=3] [ref=e246]
+            - table [ref=e247]:
+              - rowgroup [ref=e248]:
+                - row "No Kontrak Nama Project Nilai Status" [ref=e249]:
+                  - columnheader "No Kontrak" [ref=e250]
+                  - columnheader "Nama Project" [ref=e251]
+                  - columnheader "Nilai" [ref=e252]
+                  - columnheader "Status" [ref=e253]
+              - rowgroup [ref=e254]:
+                - row "01/GAC/IV/2026 Pengadaan & Pemasangan AC Kantor Pusat Rp 1.2M Aktif" [ref=e255]:
+                  - cell "01/GAC/IV/2026" [ref=e256]
+                  - cell "Pengadaan & Pemasangan AC Kantor Pusat" [ref=e257]
+                  - cell "Rp 1.2M" [ref=e258]
+                  - cell "Aktif" [ref=e259]:
+                    - generic [ref=e260]: Aktif
+                - row "04/GAC/V/2026 Maintenance AC Bulanan Rp 15jt Aktif" [ref=e261]:
+                  - cell "04/GAC/V/2026" [ref=e262]
+                  - cell "Maintenance AC Bulanan" [ref=e263]
+                  - cell "Rp 15jt" [ref=e264]
+                  - cell "Aktif" [ref=e265]:
+                    - generic [ref=e266]: Aktif
+          - generic [ref=e267]:
+            - generic [ref=e268]:
+              - img [ref=e269]
+              - heading "Listing Penawaran Kalah" [level=3] [ref=e273]
+            - table [ref=e274]:
+              - rowgroup [ref=e275]:
+                - row "No Penawaran Nama Project Nilai Tanggal" [ref=e276]:
+                  - columnheader "No Penawaran" [ref=e277]
+                  - columnheader "Nama Project" [ref=e278]
+                  - columnheader "Nilai" [ref=e279]
+                  - columnheader "Tanggal" [ref=e280]
+              - rowgroup [ref=e281]:
+                - row "QT-2026-0010 Pengadaan Mesin Produksi Rp 350jt 20 Mar 2026" [ref=e282]:
+                  - cell "QT-2026-0010" [ref=e283]
+                  - cell "Pengadaan Mesin Produksi" [ref=e284]
+                  - cell "Rp 350jt" [ref=e285]
+                  - cell "20 Mar 2026" [ref=e286]
+                - row "QT-2026-0008 Renovasi Ruang Meeting Rp 45jt 15 Feb 2026" [ref=e287]:
+                  - cell "QT-2026-0008" [ref=e288]
+                  - cell "Renovasi Ruang Meeting" [ref=e289]
+                  - cell "Rp 45jt" [ref=e290]
+                  - cell "15 Feb 2026" [ref=e291]
+      - button "Buka AI Asisten" [ref=e292]:
+        - img [ref=e293]
+  - button "Open Next.js Dev Tools" [ref=e301] [cursor=pointer]:
+    - img [ref=e302]
+  - alert [ref=e305]

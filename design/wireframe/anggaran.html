@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Anggaran — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; color:#334155; display:flex; height:100vh; }
+  .sidebar { width:240px; background:#fff; border-right:2px dashed #cbd5e1; padding:24px 16px; display:flex; flex-direction:column; gap:6px; overflow:auto; }
+  .sidebar .logo { font-weight:700; font-size:18px; margin-bottom:24px; padding:0 8px; }
+  .sidebar a { text-decoration:none; color:#475569; font-size:14px; padding:10px 12px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+  .sidebar a:hover, .sidebar a.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .sidebar .section { font-size:11px; text-transform:uppercase; color:#94a3b8; margin:16px 8px 8px; font-weight:600; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .header { height:64px; background:#fff; border-bottom:2px dashed #cbd5e1; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .header .title { font-size:18px; font-weight:700; }
+  .content { padding:32px; overflow:auto; }
+  .toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .btn { background:#334155; color:#fff; padding:10px 16px; border-radius:6px; text-decoration:none; font-size:14px; font-weight:600; border:none; cursor:pointer; }
+  .panel { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; margin-bottom:20px; }
+  .panel h3 { font-size:16px; margin-bottom:14px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:10px; text-align:left; border-bottom:1px dashed #e2e8f0; }
+  th { color:#64748b; font-weight:600; text-transform:uppercase; font-size:11px; }
+  .compare-bar { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .compare-bar .label { width:140px; font-size:13px; font-weight:600; }
+  .compare-bar .track { flex:1; height:20px; background:#e2e8f0; border-radius:4px; overflow:hidden; position:relative; }
+  .compare-bar .fill { height:100%; border-radius:4px; }
+  .compare-bar .value { width:100px; text-align:right; font-size:13px; }
+  .budget-cards { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:20px; }
+  .budget-card { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:20px; text-align:center; }
+  .budget-card .num { font-size:24px; font-weight:700; }
+  .budget-card .lbl { font-size:12px; color:#64748b; margin-top:4px; }
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">ERP GAC</div>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <div class="section">Penjualan</div>
+    <a href="penawaran.html">📄 Penawaran</a>
+    <a href="project.html">📊 Detail Project</a>
+    <div class="section">Operasional</div>
+    <a href="anggaran.html" class="active">💰 Anggaran</a>
+    <a href="pengadaan.html">🛒 Pengadaan & Biaya</a>
+    <div class="section">Keuangan</div>
+    <a href="keuangan.html">🏦 Laporan Keuangan</a>
+    <div class="section">HR</div>
+    <a href="hr.html">👥 Absensi</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="title">Manajemen Anggaran</div>
+    </div>
+    <div class="content">
+      <div class="toolbar">
+        <div style="font-size:14px; color:#64748b;">Project: <strong>Pengadaan & Pemasangan AC Kantor Pusat</strong></div>
+        <button class="btn">+ Create Anggaran</button>
+      </div>
+
+      <div class="budget-cards">
+        <div class="budget-card">
+          <div class="num">Rp 900jt</div>
+          <div class="lbl">Total Anggaran</div>
+        </div>
+        <div class="budget-card">
+          <div class="num">Rp 720jt</div>
+          <div class="lbl">Total Realisasi</div>
+        </div>
+        <div class="budget-card">
+          <div class="num">Rp 180jt</div>
+          <div class="lbl">Sisa Budget</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Anggaran vs Realisasi per Kategori</h3>
+        <div class="compare-bar">
+          <div class="label">Material & Jasa</div>
+          <div class="track"><div class="fill" style="width:80%; background:#3b82f6;"></div></div>
+          <div class="value">Ang: 600jt | Real: 480jt</div>
+        </div>
+        <div class="compare-bar">
+          <div class="label">Biaya Operasional</div>
+          <div class="track"><div class="fill" style="width:60%; background:#f59e0b;"></div></div>
+          <div class="value">Ang: 200jt | Real: 120jt</div>
+        </div>
+        <div class="compare-bar">
+          <div class="label">Pajak</div>
+          <div class="track"><div class="fill" style="width:100%; background:#10b981;"></div></div>
+          <div class="value">Ang: 100jt | Real: 100jt</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Detail Breakdown Anggaran</h3>
+        <table>
+          <tr><th>Kategori</th><th>Item</th><th>Anggaran</th><th>Realisasi</th><th>Selisih</th></tr>
+          <tr><td>Material & Jasa</td><td>AC Split 2 PK</td><td>Rp 45.000.000</td><td>Rp 42.000.000</td><td style="color:#16a34a;">+ Rp 3jt</td></tr>
+          <tr><td>Material & Jasa</td><td>Pipa & Instalasi</td><td>Rp 15.000.000</td><td>Rp 12.000.000</td><td style="color:#16a34a;">+ Rp 3jt</td></tr>
+          <tr><td>Biaya Operasional</td><td>Transportasi</td><td>Rp 5.000.000</td><td>Rp 3.000.000</td><td style="color:#16a34a;">+ Rp 2jt</td></tr>
+          <tr><td>Pajak</td><td>PPN 11%</td><td>Rp 100.000.000</td><td>Rp 100.000.000</td><td>Rp 0</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

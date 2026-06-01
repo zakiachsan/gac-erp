@@ -1,0 +1,297 @@
+--- Page 1 ---
+JagoBikinWebsite
+JBW
+Professional Web Development & Digital Solutions
+Green Andara Residence Blok C6 No.7
+Telp: 0856-9466-2592 | Email: jagobikinwebsite28@gmail.com
+PRODUCT REQUIREMENT DOCUMENT
+ERP SCM & Keuangan — PT Gemilang Agung Cemerlang
+Client: PT Gemilang Agung Cemerlang
+PIC: Bapak Rizal
+Dokumen: PRD-JBW-005/04/2026
+Tanggal: April 2026
+Versi: 1.1
+1. Latar Belakang & Goals
+Latar Belakang
+PT Gemilang Agung Cemerlang bergerak di bidang pengadaan barang dan jasa —
+meliputi proyek pengadaan dan pemasangan berbagai kebutuhan pelanggan seperti
+AC, furniture, mesin produksi, pompa, dan jasa bangunan. Saat ini perusahaan
+telah menggunakan aplikasi yang dirancang sendiri oleh pihak ketiga, namun masih
+membutuhkan penyempurnaan signifikan: modul keuangan yang belum ada,
+tampilan yang perlu diperbarui, dan berbagai fitur yang belum sempurna.
+Oleh karena itu, PT Gemilang Agung Cemerlang bermaksud membangun sistem
+ERP berbasis web yang mencakup seluruh siklus bisnis — dari penawaran,
+penganggaran, pengadaan barang & jasa, keuangan, hingga HR — dengan
+tambahan fitur AI Asisten dan Face ID Attendance.
+Goals:
+1. Digitalisasi seluruh siklus bisnis dari penawaran hingga pembayaran
+2. Sistem pengadaan barang & jasa dengan approval berjenjang yang transparan
+3. Modul keuangan terintegrasi — rekapitulasi otomatis (neraca, laba rugi,
+cashflow, hutang piutang, perpajakan)
+4. Multi-perusahaan (SaaS) — akun joint venture untuk kolaborasi dengan rekanan
+5. AI Asisten untuk tanya data keuangan & history harga barang
+6. HR absensi dengan Face ID untuk staff & pekerja harian
+2. Data & Context
+2.1 Informasi Client
+Item Detail
+Nama Perusahaan PT Gemilang Agung Cemerlang
+PIC Bapak Rizal
+Bidang Usaha Pengadaan barang dan jasa (proyek pengadaan &
+
+--- Page 2 ---
+pemasangan)
+Jenis Project ERP SCM & Keuangan — Website (SaaS multi-
+perusahaan)
+Timeline Maksimal 3 bulan (2 bulan development + 1 bulan UAT
+& monitoring)
+2.2 Model Bisnis & Arsitektur
+Aspek Detail
+Model SaaS Multi-Perusahaan — akun joint venture untuk
+kolaborasi
+Platform Website (Laravel / React)
+Database Fase Awal Hosting MySQL/PostgreSQL internal
+Database Scale Up Supabase (jika ribuan user)
+Role System Super Admin → Admin Perusahaan → Karyawan/Staf
+Pengguna Awal Internal perusahaan (< 5 orang)
+3. Struktur Modul & Fitur
+Ringkasan Alur Bisnis:
+Penawaran → Anggaran → Pengadaan & Biaya → Keuangan → HR
+3.1 Manajemen Penawaran (Quotation)
+Fitur untuk mengelola proses penawaran ke pelanggan.
+Create penawaran dengan nomor otomatis
+Input nama barang/jasa dan harga penawaran
+Pilih marketing/sales yang menangani
+Pilih Customer — data customer meliputi: nama customer, alamat, contact
+person, email, VMS (link web rekanan customer), total project & total nilai yang
+sudah berkontrak, listing project berjalan, listing penawaran kalah
+Upload lampiran dokumen penawaran (PDF, gambar)
+Maksimal 2x submit: penawaran awal & penawaran negosiasi
+Status penawaran: Submit → Negosiasi → Close (centang = menang, tidak
+centang = tidak menang)
+Ketika penawaran dicentang "Menang" → otomatis masuk ke listing project
+berjalan
+Riwayat perubahan status penawaran
+Benefit: Proses penawaran terdokumentasi rapi, riwayat negosiasi tercatat, performa sales
+terukur dari status Close (menang/kalah).
+3.2 Dashboard Detail Project
+Halaman khusus yang muncul ketika penawaran dicentang "Menang". Setiap
+project memiliki halaman detail yang berisi:
+Detail pekerjaan — informasi lengkap project
+Nilai project / pengeluaran / pemasukan — ringkasan finansial
+TAB Listing Pengajuan — daftar pengajuan barang/jasa & biaya operasional
+TAB Listing Pemasukan — daftar pemasukan dari project
+TAB Listing Pengeluaran — daftar pengeluaran project
+
+--- Page 3 ---
+TAB Hutang / Piutang — monitoring hutang piutang per project
+TAB Anggaran vs Realisasi — komparasi anggaran material, biaya ops, dan
+pajak vs realisasi di lapangan
+Dokumen — tempat simpan file arsip pekerjaan (kontrak, BAST, invoice, dll)
+Benefit: Setiap project punya dashboard lengkap — dari finansial, dokumen, hingga progress
+pengadaan. Semua informasi project dalam satu halaman.
+3.3 Manajemen Anggaran (Budgeting)
+Anggaran terintegrasi dengan modul pengadaan untuk monitoring realisasi biaya.
+Create anggaran per proyek
+3 sub-form dalam anggaran:
+Material & Jasa — breakdown harga barang/material
+Biaya Operasional — breakdown biaya operasional proyek
+Pajak — alokasi pajak
+Input manual breakdown harga masing-masing sub
+Komparasi anggaran vs realisasi — otomatis dari data pengadaan,
+ditampilkan di Dashboard Detail Project
+Monitoring budget (anggaran vs realisasi)
+Benefit: Manajemen bisa mengontrol budget proyek secara real-time, mengetahui selisih
+anggaran vs realisasi.
+3.4 Pengadaan Barang & Jasa + Biaya Operasional
+Inti sistem — mengelola seluruh siklus pengadaan perusahaan.
+Alur Pengadaan Barang & Jasa:
+1. Pengajuan Barang & Jasa (PR) — input rincian kebutuhan barang/jasa →
+Approval berjenjang
+2. Pembanding — membandingkan harga dari ≥ 2 supplier/vendor, upload
+lampiran penawaran masing-masing supplier → Approval berjenjang
+3. Purchase Order (PO) — pembuatan PO → Approval
+4. BAP (Berita Acara Pembayaran) — submit lampiran (BA progres, BAST,
+kwitansi, invoice dari vendor) → Approval berjenjang
+5. Listing Pembayaran — list yang harus dibayarkan segera setelah BAP di-
+approve. Pihak keuangan hanya boleh melakukan maker transaksi berdasarkan
+listing ini.
+6. Laporan Transaksi — rekapitulasi seluruh transaksi pengadaan
+Alur Permintaan Biaya Operasional:
+1. Pengajuan Biaya — input rincian biaya operasional → Approval berjenjang
+2. Listing Pembayaran — list biaya yang akan dibayarkan
+3. Laporan Transaksi — rekapitulasi biaya operasional
+Ketentuan Approval:
+# Role Keterangan
+1 Pengaju (Admin) Otomatis approve saat submit
+2 Mengetahui (SPV / Manager Ops) Approval berjenjang ke-2
+3 Menyetujui (Keuangan / Direktur) Approval berjenjang ke-3
+Approval berjenjang dari bawah ke atas — harus di-approve 1/1 baru masuk ke
+
+--- Page 4 ---
+jenjang berikutnya
+Fleksibel: bisa diatur siapa orangnya, minimal 2 orang
+Notifikasi approval ke pengguna yang bersangkutan
+Benefit: Transparansi penuh — setiap transaksi pengadaan tercatat, approval berjenjang
+meminimalisir kesalahan & fraud.
+3.5 Manajemen Keuangan & Perpajakan
+Modul keuangan komprehensif yang mengkoleksi seluruh transaksi dari modul
+sebelumnya dan merekapnya otomatis dalam laporan keuangan.
+Rekapitulasi Laporan Keuangan:
+Neraca
+Laba Rugi
+Cashflow
+Hutang Piutang
+Perpajakan:
+Monitoring Pajak Keluaran
+Monitoring Pajak Masukan
+Monitoring pajak lebih bayar / kurang bayar
+Dana Masuk & Dana Keluar
+Pembuatan Invoice & Kwitansi
+Rekap otomatis — seluruh transaksi dari modul sebelumnya terekap otomatis
+Benefit: Laporan keuangan real-time tanpa perlu rekap manual, pajak terpantau,
+pengambilan keputusan lebih cepat.
+3.6 HR — Absensi
+Manajemen absensi untuk 2 tipe karyawan.
+2 Tipe Absensi:
+Staff — data nama diambil dari database karyawan
+Pekerja Harian — input nama manual 1 per 1 via formulir tanpa login
+Face ID Attendance — deteksi kesamaan wajah dengan database, wajah tidak
+dikenal = tidak bisa absen
+Absensi Manual — input absen secara manual (untuk pekerja harian)
+Rekap Absensi — laporan kehadiran per periode
+Benefit: Absensi akurat dengan verifikasi Face ID, data terpisah untuk staff & pekerja
+harian, rekap otomatis.
+3.7 AI Asisten
+Asisten AI terintegrasi dalam sistem sebagai customer service pribadi perusahaan.
+Tanya data keuangan via natural language
+Cek history harga barang yang pernah dibeli — contoh: "Berapa saja harga
+barang A yang pernah dibeli?"
+Update data di sistem jika diperlukan
+Berfungsi sebagai chatbot internal perusahaan
+Benefit: Karyawan bisa mendapatkan informasi sistem tanpa perlu navigasi menu — cukup
+tanya via chat.
+
+--- Page 5 ---
+4. Alur Sistem
+4.1 Alur Utama Bisnis
+[Login] → Pilih Modul
+├── Modul: Penawaran
+│ ├── Create Penawaran (pilih Customer & Marketing) → Submit → Negosiasi → Close (Menang/Kalah)
+│ ├── Jika Menang → Auto-generate Dashboard Detail Project
+│ └── Riwayat Penawaran
+├── Modul: Dashboard Project
+│ ├── Detail Pekerjaan & Nilai Project
+│ ├── TAB: Pengajuan | Pemasukan | Pengeluaran | Hutang/Piutang | Anggaran vs Realisasi
+│ └── Dokumen Arsip
+├── Modul: Anggaran
+│ ├── Create Anggaran (Material + Ops + Pajak)
+│ └── Monitoring Anggaran vs Realisasi
+├── Modul: Pengadaan & Biaya
+│ ├── Pengajuan Barang/Jasa → Pembanding Vendor → PO → BAP → Listing Bayar
+│ └── Pengajuan Biaya Operasional → Listing Bayar
+├── Modul: Keuangan
+│ ├── Laporan Keuangan (Neraca, LabaRugi, Cashflow, HutangPiutang)
+│ ├── Perpajakan (Pajak Masukan/Keluaran)
+│ ├── Invoice & Kwitansi
+│ └── AI Asisten (Tanya data)
+└── Modul: HR
+├── Absensi Staff (Face ID / Manual)
+└── Absensi Pekerja Harian (Formulir)
+4.2 Arsitektur User & Multi-Perusahaan
+# Role Deskripsi
+1 Super Admin Mengelola seluruh perusahaan dalam sistem, aktivasi/non-aktivasi
+akun
+2 Admin Mengelola data dan user per perusahaan (setting approval, dll)
+Perusahaan
+3 Karyawan / Staf User operasional — pengaju, marketing, sales, dll
+Multi-Perusahaan (SaaS Mode): Setiap perusahaan punya data terisolasi. Admin
+perusahaan bisa mengaktifkan/non-aktifkan akun perusahaan rekanan. Tidak
+menggunakan payment gateway — aktivasi manual oleh Super Admin.
+5. Fitur-Fitur Sistem
+5.1 Manajemen Penawaran Terintegrasi dengan Data Customer
+Cara Kerja: Sales membuat penawaran dengan detail barang/jasa dan harga.
+Nomor otomatis tergenerate. Marketing dan Customer dipilih dari database. Setiap
+customer menyimpan histori: total project, nilai kontrak, listing project berjalan,
+dan penawaran yang kalah. Dokumen lampiran bisa di-upload. Status penawaran
+bisa di-track — submit, negosiasi, hingga close (menang/kalah). Ketika menang,
+otomatis membuat Dashboard Project.
+Benefit: Database penawaran & customer tersimpan rapi, performa closing terukur, data
+untuk analisis bisnis.
+5.2 Dashboard Project Lengkap
+
+--- Page 6 ---
+Cara Kerja: Setiap project yang menang memiliki halaman dashboard sendiri.
+Menampilkan detail pekerjaan, nilai project, TAB
+pengajuan/pemasukan/pengeluaran/hutang-piutang/anggaran-vs-realisasi, dan
+dokumen arsip. Semua data real-time dari transaksi yang terjadi.
+Benefit: Manajemen bisa memonitor semua aspek project dari satu halaman — tanpa bolak-
+balik modul.
+5.3 Monitoring Anggaran Real-Time
+Cara Kerja: Setiap proyek punya anggaran (material, biaya ops, pajak). Saat
+pengadaan berjalan, realisasi biaya otomatis ter-record. Sistem menampilkan
+komparasi anggaran vs realisasi secara real-time di Dashboard Project.
+Benefit: Manajemen bisa langsung tahu proyek mana yang over budget atau on track.
+5.4 Siklus Pengadaan End-to-End dengan Approval Berjenjang
+Cara Kerja: Semua pengadaan barang/jasa dan biaya operasional melalui alur:
+pengajuan → pembanding vendor → PO → BAP → listing pembayaran → laporan.
+Setiap tahap memiliki approval berjenjang dengan notifikasi otomatis ke approver.
+Benefit: Transparansi penuh, pengeluaran terkontrol, audit trail lengkap.
+5.5 AI Asisten
+Cara Kerja: User cukup mengetik pertanyaan dalam bahasa Indonesia — sistem AI
+akan menjawab berdasarkan data di database. Contoh: "Berapa harga beli AC 2 PK
+terakhir?" atau "Tampilkan total pengeluaran bulan ini."
+Benefit: Akses informasi lebih cepat tanpa perlu navigasi menu rumit.
+5.6 Absensi Face ID
+Cara Kerja: Staff melakukan absen dengan wajah — sistem mencocokkan dengan
+database wajah. Jika tidak cocok, absen ditolak. Untuk pekerja harian, absen via
+formulir dengan input nama manual.
+Benefit: Absensi akurat tanpa risiko titip absen, data kehadiran real-time.
+6. Tahap Pengembangan
+Tahap 1: Finalisasi Flow & Desain Sistem (1-2 minggu)
+Klarifikasi detail alur bisnis → Wireframe & desain UI/UX → Review & approval client →
+Revisi (maksimal 3x)
+Tahap 2: Development Modul Inti (4-5 minggu)
+Modul Penawaran (dengan data Customer) → Modul Anggaran → Modul Dashboard Project
+→ Modul Pengadaan & Biaya (termasuk approval flow, notifikasi, listing pembayaran)
+Tahap 3: Development Modul Pendukung (2-3 minggu)
+Modul Keuangan & Perpajakan → Modul HR Absensi → AI Asisten → Face ID Attendance
+Tahap 4: UAT & Monitoring (1 bulan)
+Testing end-to-end flow → UAT dengan client → Perbaikan bug & penyempurnaan → Serah
+terima
+
+--- Page 7 ---
+7. Tech Stack
+Komponen Teknologi
+Frontend Laravel Blade / React (menyesuaikan)
+Backend Laravel / PHP
+Database MySQL / PostgreSQL (hosting awal)
+AI / LLM OpenAI API / local LLM
+Face Recognition Face API / library face recognition
+Hosting Shared hosting (awal) → upgrade sesuai kebutuhan
+8. Kebutuhan dari Client
+No Item Keterangan
+1 Data master Daftar karyawan, supplier, pelanggan
+2 Contoh dokumen Format PR, PO, invoice, kwitansi yang digunakan saat ini
+3 Akses aplikasi existing Jika memungkinkan — untuk referensi fitur & flow
+4 Klarifikasi Penawaran Detail real case penggunaan modul Penawaran & data
+Customer
+5 Data struktur Nama perusahaan rekanan, jumlah pengguna per
+perusahaan perusahaan
+6 Logo & branding Logo perusahaan, warna brand
+9. Notes
+Multi-perusahaan: Sistem dibangun dengan arsitektur SaaS — data antar
+perusahaan terisolasi, aktivasi manual oleh Super Admin (tanpa payment
+gateway)
+Database awal: Hosting MySQL/PostgreSQL internal — jika skala membesar
+(>10rb user), migrasi ke Supabase (biaya terpisah)
+AI Asisten: Terintegrasi dengan database internal perusahaan — menggunakan
+OpenAI API atau local LLM
+Face ID: Deteksi kesamaan wajah — wajah harus terdaftar di database untuk
+bisa absen
+Hosting & domain: Menjadi tanggung jawab client
+Maintenance: Bug fix gratis 3 bulan setelah serah terima
+Revisi desain: Maksimal 3 kali
+Dokumen ini dapat berubah sesuai diskusi lebih lanjut dengan client.
+JagoBikinWebsite — jagobikinwebsite.com — jagobikinwebsite28@gmail.com
+PT. Naradidik Teknologi Cerdas
+

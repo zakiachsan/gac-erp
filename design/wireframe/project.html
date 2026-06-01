@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Detail Project — ERP GAC Wireframe</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background:#f1f5f9; color:#334155; display:flex; height:100vh; }
+  .sidebar { width:240px; background:#fff; border-right:2px dashed #cbd5e1; padding:24px 16px; display:flex; flex-direction:column; gap:6px; overflow:auto; }
+  .sidebar .logo { font-weight:700; font-size:18px; margin-bottom:24px; padding:0 8px; }
+  .sidebar a { text-decoration:none; color:#475569; font-size:14px; padding:10px 12px; border-radius:6px; display:flex; align-items:center; gap:10px; }
+  .sidebar a:hover, .sidebar a.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .sidebar .section { font-size:11px; text-transform:uppercase; color:#94a3b8; margin:16px 8px 8px; font-weight:600; }
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .header { height:64px; background:#fff; border-bottom:2px dashed #cbd5e1; display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+  .header .title { font-size:18px; font-weight:700; }
+  .content { padding:32px; overflow:auto; }
+  .project-header { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:flex-start; }
+  .project-header h2 { font-size:20px; margin-bottom:6px; }
+  .project-header .meta { font-size:13px; color:#64748b; }
+  .project-header .stats { display:flex; gap:24px; text-align:right; }
+  .project-header .stats .num { font-size:22px; font-weight:700; }
+  .project-header .stats .lbl { font-size:11px; color:#64748b; text-transform:uppercase; }
+  .tabs { display:flex; gap:4px; margin-bottom:20px; border-bottom:2px dashed #e2e8f0; padding-bottom:8px; }
+  .tabs button { background:transparent; border:none; padding:8px 16px; font-size:14px; cursor:pointer; color:#64748b; border-radius:6px; }
+  .tabs button.active { background:#f1f5f9; color:#0f172a; font-weight:600; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+  .panel { background:#fff; border:2px dashed #cbd5e1; border-radius:10px; padding:24px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { padding:10px; text-align:left; border-bottom:1px dashed #e2e8f0; }
+  th { color:#64748b; font-weight:600; text-transform:uppercase; font-size:11px; }
+  .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; background:#f1f5f9; }
+  .compare-bar { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .compare-bar .label { width:120px; font-size:13px; font-weight:600; }
+  .compare-bar .track { flex:1; height:20px; background:#e2e8f0; border-radius:4px; overflow:hidden; position:relative; }
+  .compare-bar .fill { height:100%; background:#94a3b8; border-radius:4px; }
+  .compare-bar .value { width:80px; text-align:right; font-size:13px; }
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">ERP GAC</div>
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <div class="section">Penjualan</div>
+    <a href="penawaran.html">📄 Penawaran</a>
+    <a href="project.html" class="active">📊 Detail Project</a>
+    <div class="section">Operasional</div>
+    <a href="anggaran.html">💰 Anggaran</a>
+    <a href="pengadaan.html">🛒 Pengadaan & Biaya</a>
+    <div class="section">Keuangan</div>
+    <a href="keuangan.html">🏦 Laporan Keuangan</a>
+    <div class="section">HR</div>
+    <a href="hr.html">👥 Absensi</a>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      <div class="title">Detail Project</div>
+    </div>
+    <div class="content">
+      <div class="project-header">
+        <div>
+          <h2>Pengadaan & Pemasangan AC Kantor Pusat</h2>
+          <div class="meta">Customer: PT Maju Jaya | Kontrak: 01/GAC/IV/2026 | Status: <span class="badge" style="background:#dcfce7;color:#166534;">Aktif</span></div>
+        </div>
+        <div class="stats">
+          <div><div class="num">Rp 1.2M</div><div class="lbl">Nilai Project</div></div>
+          <div><div class="num">Rp 840jt</div><div class="lbl">Total Pengeluaran</div></div>
+          <div><div class="num">Rp 360jt</div><div class="lbl">Sisa Budget</div></div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="active" onclick="switchTab('tab1')">Pengajuan</button>
+        <button onclick="switchTab('tab2')">Pemasukan</button>
+        <button onclick="switchTab('tab3')">Pengeluaran</button>
+        <button onclick="switchTab('tab4')">Hutang / Piutang</button>
+        <button onclick="switchTab('tab5')">Anggaran vs Realisasi</button>
+        <button onclick="switchTab('tab6')">Dokumen</button>
+      </div>
+
+      <div class="tab-panel active" id="tab1">
+        <div class="panel">
+          <h3 style="font-size:16px; margin-bottom:12px;">Listing Pengajuan Barang & Jasa</h3>
+          <table>
+            <tr><th>No PR</th><th>Tanggal</th><th>Keterangan</th><th>Total</th><th>Status</th></tr>
+            <tr><td>PR-2026-0011</td><td>28 Apr 2026</td><td>AC Split 2 PK x 10 unit</td><td>Rp 45.000.000</td><td><span class="badge">Disetujui</span></td></tr>
+            <tr><td>PR-2026-0015</td><td>02 Mei 2026</td><td>Jasa Instalasi & Pipa</td><td>Rp 12.000.000</td><td><span class="badge" style="background:#fef9c3;color:#854d0e;">Menunggu</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab2">
+        <div class="panel">
+          <h3 style="font-size:16px; margin-bottom:12px;">Listing Pemasukan</h3>
+          <table>
+            <tr><th>Tanggal</th><th>Keterangan</th><th>Jumlah</th><th>Status</th></tr>
+            <tr><td>15 Apr 2026</td><td>DP 30% Kontrak</td><td>Rp 360.000.000</td><td><span class="badge" style="background:#dcfce7;color:#166534;">Diterima</span></td></tr>
+            <tr><td>05 Mei 2026</td><td>Termin 2 (BAST)</td><td>Rp 480.000.000</td><td><span class="badge" style="background:#fef9c3;color:#854d0e;">Menunggu</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab3">
+        <div class="panel">
+          <h3 style="font-size:16px; margin-bottom:12px;">Listing Pengeluaran</h3>
+          <table>
+            <tr><th>Tanggal</th><th>Keperluan</th><th>Vendor</th><th>Jumlah</th></tr>
+            <tr><td>29 Apr 2026</td><td>Pembayaran AC Supplier</td><td>PT CoolTech</td><td>Rp 42.000.000</td></tr>
+            <tr><td>30 Apr 2026</td><td>Biaya Transportasi</td><td>CV Transport</td><td>Rp 3.000.000</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab4">
+        <div class="panel">
+          <h3 style="font-size:16px; margin-bottom:12px;">Hutang / Piutang</h3>
+          <table>
+            <tr><th>Jenis</th><th>Pihak</th><th>Jumlah</th><th>Jatuh Tempo</th><th>Status</th></tr>
+            <tr><td>Piutang</td><td>PT Maju Jaya</td><td>Rp 480.000.000</td><td>10 Mei 2026</td><td><span class="badge" style="background:#fef9c3;color:#854d0e;">Belum Dibayar</span></td></tr>
+            <tr><td>Hutang</td><td>PT CoolTech</td><td>Rp 8.000.000</td><td>15 Mei 2026</td><td><span class="badge">Belum Dibayar</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab5">
+        <div class="panel">
+          <h3 style="font-size:16px; margin-bottom:16px;">Anggaran vs Realisasi</h3>
+          <div class="compare-bar">
+            <div class="label">Material & Jasa</div>
+            <div class="track"><div class="fill" style="width:72%; background:#3b82f6;"></div></div>
+            <div class="value">72%</div>
+          </div>
+          <div class="compare-bar">
+            <div class="label">Biaya Operasional</div>
+            <div class="track"><div class="fill" style="width:45%; background:#f59e0b;"></div></div>
+            <div class="value">45%</div>
+          </div>
+          <div class="compare-bar">
+            <div class="label">Pajak</div>
+            <div class="track"><div class="fill" style="width:60%; background:#10b981;"></div></div>
+            <div class="value">60%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab6">
+        <div class="panel">
+          <h3 style="font-size:16px; margin-bottom:12px;">Dokumen Arsip</h3>
+          <table>
+            <tr><th>Jenis</th><th>Nama File</th><th>Tanggal</th><th>Aksi</th></tr>
+            <tr><td>Kontrak</td><td>Kontrak_01_GAC_IV_2026.pdf</td><td>10 Apr 2026</td><td><a href="#">Download</a></td></tr>
+            <tr><td>BAST</td><td>BAST_AC_KantorPusat.pdf</td><td>04 Mei 2026</td><td><a href="#">Download</a></td></tr>
+            <tr><td>Invoice</td><td>INV-2026-0045.pdf</td><td>04 Mei 2026</td><td><a href="#">Download</a></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(id) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>
